@@ -49,6 +49,11 @@ async function read(file) {
 }
 
 for (const locale of locales) {
+	const supportFile =
+		locale === 'root'
+			? path.join(docsRoot, 'support.md')
+			: path.join(docsRoot, locale, 'support.md');
+	if (!existsSync(supportFile)) fail(`Missing support page: ${supportFile}`);
 	for (const slug of slugs) {
 		const file =
 			locale === 'root'
@@ -88,9 +93,11 @@ for (const file of await walk(publicRoot)) {
 if (existsSync(distRoot) && (await stat(distRoot)).isDirectory()) {
 	const samples = [
 		'index.html',
+		'support/index.html',
 		'guides/ai-agent-notifications/index.html',
 		'guides/notification-api/index.html',
 		'reference/mcp/index.html',
+		'zh/support/index.html',
 		'zh/guides/ai-agent-notifications/index.html',
 		'de/guides/self-hosted-notification-server/index.html',
 	];
@@ -106,6 +113,11 @@ if (existsSync(distRoot) && (await stat(distRoot)).isDirectory()) {
 		}
 	}
 	for (const locale of locales) {
+		const supportFile =
+			locale === 'root'
+				? path.join(distRoot, 'support', 'index.html')
+				: path.join(distRoot, locale, 'support', 'index.html');
+		if (!existsSync(supportFile)) fail(`Missing built support route: ${supportFile}`);
 		for (const slug of slugs) {
 			const file =
 				locale === 'root'

@@ -14,6 +14,7 @@
 - [Data Models](https://pushgo.dev/guides/data-models/): When to use Message, Event, Thing, or a combination of them.
 - [Self-hosting](https://pushgo.dev/guides/self-hosting/): Gateway deployment, reverse proxy, storage, private transports, and MCP/OAuth operations.
 - [MCP Reference](https://pushgo.dev/reference/mcp/): MCP endpoint, OAuth binding, tools, operations, and troubleshooting.
+- [Technical Support](https://pushgo.dev/support/): App Store technical support contact, troubleshooting details, and update guidance.
 - [Authentication](https://pushgo.dev/reference/auth/): Channel credentials, gateway tokens, compatibility keys, and MCP OAuth.
 - [Message API](https://pushgo.dev/reference/api-message/): One-off notification fields, responses, and compatibility endpoints.
 - [Event API](https://pushgo.dev/reference/api-event/): Create, update, and close lifecycle events.

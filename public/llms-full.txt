@@ -109,3 +109,9 @@ Questions:
 URL: https://pushgo.dev/reference/mcp/
 
 PushGo Gateway can act as an MCP HTTP Server. MCP-capable AI assistants can send Message, manage Event, and update Thing within authorized channel scopes. OAuth2 authorization is recommended so users bind channels in a browser instead of giving channel passwords to a model.
+
+## Technical Support
+
+URL: https://pushgo.dev/support/
+
+Use support@pushgo.dev for PushGo technical support, including App Store support requests for iOS, macOS, and watchOS. Include device model, operating system version, app version, platform, Gateway context, issue timing, reproduction steps, and safe logs or screenshots when useful. Do not send passwords, tokens, private keys, or other secrets by email.

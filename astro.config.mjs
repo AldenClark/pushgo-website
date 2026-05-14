@@ -369,6 +369,20 @@ export default defineConfig({
 					},
 				},
 				{
+					label: 'Technical Support',
+					link: '/support/',
+					translations: {
+						de: 'Technischer Support',
+						es: 'Soporte técnico',
+						fr: 'Support technique',
+							ja: '技術サポート',
+							ko: '기술 지원',
+							zh: '技术支持',
+							'zh-tw': '技術支援',
+							'zh-TW': '技術支援',
+					},
+				},
+				{
 					label: 'Changelog',
 					translations: {
 						de: 'Änderungsprotokoll',

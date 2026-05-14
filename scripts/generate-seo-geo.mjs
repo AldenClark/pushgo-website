@@ -1058,6 +1058,7 @@ function llmsTxt() {
 		['Data Models', '/guides/data-models/', 'When to use Message, Event, Thing, or a combination of them.'],
 		['Self-hosting', '/guides/self-hosting/', 'Gateway deployment, reverse proxy, storage, private transports, and MCP/OAuth operations.'],
 		['MCP Reference', '/reference/mcp/', 'MCP endpoint, OAuth binding, tools, operations, and troubleshooting.'],
+		['Technical Support', '/support/', 'App Store technical support contact, troubleshooting details, and update guidance.'],
 		['Authentication', '/reference/auth/', 'Channel credentials, gateway tokens, compatibility keys, and MCP OAuth.'],
 		['Message API', '/reference/api-message/', 'One-off notification fields, responses, and compatibility endpoints.'],
 		['Event API', '/reference/api-event/', 'Create, update, and close lifecycle events.'],
@@ -1080,6 +1081,7 @@ function llmsFullTxt() {
 			.join('\n')}\n\nQuestions:\n${data.questions.map(([q, a]) => `- ${q} ${a}`).join('\n')}`);
 	}
 	sections.push(`## MCP Reference\n\nURL: ${SITE}/reference/mcp/\n\nPushGo Gateway can act as an MCP HTTP Server. MCP-capable AI assistants can send Message, manage Event, and update Thing within authorized channel scopes. OAuth2 authorization is recommended so users bind channels in a browser instead of giving channel passwords to a model.`);
+	sections.push(`## Technical Support\n\nURL: ${SITE}/support/\n\nUse support@pushgo.dev for PushGo technical support, including App Store support requests for iOS, macOS, and watchOS. Include device model, operating system version, app version, platform, Gateway context, issue timing, reproduction steps, and safe logs or screenshots when useful. Do not send passwords, tokens, private keys, or other secrets by email.`);
 	return `# PushGo LLM Context\n\nThis file summarizes the most important PushGo documentation for AI retrieval systems and coding agents. It is not a replacement for the canonical pages.\n\n${sections.join('\n\n')}\n`;
 }
 
