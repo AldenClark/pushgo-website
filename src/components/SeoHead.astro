@@ -1,0 +1,130 @@
+---
+import DefaultHead from '@astrojs/starlight/components/Head.astro';
+
+const SITE_URL = 'https://pushgo.dev';
+const LOCALE_PREFIXES = new Set(['de', 'fr', 'ja', 'ko', 'es', 'zh', 'zh-tw']);
+
+const route = Astro.locals.starlightRoute;
+const entry = route?.entry;
+const title = entry?.data?.title ?? 'PushGo';
+const description =
+	entry?.data?.description ??
+	'Open-source notifications, events, entity-state synchronization, and MCP alerts for automation workflows.';
+const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).href;
+
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+const firstSegment = segments[0];
+const isLocalizedPath = firstSegment && LOCALE_PREFIXES.has(firstSegment);
+const defaultPathSegments = isLocalizedPath ? segments.slice(1) : segments;
+const defaultPath = `/${defaultPathSegments.join('/')}${defaultPathSegments.length ? '/' : ''}`;
+const xDefaultUrl = new URL(defaultPath, SITE_URL).href;
+
+const locale = route?.locale === 'root' ? 'en' : route?.locale ?? 'en';
+const isHome = defaultPath === '/';
+const normalizedPath = defaultPath.replace(/^\/|\/$/g, '');
+const isAppsPage = normalizedPath === 'guides/apps';
+const isDocPage = Boolean(entry);
+
+const breadcrumbItems = [
+	{
+		'@type': 'ListItem',
+		position: 1,
+		name: 'PushGo',
+		item: SITE_URL,
+	},
+];
+
+if (!isHome && normalizedPath) {
+	const pathParts = normalizedPath.split('/');
+	const sectionLabels = {
+		guides: 'Guides',
+		reference: 'Reference',
+		changelog: 'Changelog',
+	};
+	let currentPath = isLocalizedPath ? `/${firstSegment}` : '';
+	for (const [index, part] of pathParts.entries()) {
+		currentPath += `/${part}`;
+		const isLast = index === pathParts.length - 1;
+		breadcrumbItems.push({
+			'@type': 'ListItem',
+			position: breadcrumbItems.length + 1,
+			name: isLast
+				? title
+				: sectionLabels[part as keyof typeof sectionLabels] ?? part.replaceAll('-', ' '),
+			item: new URL(`${currentPath}/`, SITE_URL).href,
+		});
+	}
+}
+
+const jsonLdGraph = [
+	{
+		'@type': 'Organization',
+		'@id': `${SITE_URL}/#organization`,
+		name: 'PushGo',
+		url: SITE_URL,
+		logo: `${SITE_URL}/og-image.png`,
+		sameAs: [
+			'https://github.com/AldenClark/pushgo-gateway',
+			'https://github.com/AldenClark/pushgo-android',
+		],
+	},
+	{
+		'@type': 'WebSite',
+		'@id': `${SITE_URL}/#website`,
+		name: 'PushGo',
+		url: SITE_URL,
+		description,
+		publisher: { '@id': `${SITE_URL}/#organization` },
+		inLanguage: locale,
+	},
+];
+
+if (isDocPage) {
+	jsonLdGraph.push({
+		'@type': 'TechArticle',
+		headline: title,
+		description,
+		url: canonicalUrl,
+		inLanguage: locale,
+		isPartOf: { '@id': `${SITE_URL}/#website` },
+		publisher: { '@id': `${SITE_URL}/#organization` },
+	});
+}
+
+if (breadcrumbItems.length > 1) {
+	jsonLdGraph.push({
+		'@type': 'BreadcrumbList',
+		itemListElement: breadcrumbItems,
+	});
+}
+
+if (isAppsPage) {
+	jsonLdGraph.push({
+		'@type': 'SoftwareApplication',
+		name: 'PushGo',
+		applicationCategory: 'UtilitiesApplication',
+		operatingSystem: 'iOS, macOS, watchOS, Android',
+		description:
+			'PushGo provides released Apple platform clients, an Android client, and a self-hostable Gateway for notifications, events, and entity-state synchronization.',
+		url: new URL('/guides/apps/', SITE_URL).href,
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD',
+		},
+	});
+}
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': jsonLdGraph,
+};
+---
+
+<DefaultHead />
+<link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+<meta property="og:image" content={`${SITE_URL}/og-image.png`} />
+<meta property="og:image:alt" content="PushGo open-source notification and state synchronization" />
+<meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

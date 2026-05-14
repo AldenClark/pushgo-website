@@ -1,0 +1,35 @@
+<script>
+	const redirectKey = 'pushgo-language-redirected';
+	const localePrefixes = new Set(['de', 'fr', 'ja', 'ko', 'es', 'zh', 'zh-tw']);
+	const localeMatches = [
+		{ locale: 'zh-tw', codes: ['zh-tw', 'zh-hk', 'zh-mo', 'zh-hant'] },
+		{ locale: 'zh', codes: ['zh', 'zh-cn', 'zh-sg', 'zh-hans'] },
+		{ locale: 'de', codes: ['de'] },
+		{ locale: 'fr', codes: ['fr'] },
+		{ locale: 'ja', codes: ['ja'] },
+		{ locale: 'ko', codes: ['ko'] },
+		{ locale: 'es', codes: ['es'] },
+	];
+
+	const path = window.location.pathname.replace(/\/+$/, '') || '/';
+	const referrerPath = (() => {
+		try {
+			return document.referrer ? new URL(document.referrer).pathname : '';
+		} catch {
+			return '';
+		}
+	})();
+	const cameFromLocale = localePrefixes.has(referrerPath.split('/').filter(Boolean)[0]);
+
+	if (path === '/' && !sessionStorage.getItem(redirectKey) && !cameFromLocale) {
+		const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+		const normalized = languages.filter(Boolean).map((language) => language.toLowerCase());
+		const match = localeMatches.find(({ codes }) =>
+			normalized.some((language) =>
+				codes.some((code) => language === code || language.startsWith(`${code}-`))
+			)
+		);
+		sessionStorage.setItem(redirectKey, '1');
+		if (match) window.location.replace(`/${match.locale}/`);
+	}
+</script>

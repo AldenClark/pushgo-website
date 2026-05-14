@@ -1,0 +1,72 @@
+---
+title: Gateway-Änderungsprotokoll
+description: Versionsverlauf für PushGo Gateway.
+---
+## v1.2.8
+*13.05.2026*
+
+### Verbessert
+- Verbesserte Stabilität des Nachrichtenversands bei hoher Auslastung durch Behebung eines Zeitfehlers bei der Deduplizierungsbereinigung, der bei langsameren Fanout-Schreibvorgängen zu zeitweiligen Fehlern führen konnte.
+- Es wurde eine eindeutige 32-Abonnenten-pro-Channel-Limit-Antwort mit strukturiertem Fehlercode und lokalisierter Meldung hinzugefügt.
+- Reproduzierbare Benchmark-Tools für zukünftige Gateway-Kapazitätsprüfungen hinzugefügt.
+
+## v1.2.7
+*10.05.2026*
+
+### Verbessert
+- Verbesserte Upgrade-Prüfungen für SQLite, PostgreSQL und MySQL mit Legacy-Runtime-Migrationsszenarien, Schemakonvergenzprüfungen und Lese-/Schreibüberprüfung nach dem Upgrade.
+- Preflight-, Blackbox- und datenbankübergreifende Paritätsprüfungen vor der Veröffentlichung abgeschlossen.
+
+## v1.2.6
+*24.04.2026*
+
+### Verbessert
+- Den aktuellen Gateway-Snapshot nach v1.2.5 in die Release-Linie gebracht und Laufzeitversion, Paketmetadaten und Diagnosekennzeichnung angepasst.
+
+## v1.2.5
+*22.04.2026*
+
+### Behoben
+- Fehler bei der Bereinigung privater Wartungsarbeiten bei SQLite-Builds behoben, die `DELETE ... LIMIT` nicht unterstützen.
+
+### Verbessert
+- Private Transportprofile geben `wss_port` jetzt korrekt bekannt, wenn `PUSHGO_PUBLIC_BASE_URL` einen benutzerdefinierten externen Port enthält.
+
+## v1.2.4
+*22.04.2026*
+
+### Verbessert
+- Die Konfiguration des privaten Transports erfolgt jetzt explizit über `PUSHGO_PRIVATE_TRANSPORTS` / `--private-transports`, z. B. `none`, `wss` oder `quic,tcp,wss`.
+- Das Laufzeitverhalten richtet sich jetzt strikt nach ausgewählten Transporten: `/private/ws` wird nur gemountet, wenn `wss` aktiviert ist, und QUIC/TCP-Listener starten nur, wenn sie ausgewählt sind.
+- TLS-Abhängigkeitsprüfungen sind transportbewusst: QUIC erfordert Zertifikat+Schlüssel; TCP erfordert Zertifikat+Schlüssel nur, wenn TLS nicht ausgelagert ist; Für WSS sind keine privaten Transportzertifikate erforderlich.
+
+## v1.2.3
+*22.04.2026*
+
+### Verbessert
+- Profilgesteuerte Beobachtbarkeit für Diagnosen, strukturierte Trace-Ereignisse und Laufzeitstatistiken hinzugefügt.
+- Optimierte Diagnose rund um Privatkanal-Vorgänge bei gleichzeitiger Vereinheitlichung der Dispatch-/Laufzeit-Telemetrie in Statistiken und Trace-Pfaden.
+- Linux-Release-Artefakte und Laufzeitcontainer-Baseline auf Debian `bookworm-slim` abgestimmt.
+
+## v1.2.2
+*19.04.2026*
+
+### Verbessert
+- Die angesammelten Gateway-Änderungen nach v1.2.1 wurden in die Produktionsversions-Baseline übernommen und die Versionsdokumentation mit Diagnoseversionsmetadaten synchronisiert.
+
+## v1.2.1
+*15.04.2026*
+
+### Verbessert
+- Verbesserte ACK- und Pull-Zustellungszuverlässigkeit durch Zwischenspeichern von Provider-Wakeup-Zustellungen vor dem Versand.
+- Verbessertes Erstsynchronisierungsverhalten für Anbieter-Pull-Routen, wodurch verpasste Pulls nach dem Abonnieren/Synchronisieren reduziert werden.
+- Verbesserte Konsistenz der Provider-Pull-Abonnementinitialisierung für SQLite, PostgreSQL und MySQL.
+
+## v1.2.0
+*10.04.2026*
+
+### Verbessert
+- SemVer-Release-Benennung für Gateway übernommen.
+- Formelle Versionshinweise und Changelog-Governance hinzugefügt.
+- Die Weitergabe von Wakeup-Titeln über die Deploymentspfade der Anbieter hinweg wurde angepasst.
+- Verbesserte Fallback-Zuverlässigkeit für private Channels nach ACK-Timeout.

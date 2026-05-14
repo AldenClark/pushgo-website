@@ -1,0 +1,32 @@
+# PushGo
+
+> Open-source notifications, events, entity-state synchronization, and MCP alerts for automation, DevOps, IoT, self-hosting, and AI agent workflows.
+
+## Core Pages
+
+- [PushGo Overview](https://pushgo.dev/): What PushGo is, where to start, and how Message, Event, Thing, Gateway, and MCP fit together.
+- [AI Agent Notifications with MCP](https://pushgo.dev/guides/ai-agent-notifications/): How AI agents and chatbots can send PushGo notifications and state updates through MCP and OAuth.
+- [Push Notification API](https://pushgo.dev/guides/notification-api/): HTTP notification API examples for curl, scripts, webhooks, CI/CD, NAS, and automation services.
+- [Self-hosted Notification Server](https://pushgo.dev/guides/self-hosted-notification-server/): How to run PushGo Gateway as an open-source self-hosted notification server.
+- [DevOps and CI/CD Notifications](https://pushgo.dev/guides/devops-notifications/): How to model build, deployment, incident, and service health notifications.
+- [NAS, IoT, and Home Assistant Notifications](https://pushgo.dev/guides/home-automation-notifications/): How to model home automation, device, NAS, and sensor notifications.
+- [Migration from ntfy, Bark, or ServerChan](https://pushgo.dev/guides/ntfy-bark-serverchan-migration/): How to migrate existing notification scripts to PushGo.
+- [Data Models](https://pushgo.dev/guides/data-models/): When to use Message, Event, Thing, or a combination of them.
+- [Self-hosting](https://pushgo.dev/guides/self-hosting/): Gateway deployment, reverse proxy, storage, private transports, and MCP/OAuth operations.
+- [MCP Reference](https://pushgo.dev/reference/mcp/): MCP endpoint, OAuth binding, tools, operations, and troubleshooting.
+- [Authentication](https://pushgo.dev/reference/auth/): Channel credentials, gateway tokens, compatibility keys, and MCP OAuth.
+- [Message API](https://pushgo.dev/reference/api-message/): One-off notification fields, responses, and compatibility endpoints.
+- [Event API](https://pushgo.dev/reference/api-event/): Create, update, and close lifecycle events.
+- [Thing API](https://pushgo.dev/reference/api-thing/): Create and update persistent entity state.
+- [End-to-End Encryption](https://pushgo.dev/reference/e2ee/): Client-side decryption for sensitive fields.
+
+## Localized Documentation
+
+- [English](https://pushgo.dev/)
+- [简体中文](https://pushgo.dev/zh)
+- [繁體中文](https://pushgo.dev/zh-tw)
+- [Deutsch](https://pushgo.dev/de)
+- [Français](https://pushgo.dev/fr)
+- [日本語](https://pushgo.dev/ja)
+- [한국어](https://pushgo.dev/ko)
+- [Español](https://pushgo.dev/es)

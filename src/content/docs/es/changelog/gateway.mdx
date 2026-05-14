@@ -1,0 +1,72 @@
+---
+title: Registro de cambios de Gateway
+description: Historial de versiones de PushGo Gateway.
+---
+## v1.2.8
+*2026-05-13*
+
+### Mejorado
+- Se mejoró la estabilidad de envío de mensajes de alta carga al corregir un error en el tiempo de limpieza de deduplicación pendiente que podría causar fallas intermitentes durante escrituras de distribución más lentas.
+- Se agregó una respuesta clara de límite de 32 suscriptores por canal con un código de error estructurado y un mensaje localizado.
+- Se agregaron herramientas de referencia reproducibles para futuras comprobaciones de capacidad del Gateway.
+
+##v1.2.7
+*2026-05-10*
+
+### Mejorado
+- Se reforzaron las comprobaciones de actualización de SQLite, PostgreSQL y MySQL con escenarios de migración de tiempo de ejecución heredado, comprobaciones de convergencia de esquemas y verificación de lectura/escritura posterior a la actualización.
+- Se completaron las auditorías de verificación previa, caja negra y paridad entre bases de datos antes del lanzamiento.
+
+## v1.2.6
+*2026-04-24*
+
+### Mejorado
+- Se incorporó la instantánea actual de Gateway posterior a la versión 1.2.5 a la línea de lanzamiento y se alineó la versión del tiempo de ejecución, los metadatos del paquete y el etiquetado de diagnóstico.
+
+##v1.2.5
+*2026-04-22*
+
+### Fijo
+- Se corrigieron fallas de limpieza de mantenimiento privado en compilaciones SQLite que no son compatibles con `DELETE ... LIMIT`.
+
+### Mejorado
+- Los perfiles de transporte privado ahora anuncian correctamente `wss_port` cuando `PUSHGO_PUBLIC_BASE_URL` incluye un puerto externo personalizado.
+
+## v1.2.4
+*2026-04-22*
+
+### Mejorado
+- La configuración del transporte privado ahora es explícita a través de `PUSHGO_PRIVATE_TRANSPORTS` / `--private-transports`, como `none`, `wss` o `quic,tcp,wss`.
+- El comportamiento del tiempo de ejecución ahora sigue estrictamente los transportes seleccionados: `/private/ws` se monta solo cuando `wss` está habilitado y los oyentes QUIC/TCP se inician solo cuando se seleccionan.
+- Las comprobaciones de dependencia de TLS tienen en cuenta el transporte: QUIC requiere certificado+clave; TCP requiere certificado+clave solo cuando TLS no está descargado; WSS no requiere certificados de transporte privado.
+
+## v1.2.3
+*2026-04-22*
+
+### Mejorado
+- Se agregó observabilidad basada en perfiles para diagnósticos, eventos de seguimiento estructurados y estadísticas de tiempo de ejecución.
+- Diagnósticos optimizados en torno a operaciones de canales privados al tiempo que unifica la telemetría de despacho/tiempo de ejecución en estadísticas y rutas de seguimiento.
+- Alineación de los artefactos de lanzamiento de Linux y la línea base del contenedor de tiempo de ejecución en Debian `bookworm-slim`.
+
+## v1.2.2
+*2026-04-19*
+
+### Mejorado
+- Se incorporaron los cambios acumulados de Gateway después de la versión 1.2.1 a la línea base de la versión de producción y se sincronizó la documentación de la versión con los metadatos de la versión de diagnóstico.
+
+## v1.2.1
+*2026-04-15*
+
+### Mejorado
+- Se mejoró la confiabilidad de la entrega de extracción ACK + al almacenar en caché las entregas de activación del proveedor antes del envío.
+- Se mejoró el comportamiento de primera sincronización para las rutas de extracción del proveedor, lo que reduce las extracciones perdidas después de la suscripción/sincronización.
+- Se mejoró la coherencia de la inicialización de la suscripción de extracción de proveedores en SQLite, PostgreSQL y MySQL.
+
+## v1.2.0
+*2026-04-10*
+
+### Mejorado
+- Se adoptó el nombre de la versión SemVer para Gateway.
+- Se agregaron notas de versión formales y gobernanza del registro de cambios.
+- Propagación alineada del título de activación entre las rutas de entrega del proveedor.
+- Se mejoró la confiabilidad del respaldo del canal privado después del tiempo de espera de ACK.

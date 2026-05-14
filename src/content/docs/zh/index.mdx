@@ -1,0 +1,110 @@
+---
+title: PushGo
+description: 面向个人、运维、IoT 与自动化场景的通知、事件与实体同步网关。
+template: splash
+hero:
+  tagline: 用 Message、Event 和 Thing 统一表达提醒、过程与状态。
+  image:
+    file: ../../../assets/logo.png
+  actions:
+    - text: 快速上手
+      link: /zh/guides/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: 选择数据模型
+      link: /zh/guides/data-models/
+      icon: document
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+PushGo 是一个开源通知与状态同步系统。你可以直接使用公共网关发送第一条通知，也可以部署自己的 Gateway，把数据、鉴权、私有通道和 MCP/OAuth 控制在自己的基础设施里。
+
+## 先走哪条路径
+
+<div class="path-grid">
+  <a class="path-card" href="/zh/guides/getting-started/">
+    <span class="path-card__label">第一次接入</span>
+    <strong class="path-card__title">快速上手</strong>
+    <span class="path-card__text">创建或订阅 Channel，选择 Gateway，并发送一条可验证的 Message。</span>
+  </a>
+  <a class="path-card" href="/zh/guides/data-models/">
+    <span class="path-card__label">判断数据模型</span>
+    <strong class="path-card__title">数据模型</strong>
+    <span class="path-card__text">弄清 Message、Event、Thing 分别适合什么场景，以及什么时候组合使用。</span>
+  </a>
+  <a class="path-card" href="/zh/guides/use-cases/">
+    <span class="path-card__label">接入真实场景</span>
+    <strong class="path-card__title">典型场景</strong>
+    <span class="path-card__text">把 NAS 告警、CI/CD 流水线、Home Assistant 和个人自动化映射到 PushGo。</span>
+  </a>
+  <a class="path-card" href="/zh/guides/migration/">
+    <span class="path-card__label">迁移已有脚本</span>
+    <strong class="path-card__title">迁移指南</strong>
+    <span class="path-card__text">从 ntfy、Bark、ServerChan 或普通 Webhook 迁移，先保留现有流程再逐步升级。</span>
+  </a>
+  <a class="path-card" href="/zh/guides/self-hosting/">
+    <span class="path-card__label">掌控自己的 Gateway</span>
+    <strong class="path-card__title">私有部署</strong>
+    <span class="path-card__text">部署自己的 Gateway，控制鉴权、存储、私有通道和运维策略。</span>
+  </a>
+  <a class="path-card" href="/zh/reference/mcp/">
+    <span class="path-card__label">连接 AI 助手</span>
+    <strong class="path-card__title">MCP 参考</strong>
+    <span class="path-card__text">让 MCP 客户端在授权 Channel 范围内发送 Message、管理 Event、更新 Thing。</span>
+  </a>
+</div>
+
+## 下载与端点
+
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### 已发布组件
+    - **iOS / macOS / watchOS**: [在 App Store 下载](https://apps.apple.com/app/pushgo)
+    - **Android**: [下载 APK](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [二进制与 Docker 镜像](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### 公共网关
+    - **Global**: `https://gateway.pushgo.dev`
+    - **中国大陆**: `https://gateway.pushgo.cn`
+  </div>
+</div>
+
+## 为什么选择 PushGo
+
+<CardGrid stagger>
+  <Card title="三类数据模型" icon="document">
+    Message 处理一次性提醒，Event 跟踪可多次更新的生命周期，Thing 维护设备、服务或任务的当前状态。
+  </Card>
+  <Card title="平台原生投递" icon="rocket">
+    Apple 客户端通过 APNs 接收系统通知，Android 客户端可结合 FCM 和私有通道获得更灵活的同步能力。
+  </Card>
+  <Card title="可私有部署" icon="setting">
+    Gateway 可运行在自己的服务器上，支持持久化数据库、网关级鉴权、私有通道、可观测性和反向代理部署。
+  </Card>
+  <Card title="端到端加密字段" icon="heart">
+    敏感展示字段可以放入 `ciphertext`，由客户端本地解密，Gateway 只负责透传、鉴权和分发。
+  </Card>
+  <Card title="迁移成本低" icon="star">
+    兼容 ntfy、Bark 和 ServerChan 入口，适合先迁移现有脚本，再逐步升级到原生数据模型。
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Gateway 可作为 MCP HTTP Server，让 AI 助手在用户授权频道范围内发送 Message、管理 Event 和更新 Thing。
+  </Card>
+</CardGrid>
+
+## 最小请求示例
+
+```bash
+curl -X POST https://gateway.pushgo.cn/message \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "YOUR_CHANNEL_ID",
+    "password": "YOUR_CHANNEL_PASSWORD",
+    "title": "来自 PushGo 的问候",
+    "body": "这是一条测试通知。"
+  }'
+```
+
+接下来阅读 [快速上手](/zh/guides/getting-started/)，用真实频道完成第一次发送。

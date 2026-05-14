@@ -1,0 +1,123 @@
+---
+title: PushGo
+description: Notification, event, and entity-state synchronization for personal automation, operations, IoT, and AI workflows.
+template: splash
+hero:
+  tagline: Use Message, Event, and Thing to model alerts, processes, and state.
+  image:
+    file: ../../assets/logo.png
+  actions:
+    - text: Get Started
+      link: /guides/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: Choose a Model
+      link: /guides/data-models/
+      icon: document
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import LanguageRedirect from '../../components/LanguageRedirect.astro';
+
+<LanguageRedirect />
+
+PushGo is an open-source notification and state synchronization system. Use the public Gateway to send your first notification, or run your own Gateway to control data paths, authentication, private transports, and MCP/OAuth.
+
+## Choose Your Path
+
+<div class="path-grid">
+  <a class="path-card" href="/guides/getting-started/">
+    <span class="path-card__label">First notification</span>
+    <strong class="path-card__title">Getting Started</strong>
+    <span class="path-card__text">Create or subscribe to a Channel, choose a Gateway, and send a working Message.</span>
+  </a>
+  <a class="path-card" href="/guides/data-models/">
+    <span class="path-card__label">Model the right data</span>
+    <strong class="path-card__title">Data Models</strong>
+    <span class="path-card__text">Decide when to use Message, Event, Thing, or a combination of them.</span>
+  </a>
+  <a class="path-card" href="/guides/use-cases/">
+    <span class="path-card__label">Connect real workflows</span>
+    <strong class="path-card__title">Use Cases</strong>
+    <span class="path-card__text">Map NAS alerts, CI/CD pipelines, Home Assistant, and personal automations to PushGo.</span>
+  </a>
+  <a class="path-card" href="/guides/migration/">
+    <span class="path-card__label">Move existing scripts</span>
+    <strong class="path-card__title">Migration Guide</strong>
+    <span class="path-card__text">Port ntfy, Bark, ServerChan, or webhook scripts without rebuilding everything at once.</span>
+  </a>
+  <a class="path-card" href="/guides/self-hosting/">
+    <span class="path-card__label">Control the Gateway</span>
+    <strong class="path-card__title">Self-Hosting</strong>
+    <span class="path-card__text">Deploy your own Gateway for private transports, authentication, storage, and operations.</span>
+  </a>
+  <a class="path-card" href="/reference/mcp/">
+    <span class="path-card__label">Use AI assistants</span>
+    <strong class="path-card__title">MCP Reference</strong>
+    <span class="path-card__text">Let MCP clients send Message, manage Event, and update Thing inside authorized Channel scopes.</span>
+  </a>
+  <a class="path-card" href="/guides/ai-agent-notifications/">
+    <span class="path-card__label">AI agent path</span>
+    <strong class="path-card__title">AI Agent Notifications</strong>
+    <span class="path-card__text">Use MCP and OAuth so agents and chatbots can notify users, update Event, and sync Thing.</span>
+  </a>
+  <a class="path-card" href="/guides/notification-api/">
+    <span class="path-card__label">HTTP entry point</span>
+    <strong class="path-card__title">Notification API</strong>
+    <span class="path-card__text">Send notifications from curl, scripts, webhooks, CI/CD, NAS, and automation services.</span>
+  </a>
+</div>
+
+## Downloads and Endpoints
+
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### Released Components
+    - **iOS / macOS / watchOS**: [Download from the App Store](https://apps.apple.com/app/pushgo)
+    - **Android**: [Download APK](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [Binaries and Docker images](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### Public Gateways
+    - **Global**: `https://gateway.pushgo.dev`
+    - **Mainland China**: `https://gateway.pushgo.cn`
+  </div>
+</div>
+
+## Why PushGo
+
+<CardGrid stagger>
+  <Card title="Three data models" icon="document">
+    Message handles one-off alerts, Event tracks updatable lifecycles, and Thing maintains current state for devices, services, or tasks.
+  </Card>
+  <Card title="Native platform delivery" icon="rocket">
+    Apple clients receive system notifications through APNs; Android clients can combine FCM with private transports for more flexible synchronization.
+  </Card>
+  <Card title="Self-hostable" icon="setting">
+    Run the Gateway on your own infrastructure with persistent storage, gateway authentication, private transports, observability, and reverse proxies.
+  </Card>
+  <Card title="End-to-end encrypted fields" icon="heart">
+    Sensitive fields can be placed in `ciphertext` and decrypted locally by clients while the Gateway only authenticates, relays, and dispatches.
+  </Card>
+  <Card title="Low migration cost" icon="star">
+    Compatibility endpoints for ntfy, Bark, and ServerChan let existing scripts keep working while you move to native PushGo models.
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    The Gateway can act as an MCP HTTP Server so AI assistants can send Message, manage Event, and update Thing within authorized channel scopes.
+  </Card>
+</CardGrid>
+
+## Minimal Request
+
+```bash
+curl -X POST https://gateway.pushgo.dev/message \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "YOUR_CHANNEL_ID",
+    "password": "YOUR_CHANNEL_PASSWORD",
+    "title": "Hello from PushGo",
+    "body": "This is a test notification."
+  }'
+```
+
+Continue with [Getting Started](/guides/getting-started/) to send this request with a real channel.

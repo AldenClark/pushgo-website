@@ -1,0 +1,44 @@
+---
+title: Android Changelog
+description: Version history for PushGo Android app.
+---
+
+## v1.2.3
+*2026-05-11*
+
+### Improved
+- Improved message deletion with undoable local deletion for easier recovery.
+- Added an action to mark all currently displayed messages as read.
+- Improved message filtering with clearer multi-select facet controls aligned with tag search.
+- Improved message receiving reliability and in-app message state consistency.
+
+### Fixed
+- Fixed animated image detection and playback in Markdown/detail rendering.
+- Fixed detail-page media loading so fetches no longer block screen responsiveness.
+
+## v1.2.2
+*2026-04-24*
+
+### Improved
+- Improved encrypted notification payload handling so decrypted message, URL, image, and event/object metadata remain consistent across views.
+- Added clearer channel and decryption status indicators across message, event, and object screens.
+- Improved detail image loading and tap behavior with explicit loading/error placeholders.
+
+## v1.2.1
+*2026-04-22*
+
+### Improved
+- Queued and retried inbound messages during app startup to reduce early-runtime message loss.
+- Improved private/provider ingress consistency with stricter routing and safer duplicate suppression.
+- Improved settings and message detail state updates with clearer load-failure feedback.
+- Improved event and object detail synchronization, pagination, and close/delete interactions.
+
+## v1.2.0
+*2026-04-20*
+
+### Fixed
+- Fixed Android update install-blocked flow so users get an in-app error alert immediately.
+- Fixed blocked-install fallback so users can continue via Android system installer in one tap.
+
+### Improved
+- Improved update continuity and recovery path for Android in-app update failures.

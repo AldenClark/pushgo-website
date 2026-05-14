@@ -1,0 +1,14 @@
+{
+  "search.label": "搜索文档",
+  "search.shortcutLabel": "搜索",
+  "tableOfContents.onThisPage": "本页内容",
+  "page.editLink": "在 GitHub 上编辑此页",
+  "page.lastUpdated": "最后更新于：",
+  "page.nextLink": "下一篇",
+  "page.previousLink": "上一篇",
+  "404.text": "抱歉，找不到您要查看的页面。请检查 URL 或尝试使用搜索功能。",
+  "aside.note": "备注",
+  "aside.tip": "提示",
+  "aside.caution": "注意",
+  "aside.danger": "危险"
+}

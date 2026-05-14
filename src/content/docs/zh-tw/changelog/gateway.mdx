@@ -1,0 +1,72 @@
+---
+title: Gateway 更新記錄
+description: PushGo Gateway 版本更新歷史。
+---
+## v1.2.8
+*2026-05-13*
+
+### 改進
+- 提高了高負載訊息分發穩定性，修復 pending dedupe 清理時間視窗計算問題，避免在慢速 fanout 寫入期間出現間歇性失敗。
+- 增加明確的單一 Channel 32 個訂閱者限制回應，包含結構化錯誤碼和在地化訊息，便於用戶端可預期處理滿員 Channel。
+- 增加可重複的容量基準測試工具，方便後續做 Gateway 容量回歸檢查。
+
+## v1.2.7
+*2026-05-10*
+
+### 改進
+- 強化 SQLite、PostgreSQL 和 MySQL 的升級可靠度驗證，涵蓋舊Runtime遷移、schema 收斂和升級後讀寫行為。
+- 完成釋出前 preflight、blackbox 和跨資料庫一致性審計，提升生產釋出可信度。
+
+## v1.2.6
+*2026-04-24*
+
+### 改進
+- 將 v1.2.5 之後的當前 Gateway 更新納入釋出線，確保Runtime版本、包元資料和診斷標籤保持一致。
+
+## v1.2.5
+*2026-04-22*
+
+### 修復
+- 修復部分 SQLite 環境中私人維護清理失敗的問題，避免依賴並非所有 SQLite 構建都支援的 `DELETE ... LIMIT` 語法。
+
+### 改進
+- 當 `PUSHGO_PUBLIC_BASE_URL` 包含自定義埠時，私人傳輸 profile 會正確宣告 `wss_port`，讓用戶端使用一致的外部入口。
+
+## v1.2.4
+*2026-04-22*
+
+### 改進
+- 私人通道配置改為明確 `PUSHGO_PRIVATE_TRANSPORTS` / `--private-transports`，支援 `none`、`wss`、`quic,tcp,wss` 等明確組合。
+- Runtime嚴格遵循選中的傳輸：只有啟用 `wss` 才掛載 `/private/ws`，只有啟用 QUIC/TCP 才啟動對應監聽。
+- TLS 依賴檢查按傳輸型別區分：QUIC 必須配置憑證和私鑰；TCP 只在未 TLS offload 時需要；WSS 不需要私人通道憑證。
+
+## v1.2.3
+*2026-04-22*
+
+### 改進
+- 引入基於 profile 的可觀測性模型，統一診斷、結構化 Trace 和Runtime統計。
+- 診斷面聚焦私人通道維運端點，分送與Runtime間遙測統一進入 stats 與 trace 路徑。
+- Linux 發佈產物和Runtime容器基線對齊到 Debian `bookworm-slim`，降低部署環境差異。
+
+## v1.2.2
+*2026-04-19*
+
+### 改進
+- 將 v1.2.1 之後積累的 Gateway 變更納入生產釋出基線，並同步釋出文件與診斷版本資訊。
+
+## v1.2.1
+*2026-04-15*
+
+### 改進
+- 在 provider 分發前快取喚醒交付，提升 ACK + pull 的可靠性。
+- 改進訂閱/同步後的首次 provider pull 行為，減少冷啟動拉取遺失。
+- 改進 SQLite、PostgreSQL 和 MySQL 啟動時 provider-pull 訂閱初始化一致性。
+
+## v1.2.0
+*2026-04-10*
+
+### 改進
+- Gateway 採用 SemVer 發行命名。
+- 增加正式釋出說明和 Changelog 治理。
+- 對齊廠商 Channel 喚醒標題傳播路徑。
+- 改進私人通道 ACK 超時後的回退可靠性。

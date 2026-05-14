@@ -1,0 +1,108 @@
+---
+title: PushGo
+description: 개인 자동화, 운영, IoT, AI 워크플로를 위한 알림, Event, 상태 동기화.
+template: splash
+hero:
+  tagline: Message, Event, Thing으로 알림, 진행 과정, 현재 상태를 표현합니다.
+  image:
+    file: ../../../assets/logo.png
+  actions:
+    - text: 시작하기
+      link: /ko/guides/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: 모델 선택
+      link: /ko/guides/data-models/
+      icon: document
+---
+
+PushGo는 알림과 상태 동기화를 위한 오픈 소스 시스템입니다. 공개 Gateway로 첫 알림을 보낼 수 있고, 데이터 경로, 인증, private transport, MCP/OAuth를 직접 제어해야 한다면 자체 Gateway를 운영할 수 있습니다.
+
+## 목적별 시작점
+
+<div class="path-grid">
+  <a class="path-card" href="/ko/guides/getting-started/">
+    <span class="path-card__label">첫 연결</span>
+    <strong class="path-card__title">시작하기</strong>
+    <span class="path-card__text">Channel을 만들거나 구독하고 Gateway를 선택한 뒤 동작하는 Message를 보냅니다.</span>
+  </a>
+  <a class="path-card" href="/ko/guides/data-models/">
+    <span class="path-card__label">모델 선택</span>
+    <strong class="path-card__title">데이터 모델</strong>
+    <span class="path-card__text">Message, Event, Thing을 언제 쓰고 어떻게 조합할지 판단합니다.</span>
+  </a>
+  <a class="path-card" href="/ko/guides/use-cases/">
+    <span class="path-card__label">실제 워크플로 연결</span>
+    <strong class="path-card__title">사용 사례</strong>
+    <span class="path-card__text">NAS, CI/CD, Home Assistant, 개인 자동화를 PushGo 모델에 매핑합니다.</span>
+  </a>
+  <a class="path-card" href="/ko/guides/migration/">
+    <span class="path-card__label">기존 스크립트 이전</span>
+    <strong class="path-card__title">마이그레이션 가이드</strong>
+    <span class="path-card__text">ntfy, Bark, ServerChan, Webhook을 한 번에 다시 만들지 않고 단계적으로 이전합니다.</span>
+  </a>
+  <a class="path-card" href="/ko/guides/self-hosting/">
+    <span class="path-card__label">Gateway 직접 운영</span>
+    <strong class="path-card__title">셀프 호스팅</strong>
+    <span class="path-card__text">인증, 저장소, private transport, 운영 정책을 직접 제어합니다.</span>
+  </a>
+  <a class="path-card" href="/ko/reference/mcp/">
+    <span class="path-card__label">AI 어시스턴트 연결</span>
+    <strong class="path-card__title">MCP 참조</strong>
+    <span class="path-card__text">MCP 클라이언트가 승인된 Channel 안에서 Message, Event, Thing을 다루게 합니다.</span>
+  </a>
+</div>
+
+## 다운로드와 엔드포인트
+
+### 공개된 구성 요소
+
+- **iOS / macOS / watchOS**: [App Store에서 다운로드](https://apps.apple.com/app/pushgo)
+- **Android**: [APK 다운로드](https://github.com/AldenClark/pushgo-android/releases)
+- **Gateway**: [바이너리와 Docker 이미지](https://github.com/AldenClark/pushgo-gateway/releases)
+
+### 공개 Gateway
+
+- **Global**: `https://gateway.pushgo.dev`
+- **중국 본토**: `https://gateway.pushgo.cn`
+
+## PushGo를 선택하는 이유
+
+### 세 가지 데이터 모델
+
+Message는 한 번 보내는 알림에 적합합니다. Event는 여러 번 업데이트되는 수명 주기를 표현합니다. Thing은 디바이스, 서비스, 작업의 현재 상태를 유지합니다.
+
+### 플랫폼 네이티브 전달
+
+Apple 클라이언트는 APNs를 통해 시스템 알림을 받습니다. Android 클라이언트는 FCM과 private transport를 조합해 더 유연하게 동기화할 수 있습니다.
+
+### 셀프 호스팅
+
+Gateway는 영구 데이터베이스, Gateway 인증, private transport, 관측성, reverse proxy 구성을 포함해 자체 인프라에서 운영할 수 있습니다.
+
+### 엔드투엔드 암호화 필드
+
+민감한 내용은 `ciphertext`에 두고 클라이언트가 로컬에서 복호화할 수 있습니다. Gateway는 인증, 중계, 전달만 담당하며 평문 내용을 이해할 필요가 없습니다.
+
+### 낮은 마이그레이션 비용
+
+ntfy, Bark, ServerChan 호환 엔드포인트를 제공하므로 기존 스크립트를 유지하면서 PushGo 네이티브 모델로 점진적으로 이전할 수 있습니다.
+
+### MCP/OAuth
+
+Gateway는 MCP HTTP Server로 동작할 수 있습니다. AI 어시스턴트는 승인된 채널 범위 안에서 Message를 보내고, Event를 관리하고, Thing을 업데이트할 수 있습니다.
+
+## 최소 요청
+
+```bash
+curl -X POST https://gateway.pushgo.dev/message \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "YOUR_CHANNEL_ID",
+    "password": "YOUR_CHANNEL_PASSWORD",
+    "title": "Hello from PushGo",
+    "body": "This is a test notification."
+  }'
+```
+
+다음으로 [시작하기](/ko/guides/getting-started/)를 읽고 실제 채널에서 이 요청을 전송합니다.

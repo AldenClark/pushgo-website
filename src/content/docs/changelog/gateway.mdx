@@ -1,0 +1,73 @@
+---
+title: Gateway Changelog
+description: Version history for PushGo Gateway.
+---
+
+## v1.2.8
+*2026-05-13*
+
+### Improved
+- Improved high-load message dispatch stability by fixing a pending dedupe cleanup timing bug that could cause intermittent failures during slower fanout writes.
+- Added a clear 32-subscriber-per-channel limit response with structured error code and localized message.
+- Added reproducible benchmark tooling for future gateway capacity checks.
+
+## v1.2.7
+*2026-05-10*
+
+### Improved
+- Strengthened SQLite, PostgreSQL, and MySQL upgrade checks with legacy-runtime migration scenarios, schema convergence checks, and post-upgrade read/write verification.
+- Completed preflight, blackbox, and cross-database parity audit passes before release.
+
+## v1.2.6
+*2026-04-24*
+
+### Improved
+- Brought the current Gateway snapshot after v1.2.5 into the release line and aligned runtime version, package metadata, and diagnostic labeling.
+
+## v1.2.5
+*2026-04-22*
+
+### Fixed
+- Fixed private maintenance cleanup failures on SQLite builds that do not support `DELETE ... LIMIT`.
+
+### Improved
+- Private transport profiles now advertise `wss_port` correctly when `PUSHGO_PUBLIC_BASE_URL` includes a custom external port.
+
+## v1.2.4
+*2026-04-22*
+
+### Improved
+- Private transport configuration is now explicit through `PUSHGO_PRIVATE_TRANSPORTS` / `--private-transports`, such as `none`, `wss`, or `quic,tcp,wss`.
+- Runtime behavior now follows selected transports strictly: `/private/ws` is mounted only when `wss` is enabled, and QUIC/TCP listeners start only when selected.
+- TLS dependency checks are transport-aware: QUIC requires cert+key; TCP requires cert+key only when TLS is not offloaded; WSS does not require private transport certs.
+
+## v1.2.3
+*2026-04-22*
+
+### Improved
+- Added profile-driven observability for diagnostics, structured Trace events, and runtime stats.
+- Streamlined diagnostics around private-channel operations while unifying dispatch/runtime telemetry into stats and trace paths.
+- Aligned Linux release artifacts and runtime container baseline on Debian `bookworm-slim`.
+
+## v1.2.2
+*2026-04-19*
+
+### Improved
+- Brought accumulated Gateway changes after v1.2.1 into the production release baseline and synchronized release documentation with diagnostic version metadata.
+
+## v1.2.1
+*2026-04-15*
+
+### Improved
+- Improved ACK + pull delivery reliability by caching provider wakeup deliveries before dispatch.
+- Improved first-sync behavior for provider pull routes, reducing missed pulls after subscribe/sync.
+- Improved provider-pull subscription initialization consistency across SQLite, PostgreSQL, and MySQL.
+
+## v1.2.0
+*2026-04-10*
+
+### Improved
+- Adopted SemVer release naming for Gateway.
+- Added formal release notes and Changelog governance.
+- Aligned wakeup title propagation across provider delivery paths.
+- Improved private channel fallback reliability after ACK timeout.

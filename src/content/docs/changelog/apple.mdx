@@ -1,0 +1,32 @@
+---
+title: Apple Changelog
+description: Version history for PushGo iOS, macOS, and watchOS apps.
+---
+
+## v1.2.2
+*2026-05-11*
+
+### Improved
+- Added tag-aware message search and multi-select facet filters with tag counts.
+- Improved list filtering and discovery across messages, events, and objects.
+- Unified destructive delete/close actions with undoable local deletion behavior.
+- Improved error feedback consistency across iOS, macOS, and watchOS.
+- Hardened notification ingress recovery and Apple Watch delivery reliability.
+
+## v1.2.1
+*2026-04-24*
+
+### Improved
+- Included Apple-side reliability updates accumulated after v1.2.0.
+- Improved overall reliability and behavior consistency across iOS, macOS, and watchOS.
+- Improved Markdown and remote image rendering stability in shared Apple UI surfaces.
+
+## v1.2.0
+*2026-04-20*
+
+### Improved
+- Improved ACK + pull reliability after provider token refresh by triggering ingress sync immediately.
+- Improved delivery continuity on iOS and macOS when provider route bindings refresh.
+
+### Fixed
+- Fixed a timing gap where provider pull could lag behind token updates.

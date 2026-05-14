@@ -1,0 +1,108 @@
+---
+title: PushGo
+description: Synchronisation des notifications, des événements et des états pour l'automatisation personnelle, l'exploitation, l'IoT et les workflows d'IA.
+template: splash
+hero:
+  tagline: Modélisez les alertes, les processus et les états avec Message, Event et Thing.
+  image:
+    file: ../../../assets/logo.png
+  actions:
+    - text: Bien démarrer
+      link: /fr/guides/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: Choisir un modèle
+      link: /fr/guides/data-models/
+      icon: document
+---
+
+PushGo est un système open source de notification et de synchronisation d'état. Vous pouvez utiliser le Gateway public pour envoyer une première notification, ou exploiter votre propre Gateway afin de garder la maîtrise des chemins de données, de l'authentification, des transports privés et de MCP/OAuth.
+
+## Quel point d'entrée choisir ?
+
+<div class="path-grid">
+  <a class="path-card" href="/fr/guides/getting-started/">
+    <span class="path-card__label">Premier essai</span>
+    <strong class="path-card__title">Bien démarrer</strong>
+    <span class="path-card__text">Créer ou rejoindre un Channel, choisir un Gateway et envoyer un Message fonctionnel.</span>
+  </a>
+  <a class="path-card" href="/fr/guides/data-models/">
+    <span class="path-card__label">Choisir un modèle</span>
+    <strong class="path-card__title">Modèles de données</strong>
+    <span class="path-card__text">Savoir quand utiliser Message, Event, Thing ou une combinaison des trois.</span>
+  </a>
+  <a class="path-card" href="/fr/guides/use-cases/">
+    <span class="path-card__label">Brancher des workflows</span>
+    <strong class="path-card__title">Cas d’usage</strong>
+    <span class="path-card__text">Relier NAS, CI/CD, Home Assistant et automatisations personnelles à PushGo.</span>
+  </a>
+  <a class="path-card" href="/fr/guides/migration/">
+    <span class="path-card__label">Migrer des scripts</span>
+    <strong class="path-card__title">Guide de migration</strong>
+    <span class="path-card__text">Migrer depuis ntfy, Bark, ServerChan ou des webhooks sans tout réécrire immédiatement.</span>
+  </a>
+  <a class="path-card" href="/fr/guides/self-hosting/">
+    <span class="path-card__label">Exploiter son Gateway</span>
+    <strong class="path-card__title">Auto-hébergement</strong>
+    <span class="path-card__text">Contrôler authentification, stockage, transports privés et exploitation du Gateway.</span>
+  </a>
+  <a class="path-card" href="/fr/reference/mcp/">
+    <span class="path-card__label">Connecter l’IA</span>
+    <strong class="path-card__title">Référence MCP</strong>
+    <span class="path-card__text">Permettre aux clients MCP d’envoyer Message, gérer Event et mettre à jour Thing dans les Channels autorisés.</span>
+  </a>
+</div>
+
+## Téléchargements et points d'accès
+
+### Composants publiés
+
+- **iOS / macOS / watchOS** : [Télécharger depuis l'App Store](https://apps.apple.com/app/pushgo)
+- **Android** : [Télécharger l'APK](https://github.com/AldenClark/pushgo-android/releases)
+- **Gateway** : [Binaires et images Docker](https://github.com/AldenClark/pushgo-gateway/releases)
+
+### Gateways publics
+
+- **Global** : `https://gateway.pushgo.dev`
+- **Chine continentale** : `https://gateway.pushgo.cn`
+
+## Pourquoi PushGo ?
+
+### Trois modèles de données
+
+Message sert aux notifications ponctuelles. Event décrit un cycle de vie qui peut être mis a jour. Thing conserve l'état courant d'un appareil, d'un service ou d'une tâche.
+
+### Distribution native
+
+Les clients Apple reçoivent les notifications système via APNs. Les clients Android peuvent combiner FCM avec des transports privés pour une synchronisation plus flexible.
+
+### Auto-hébergement
+
+Le Gateway peut fonctionner dans votre propre infrastructure avec base persistante, authentification de Gateway, transports privés, observabilité et prise en charge des reverse proxies.
+
+### Champs chiffrables de bout en bout
+
+Les contenus sensibles peuvent être placés dans `ciphertext` et déchiffrés localement par le client. Le Gateway authentifie, relaie et distribue sans devoir comprendre le contenu en clair.
+
+### Migration progressive
+
+Les points d'accès compatibles avec ntfy, Bark et ServerChan permettent de conserver les scripts existants pendant la transition vers les modèles natifs de PushGo.
+
+### MCP/OAuth
+
+Le Gateway peut fonctionner comme serveur MCP HTTP afin que des assistants IA puissent envoyer des Message, gérer des Event et mettre a jour des Thing dans le perimêtre de canaux autorisé.
+
+## Requête minimale
+
+```bash
+curl -X POST https://gateway.pushgo.dev/message \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel_id": "YOUR_CHANNEL_ID",
+    "password": "YOUR_CHANNEL_PASSWORD",
+    "title": "Hello from PushGo",
+    "body": "This is a test notification."
+  }'
+```
+
+Continuez avec [Bien démarrer](/fr/guides/getting-started/) pour exécuter cette requete avec un Channel réel.

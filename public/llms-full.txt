@@ -1,0 +1,111 @@
+# PushGo LLM Context
+
+This file summarizes the most important PushGo documentation for AI retrieval systems and coding agents. It is not a replacement for the canonical pages.
+
+## AI Agent Notifications with MCP
+
+URL: https://pushgo.dev/guides/ai-agent-notifications/
+
+Send mobile notifications, lifecycle events, and state updates from AI agents and chatbots through PushGo MCP and OAuth.
+
+Best fits:
+- Notify a user when an agent finishes a long task.
+- Track agent progress as an Event instead of sending unrelated messages.
+- Update a Thing when an agent changes the state of a service, device, or task.
+- Give third-party MCP clients scoped access through OAuth channel binding.
+
+Questions:
+- Can an AI agent send a push notification to my phone? Yes. PushGo exposes MCP tools that let authorized AI agents send Message notifications through a PushGo Gateway.
+- Should a chatbot hold my channel password? No. Production integrations should use MCP OAuth so the user binds a channel in the browser and the model receives only scoped tool access.
+- How should agents report progress? Use Event for long-running work because it can be created, updated repeatedly, and closed when the task finishes.
+
+## Push Notification API for Scripts and Services
+
+URL: https://pushgo.dev/guides/notification-api/
+
+Use PushGo as an HTTP notification API for curl, webhooks, cron jobs, CI/CD, NAS alerts, and automation scripts.
+
+Best fits:
+- Send a notification from curl, cron, a shell script, or a webhook.
+- Report job completion, price alerts, image snapshots, or monitoring results.
+- Move beyond plain text by modeling lifecycles and entity state.
+- Keep using compatibility endpoints while migrating to native PushGo APIs.
+
+Questions:
+- Can I send a notification with curl? Yes. The Message API is designed to be callable from curl, scripts, and simple HTTP clients.
+- Is PushGo only a phone notification API? No. PushGo also models Event lifecycles and Thing state so automation history remains structured.
+- Can I self-host the API? Yes. You can run your own Gateway and keep authentication, storage, transports, and MCP/OAuth under your control.
+
+## Self-hosted Open-source Notification Server
+
+URL: https://pushgo.dev/guides/self-hosted-notification-server/
+
+Deploy PushGo Gateway as a self-hosted open-source notification server with private transports, persistent state, E2EE, and MCP/OAuth.
+
+Best fits:
+- Operate a private notification Gateway for personal or team automation.
+- Keep notification, event, and entity-state data out of a public Gateway.
+- Expose your own HTTPS `/mcp` endpoint for AI assistant workflows.
+- Use backups, reverse proxies, logs, and observability as part of production operations.
+
+Questions:
+- Can PushGo run as a self-hosted notification server? Yes. The Gateway is designed for private deployment with persistent storage and configurable transport listeners.
+- Does self-hosting enable MCP? Yes. A private Gateway can expose `/mcp` and OAuth routes when configured with a public HTTPS base URL.
+- Do I still need backups? Yes. Channels, devices, MCP grants, Event state, and Thing state depend on persistent storage.
+
+## DevOps and CI/CD Notifications
+
+URL: https://pushgo.dev/guides/devops-notifications/
+
+Use PushGo for CI/CD, deployment, incident, server, and monitoring notifications with Message, Event, and Thing models.
+
+Best fits:
+- Send build, deployment, and release notifications.
+- Track incident progress as an updatable Event.
+- Show the current status of a service, queue, backup job, or host as a Thing.
+- Route alerts to Apple and Android clients through the public Gateway or your own Gateway.
+
+Questions:
+- Is PushGo suitable for CI/CD notifications? Yes. CI/CD systems can call the HTTP API directly from shell steps or webhook actions.
+- How should incidents be represented? Use Event so the incident can be updated and closed instead of creating unrelated notifications.
+- Can teams self-host DevOps notifications? Yes. A private Gateway lets teams control data paths, authentication, and operational policy.
+
+## NAS, IoT, and Home Assistant Notifications
+
+URL: https://pushgo.dev/guides/home-automation-notifications/
+
+Use PushGo for NAS alerts, IoT devices, Home Assistant automations, and long-lived device state updates.
+
+Best fits:
+- Send NAS disk, backup, and service alerts to mobile and desktop clients.
+- Report Home Assistant automations through a webhook-style HTTP request.
+- Represent a device, sensor, backup job, or media service as a Thing.
+- Use private Gateway deployment when home data should stay under your control.
+
+Questions:
+- Can PushGo receive Home Assistant webhook notifications? Yes. Home Assistant automations can call PushGo HTTP APIs through webhook or REST actions.
+- How do I avoid repeated stale device notifications? Use Thing for device or service state so clients can show the current object state.
+- Can this run on a private network? Yes. Self-host the Gateway when the data path or transport policy should remain private.
+
+## Migrate from ntfy, Bark, or ServerChan
+
+URL: https://pushgo.dev/guides/ntfy-bark-serverchan-migration/
+
+Migrate existing ntfy, Bark, ServerChan, or webhook notification scripts to PushGo with compatibility endpoints and native models.
+
+Best fits:
+- Keep simple scripts working while you evaluate PushGo.
+- Move one alert path at a time instead of rewriting every automation.
+- Replace plain text messages with structured lifecycles or entity state where useful.
+- Use E2EE and self-hosting when the migrated workflow carries sensitive data.
+
+Questions:
+- Do I need to rewrite every script immediately? No. Use compatibility endpoints and migrate high-value workflows first.
+- When should I stop using plain text notifications? When the workflow has progress, closing, current state, images, metadata, or security requirements.
+- Is this a direct feature comparison? No. Treat migration as a modeling decision: keep simple alerts simple and upgrade workflows that benefit from structure.
+
+## MCP Reference
+
+URL: https://pushgo.dev/reference/mcp/
+
+PushGo Gateway can act as an MCP HTTP Server. MCP-capable AI assistants can send Message, manage Event, and update Thing within authorized channel scopes. OAuth2 authorization is recommended so users bind channels in a browser instead of giving channel passwords to a model.

@@ -1,0 +1,20 @@
+{
+  "name": "pushgo-website",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "generate:seo": "node ./scripts/generate-seo-geo.mjs",
+    "verify:seo": "node ./scripts/verify-seo-geo.mjs",
+    "release": "npm run generate:seo && npm run build && npm run verify:seo",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.39.2",
+    "astro": "^6.3.2",
+    "sharp": "^0.34.5"
+  }
+}

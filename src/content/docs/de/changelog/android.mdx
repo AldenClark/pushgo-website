@@ -1,0 +1,43 @@
+---
+title: Android-Änderungsprotokoll
+description: Versionsverlauf für die PushGo-Android-App.
+---
+## v1.2.3
+*11.05.2026*
+
+### Verbessert
+- Verbesserte Nachrichtenlöschung mit rückgängig gemachter lokaler Löschung für eine einfachere Wiederherstellung.
+- Eine Aktion hinzugefügt, um alle aktuell angezeigten Nachrichten als gelesen zu markieren.
+- Verbesserte Nachrichtenfilterung mit klareren Mehrfachauswahl-Facettensteuerelementen, abgestimmt auf die Tag-Suche.
+- Verbesserte Zuverlässigkeit des Nachrichtenempfangs und Konsistenz des In-App-Nachrichtenstatus.
+
+### Behoben
+- Die Erkennung und Wiedergabe animierter Bilder im Markdown/Detail-Rendering wurde korrigiert.
+- Das Laden von Medien auf Detailseiten wurde korrigiert, sodass Abrufe die Bildschirmreaktionsfähigkeit nicht mehr blockieren.
+
+## v1.2.2
+*24.04.2026*
+
+### Verbessert
+- Verbesserte Handhabung der verschlüsselten Benachrichtigungsnutzlast, sodass entschlüsselte Nachrichten-, URL-, Bild- und Ereignis-/Objektmetadaten in allen Ansichten konsistent bleiben.
+- Klarere Channel- und Entschlüsselungsstatusanzeigen für Nachrichten-, Ereignis- und Objektbildschirme hinzugefügt.
+- Verbessertes Lade- und Tippverhalten von Detailbildern mit expliziten Lade-/Fehlerplatzhaltern.
+
+## v1.2.1
+*22.04.2026*
+
+### Verbessert
+- Eingehende Nachrichten werden während des App-Starts in die Warteschlange gestellt und wiederholt, um den Nachrichtenverlust zu Beginn der Laufzeit zu reduzieren.
+- Verbesserte Konsistenz des privaten/Provider-Eingangs mit strengerem Routing und sichererer Unterdrückung von Duplikaten.
+- Verbesserte Einstellungen und Aktualisierungen des Nachrichtendetailstatus mit klarerer Rückmeldung bei Ladefehlern.
+- Verbesserte Synchronisierung von Ereignis- und Objektdetails, Paginierung und Interaktionen zum Schließen/Löschen.
+
+## v1.2.0
+*20.04.2026*
+
+### Behoben
+- Der Ablauf bei der Installation blockierter Android-Updates wurde behoben, sodass Benutzer sofort eine In-App-Fehlerwarnung erhalten.
+- Der Fallback bei blockierter Installation wurde behoben, sodass Benutzer mit einem Fingertipp über das Android-Systeminstallationsprogramm fortfahren können.
+
+### Verbessert
+- Verbesserte Update-Kontinuität und Wiederherstellungspfad für Android-In-App-Update-Fehler.
