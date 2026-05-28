@@ -53,19 +53,19 @@ POST /event/close
 
 | 필드 | 유형 | 규칙 |
 | :--- | :--- | :--- |
-| `event_id` | `string` | 업데이트 및 종료에 필요합니다. 생성 시 전송되어서는 안 됩니다. |
+| `event_id` | `string` | update/close에 필수이며 create에는 보내면 안 됩니다. 1-64자, 문자/숫자/`_`/`:`/`-`. |
 | `title` | `string` | 생성 시 필요합니다. 업데이트 및 닫기 시 선택 사항입니다. |
 | `description` | `string` | 선택 과목; 빈 문자열은 누락된 것으로 처리됩니다. |
 | `status` | `string` | 필수의; 비어 있지 않으며 최대 24자입니다. |
 | `message` | `string` | 필수의; 비어 있지 않으며 최대 512자입니다. |
 | `severity` | `string` | 필수의; `critical`, `high`, `normal`, `low`만 해당됩니다. |
-| `event_time` | `number` | 필수의; 이 업데이트가 발생했을 때 Unix는 밀리초입니다. |
-| `started_at` | `number` | 생성만 가능합니다. 전체 Event 시작 시간. |
-| `ended_at` | `number` | 닫기만 가능합니다. 전체 Event 종료 시간. |
+| `event_time` | `number` | 필수. 이 업데이트 발생 시간입니다. Unix 초 또는 밀리초를 허용하고 밀리초로 정규화합니다. |
+| `started_at` | `number` | create 전용. 생략하면 `event_time`이 기본값이며 update/close에서는 거부됩니다. |
+| `ended_at` | `number` | close 전용. 생략하면 `event_time`이 기본값이며 create/update에서는 거부됩니다. |
 | `tags` | `string[]` | 최대 32개 항목(각각 최대 64자)이 잘리고 중복이 제거됩니다. |
 | `images` | `string[]` | 최대 32개의 이미지 URL, 각각 최대 2048자. |
 | `attrs` | `object` | 객체 패치; `null`는 키를 제거합니다. 배열은 허용되지 않습니다. |
-| `metadata` | `object` | 스칼라 값만; 키 <= 64, 값 <= 512. |
+| `metadata` | `object` | 아니요 | 사용자 지정 scalar key-value입니다. key <= 64, 비어 있지 않은 scalar value <= 512. 중첩 object와 array는 거부됩니다. |
 
 ## Event 만들기
 

@@ -34,11 +34,7 @@ Common settings:
 | Environment variable | Default | Description |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | Enables Dynamic Client Registration. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | none | Predefined OAuth clients in `client_id:client_secret` format. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Access token lifetime. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Refresh token absolute lifetime. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Refresh token idle lifetime. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel bind page session lifetime. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | none | Predefined OAuth clients in `client_id:client_secret` format; separate multiple clients by newline or semicolon. |
 
 If the client does not support DCR, use `PUSHGO_MCP_PREDEFINED_CLIENTS`.
 
@@ -61,7 +57,7 @@ Prefer OAuth2 authorization in production.
 6. The assistant polls `pushgo.channel.bind.status`.
 7. After authorization, the assistant can call tools within the bound channel scope.
 
-The bind session lifetime is controlled by `PUSHGO_MCP_BIND_SESSION_TTL_SECS`.
+Bind sessions and token lifetimes are managed by the current Gateway runtime profile; they are not public CLI/env knobs in v1.2.9.
 
 ## Tools
 
@@ -110,7 +106,7 @@ The bind session lifetime is controlled by `PUSHGO_MCP_BIND_SESSION_TTL_SECS`.
 ## Operations
 
 - MCP grants are persisted; do not treat the database or storage directory as disposable cache.
-- Access tokens are short-lived; refresh tokens are longer-lived. Adjust TTLs based on client risk.
+- Token and bind-session lifetimes are profile-owned runtime settings in v1.2.9; choose the appropriate runtime profile instead of setting TTL env vars.
 - Rotate predefined client secrets regularly.
 - Use separate channels for high-risk automation instead of authorizing everything into one channel.
 - Use Gateway structured logs and stats for operational debugging.
@@ -120,7 +116,7 @@ The bind session lifetime is controlled by `PUSHGO_MCP_BIND_SESSION_TTL_SECS`.
 | Symptom | Check |
 | :--- | :--- |
 | Client cannot discover OAuth metadata | `PUSHGO_PUBLIC_BASE_URL` must be an external HTTPS URL; reverse proxy must forward well-known routes. |
-| Bind link does not open | Public DNS, HTTPS certificate, reverse-proxy path, and `PUSHGO_MCP_BIND_SESSION_TTL_SECS`. |
+| Bind link does not open | Public DNS, HTTPS certificate, reverse-proxy path, `PUSHGO_PUBLIC_BASE_URL`, and whether the bind session has expired. |
 | DCR fails | Client DCR support and `PUSHGO_MCP_DCR_ENABLED`. |
 | Tool call asks for `password` | You may be in Legacy mode, or OAuth authorization is incomplete. |
 | Authorized but no channels visible | Bind session completion, scopes, and whether the channel grant was revoked. |

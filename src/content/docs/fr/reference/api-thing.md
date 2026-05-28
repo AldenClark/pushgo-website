@@ -56,7 +56,7 @@ Le corps de la requête doit être JSON et les champs inconnus sont rejetés. Si
 
 | Champ | Tapez | Règles |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | Requis pour la mise à jour, l'archivage et la suppression ; ne doit pas être envoyé lors de la création. |
+| `thing_id` | `string` | Obligatoire pour update/archive/delete ; ne pas envoyer sur create ; 1-64 caractères, lettres/chiffres/`_`/`:`/`-`. |
 | `title` | `string` | Recommandé lors de la création ; le Gateway ne rejette actuellement pas le `title` manquant. |
 | `description` | `string` | Facultatif ; les chaînes vides sont traitées comme manquantes. |
 | `tags` | `string[]` | Jusqu'à 32 éléments, 64 caractères maximum chacun, découpés et dédupliqués. |
@@ -64,11 +64,11 @@ Le corps de la requête doit être JSON et les champs inconnus sont rejetés. Si
 | `images` | `string[]` | Jusqu'à 32 URL d'images, de 2 048 caractères maximum chacune. |
 | `created_at` | `number` | Créer uniquement ; revient à `observed_at` en cas d'omission. |
 | `deleted_at` | `number` | Supprimer uniquement ; revient à `observed_at` en cas d'omission. |
-| `observed_at` | `number` | Requis; temps d'observation pour cette mise à jour d'état, millisecondes Unix. |
-| `external_ids` | `object` | modèle de clé `[A-Za-z0-9_:.\-]`, clé <= 64 ; la valeur est `string` ou `null`. |
-| `location_type` + `location_value` | `string` + `string` | Doit apparaître ensemble ; le type est `physical`, `geo`, `cloud`, `datacenter` ou `logical`. |
+| `observed_at` | `number` | Obligatoire ; moment d'observation de cette mise à jour d'état ; secondes ou millisecondes Unix acceptées et normalisées en millisecondes. |
+| `external_ids` | `object` | Motif de clé `[A-Za-z0-9_:.-]`, clé <= 64 et mise en minuscules ; valeur `string` non vide <= 256 ou `null` pour supprimer. |
+| `location_type` + `location_value` | `string` + `string` | Doivent être fournis ensemble ; type `physical`, `geo`, `cloud`, `datacenter` ou `logical`. Formats : `geo` = `lat,lng`, `cloud` = `provider:region[:zone]`, `datacenter` = `site[:room[:rack]]`, `logical` = tokens séparés par `/`. |
 | `attrs` | `object` | Correctif d'objet ; `null` supprime une clé  ; les tableaux ne sont pas autorisés ; un seul niveau d'objet imbriqué. |
-| `metadata` | `object` | Valeurs scalaires uniquement ; clé <= 64, valeur <= 512. |
+| `metadata` | `object` | Non | Paires clé-valeur scalaires personnalisées ; clé <= 64, valeur scalaire non vide <= 512 ; objets imbriqués et tableaux rejetés. |
 
 ## Créer un Thing
 

@@ -56,7 +56,7 @@ POST /thing/delete
 
 |フィールド |タイプ |ルール |
 | :--- | :--- | :--- |
-| `thing_id` | `string` |更新、アーカイブ、削除に必要です。作成時に送信してはなりません。 |
+| `thing_id` | `string` | update/archive/delete で必須。create では送信不可。1-64 文字、英数字/`_`/`:`/`-`。 |
 | `title` | `string` |作成時に推奨されます。 Gateway は現在、不足している `title` を拒否しません。 |
 | `description` | `string` |オプション。空の文字列は欠落しているものとして扱われます。 |
 | `tags` | `string[]` |最大 32 項目、それぞれ最大 64 文字、トリミングおよび重複排除。 |
@@ -64,11 +64,11 @@ POST /thing/delete
 | `images` | `string[]` |最大 32 個の画像 URL、それぞれ最大 2048 文字。 |
 | `created_at` | `number` |作成のみ。省略すると `observed_at` に戻ります。 |
 | `deleted_at` | `number` |削除のみ。省略すると `observed_at` に戻ります。 |
-| `observed_at` | `number` |必須;この状態更新の観察時間 (Unix ミリ秒)。 |
-| `external_ids` | `object` |キーパターン `[A-Za-z0-9_:.\-]`、キー <= 64;値は `string` または `null` です。 |
-| `location_type` + `location_value` | `string` + `string` |必ず一緒に登場する必要があります。タイプは `physical`、`geo`、`cloud`、`datacenter`、または `logical` です。 |
+| `observed_at` | `number` | 必須。この状態更新の観測時刻。Unix 秒またはミリ秒を受け付け、ミリ秒へ正規化します。 |
+| `external_ids` | `object` | key は `[A-Za-z0-9_:.-]`、<= 64、lowercase 化。value は空でない `string` <= 256、削除は `null`。 |
+| `location_type` + `location_value` | `string` + `string` | 必ず同時に指定します。type は `physical`、`geo`、`cloud`、`datacenter`、`logical`。形式: `geo` は `lat,lng`、`cloud` は `provider:region[:zone]`、`datacenter` は `site[:room[:rack]]`、`logical` は slash 区切り token。 |
 | `attrs` | `object` |オブジェクトパッチ; `null` はキーを削除します。配列は許可されません。ネストされたオブジェクト レベルは 1 つだけです。 |
-| `metadata` | `object` | スカラー値のみ。キー <= 64、値 <= 512。 |
+| `metadata` | `object` | いいえ | カスタムのスカラー key-value。key <= 64、空でないスカラー value <= 512。ネストしたオブジェクトと配列は拒否されます。 |
 
 ## Thing を作成する
 

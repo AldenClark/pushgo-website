@@ -53,19 +53,19 @@ POST /event/close
 
 | 欄位 | 型別 | 規則 |
 | :--- | :--- | :--- |
-| `event_id` | `string` | 更新與關閉必填；建立時不能傳，由 Gateway 產生。 |
+| `event_id` | `string` | update/close 必填；create 時不得傳入；1-64 個字元，可用字母、數字、`_`、`:`、`-`。 |
 | `title` | `string` | 建立必填；更新和關閉可選。 |
 | `description` | `string` | 可選；空字串依預設處理。 |
 | `status` | `string` | 必填；非空，最大 24 字元。 |
 | `message` | `string` | 必填；非空，最大 512 字元。 |
 | `severity` | `string` | 必填；僅允許 `critical`、`high`、`normal`、`low`。 |
-| `event_time` | `number` | 必填；本次變更發生時間，Unix 毫秒時間戳記。 |
-| `started_at` | `number` | 僅 create 允許；整個事件開始時間。 |
-| `ended_at` | `number` | 僅 close 允許；整個事件結束時間。 |
+| `event_time` | `number` | 必填；本次更新發生時間；接受 Unix 秒或毫秒，並歸一化為毫秒。 |
+| `started_at` | `number` | 僅 create；省略時預設為 `event_time`，update/close 會拒絕。 |
+| `ended_at` | `number` | 僅 close；省略時預設為 `event_time`，create/update 會拒絕。 |
 | `tags` | `string[]` | 最多 32 項，每項最多 64 字元，trim 後去重。 |
 | `images` | `string[]` | 最多 32 項，每項最多 2048 字元，trim 後去重。 |
 | `attrs` | `object` | 物件補丁；value 為 `null` 表示刪鍵；不允許陣列。 |
-| `metadata` | `object` | 僅支援標量值；key <= 64，value <= 512。 |
+| `metadata` | `object` | 否 | 自訂標量鍵值；key <= 64，非空標量 value <= 512；拒絕巢狀物件和陣列。 |
 
 ## 建立事件
 

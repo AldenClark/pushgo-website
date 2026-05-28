@@ -168,11 +168,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 環境變數 | 預設值 | 說明 |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 是否允許 Dynamic Client Registration。 |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 無 | 預置 OAuth 用戶端，格式為 `client_id:client_secret`。 |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | access token 有效期限。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | refresh token 絕對有效期限。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | refresh token 空閒效期。 |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel 繫結頁面會話有效期限。 |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 無 | 預置 OAuth 用戶端，格式為 `client_id:client_secret`；多個用戶端用換行或分號分隔。 |
 
 更多工具和授權流程請見 [MCP 參考](/zh-tw/reference/mcp/)。
 
@@ -182,6 +178,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP API、WSS、MCP/OAuth 的監聽位址。 |
 | `--db-url` / `PUSHGO_DB_URL` | 無，必填 | 資料庫 URL，支援 SQLite、PostgreSQL 和 MySQL。 |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | 執行階段容量設定檔：`small` 用於私有/輕量部署，`public` 用於高負載部署。 |
 | `--token` / `PUSHGO_TOKEN` | 無 | Gateway 級 Bearer Token；為空時不啟用 Gateway 級 Token 驗證。 |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | token-service 位址，生產環境建議明確設定。 |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | 無 | 對外 HTTPS 根位址。 |
@@ -197,18 +194,9 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 - 生產排障優先使用 `PUSHGO_OBSERVABILITY_PROFILE=ops`，臨時深查再切到 `incident` 或 `debug`。
 - Android 私人通道問題先檢查 `/gateway/profile` 宣告的連線埠和外部可存取性。
 
-常用容量相關變數：
+執行階段容量：
 
-| 環境變數 | 說明 |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | 分發 worker 數量覆蓋值。 |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | 分發佇列容量覆蓋值。 |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | 私人通道 fallback 排程佇列容量。 |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | 單連線私人投遞佇列容量。 |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | APNs 程序內最大傳送並發數。 |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | 分發目標快取 TTL。 |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite page-cache 目標值。 |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL 自動 checkpoint 頁數。 |
+Gateway v1.2.9 的執行容量由執行階段設定檔管理。私有或輕量部署使用 `PUSHGO_RUNTIME_PROFILE=small`，高負載公開部署使用 `PUSHGO_RUNTIME_PROFILE=public`。佇列、分發、提供者、資料庫連線池和 SQLite 等底層調校值現在是設定檔內建預設值，不再作為公開環境變數配置。
 
 ## 升級與回滾
 

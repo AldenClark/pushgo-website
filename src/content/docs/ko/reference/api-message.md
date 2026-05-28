@@ -28,15 +28,15 @@ POST /message
 | `title` | `string` | 예 | Message 제목은 비워둘 수 없습니다. |
 | `body` | `string` | 아니요 | Message 본체, Markdown가 지원됩니다. |
 | `op_id` | `string` | 아니요 | 멱등성 키, 1~128자, 문자/숫자/`_`/`:`/`-`. |
-| `thing_id` | `string` | 아니요 | Message를 기존 Thing과 연결합니다. |
-| `occurred_at` | `number` | 아니요 | Message가 발생한 시간(Unix 밀리초) |
+| `thing_id` | `string` | 아니요 | 기존 Thing에 연결합니다. 1-64자, 문자/숫자/`_`/`:`/`-`. |
+| `occurred_at` | `number` | 아니요 | 메시지 발생 시간입니다. Unix 초 또는 밀리초를 허용합니다. `thing_id`가 있으면 필수입니다. |
 | `severity` | `string` | 아니요 | `critical`, `high`, `normal`, `low`; 알 수 없는 값은 `normal`로 정규화됩니다. |
 | `ttl` | `number` | 아니요 | Unix-밀리초 만료 시간. 공급자 TTL은 약 28일로 제한됩니다. |
 | `url` | `string` | 아니요 | 선택적 클릭연결 URL입니다. |
 | `images` | `string[]` | 아니요 | 최대 32개의 이미지 URL, 각각 최대 2048자. |
 | `tags` | `string[]` | 아니요 | 최대 32개의 태그, 각각 최대 64자, 잘라내기 및 중복 제거. |
 | `ciphertext` | `string` | 아니요 | 선택적 E2EE 암호문 페이로드. |
-| `metadata` | `object` | 아니요 | 맞춤 스칼라 키-값 키 <= 64, 값 <= 512. |
+| `metadata` | `object` | 아니요 | 사용자 지정 scalar key-value입니다. key <= 64, 비어 있지 않은 scalar value <= 512. 중첩 object와 array는 거부됩니다. |
 
 ## 심각도 매핑
 

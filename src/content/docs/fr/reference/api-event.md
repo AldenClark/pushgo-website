@@ -53,19 +53,19 @@ Le corps de la requête doit être JSON et les champs inconnus sont rejetés. Si
 
 | Champ | Tapez | Règles |
 | :--- | :--- | :--- |
-| `event_id` | `string` | Obligatoire pour la mise à jour et la fermeture ; ne doit pas être envoyé lors de la création. |
+| `event_id` | `string` | Obligatoire pour update/close ; ne pas envoyer sur create ; 1-64 caractères, lettres/chiffres/`_`/`:`/`-`. |
 | `title` | `string` | Obligatoire lors de la création ; facultatif lors de la mise à jour et de la fermeture. |
 | `description` | `string` | Facultatif ; les chaînes vides sont traitées comme manquantes. |
 | `status` | `string` | Requis; non vide, maximum 24 caractères. |
 | `message` | `string` | Requis; non vide, maximum 512 caractères. |
 | `severity` | `string` | Requis; uniquement `critical`, `high`, `normal`, `low`. |
-| `event_time` | `number` | Requis; lorsque cette mise à jour s'est produite, en millisecondes Unix. |
-| `started_at` | `number` | Créer uniquement ; heure globale de début de l’événement. |
-| `ended_at` | `number` | Fermer uniquement ; heure globale de fin de l’événement. |
+| `event_time` | `number` | Obligatoire ; moment de cette mise à jour ; secondes ou millisecondes Unix acceptées et normalisées en millisecondes. |
+| `started_at` | `number` | Create uniquement ; vaut `event_time` par défaut ; rejeté sur update/close. |
+| `ended_at` | `number` | Close uniquement ; vaut `event_time` par défaut ; rejeté sur create/update. |
 | `tags` | `string[]` | Jusqu'à 32 éléments, 64 caractères maximum chacun, découpés et dédupliqués. |
 | `images` | `string[]` | Jusqu'à 32 URL d'images, de 2 048 caractères maximum chacune. |
 | `attrs` | `object` | Correctif d'objet ; `null` supprime une clé  ; les tableaux ne sont pas autorisés. |
-| `metadata` | `object` | Valeurs scalaires uniquement ; clé <= 64, valeur <= 512. |
+| `metadata` | `object` | Non | Paires clé-valeur scalaires personnalisées ; clé <= 64, valeur scalaire non vide <= 512 ; objets imbriqués et tableaux rejetés. |
 
 ## Créer un Event
 

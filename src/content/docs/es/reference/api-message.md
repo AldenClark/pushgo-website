@@ -28,15 +28,15 @@ El cuerpo de la petición debe ser JSON y los campos desconocidos se rechazan. S
 | `title` | `string` | Sí | Título Message, no debe estar vacío. |
 | `body` | `string` | No | Se admite el cuerpo Message, Markdown. |
 | `op_id` | `string` | No | Clave de idempotencia, 1-128 caracteres, letras/dígitos/`_`/`:`/`-`. |
-| `thing_id` | `string` | No | Asocie el mensaje con un Thing existente. |
-| `occurred_at` | `number` | No | Hora en que se produjo el mensaje, milisegundos Unix. |
+| `thing_id` | `string` | No | Asocia el mensaje con un Thing existente; 1-64 caracteres, letras/dígitos/`_`/`:`/`-`. |
+| `occurred_at` | `number` | No | Momento del mensaje; acepta segundos o milisegundos Unix. Obligatorio cuando se incluye `thing_id`. |
 | `severity` | `string` | No | `critical`, `high`, `normal`, `low`; los valores desconocidos se normalizan a `normal`. |
 | `ttl` | `number` | No | Tiempo de vencimiento de milisegundos de Unix; El TTL del proveedor tiene un límite de alrededor de 28 días. |
 | `url` | `string` | No | URL de destino opcional. |
 | `images` | `string[]` | No | Hasta 32 URL de imágenes, con un máximo de 2048 caracteres cada una. |
 | `tags` | `string[]` | No | Hasta 32 etiquetas, con un máximo de 64 caracteres cada una, recortadas y deduplicadas. |
 | `ciphertext` | `string` | No | Carga útil de texto cifrado E2EE opcional. |
-| `metadata` | `object` | No | Valores-clave escalares personalizados; clave <= 64, valor <= 512. |
+| `metadata` | `object` | No | Pares clave-valor escalares; clave <= 64, valor escalar no vacío <= 512; objetos anidados y arrays se rechazan. |
 
 ## Mapeo de gravedad
 

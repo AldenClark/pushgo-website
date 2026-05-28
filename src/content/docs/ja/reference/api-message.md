@@ -28,15 +28,15 @@ POST /message
 | `title` | `string` |はい | Message タイトルは空であってはなりません。 |
 | `body` | `string` |いいえ | Message本体、Markdownに対応します。 |
 | `op_id` | `string` |いいえ |冪等キー、1 ～ 128 文字、文字/数字/`_`/`:`/`-`。 |
-| `thing_id` | `string` |いいえ |Messageを既存の Thing に関連付けます。 |
-| `occurred_at` | `number` |いいえ |Messageが発生した時刻 (Unix ミリ秒)。 |
+| `thing_id` | `string` | いいえ | 既存の Thing に関連付けます。1-64 文字、英数字/`_`/`:`/`-`。 |
+| `occurred_at` | `number` | いいえ | メッセージ発生時刻。Unix 秒またはミリ秒を受け付けます。`thing_id` がある場合は必須です。 |
 | `severity` | `string` |いいえ | `critical`、`high`、`normal`、`low`;不明な値は `normal` に正規化されます。 |
 | `ttl` | `number` |いいえ | Unix ミリ秒の有効期限。プロバイダーの TTL は約 28 日に制限されています。 |
 | `url` | `string` |いいえ |オプションのリンク先 URL。 |
 | `images` | `string[]` |いいえ |最大 32 個の画像 URL、それぞれ最大 2048 文字。 |
 | `tags` | `string[]` |いいえ |最大 32 個のタグ、それぞれ最大 64 文字、トリミングおよび重複排除。 |
 | `ciphertext` | `string` |いいえ |オプションの E2EE 暗号文ペイロード。 |
-| `metadata` | `object` | いいえ | カスタムのスカラー Key-Value。キー <= 64、値 <= 512。 |
+| `metadata` | `object` | いいえ | カスタムのスカラー key-value。key <= 64、空でないスカラー value <= 512。ネストしたオブジェクトと配列は拒否されます。 |
 
 ## 重大度のマッピング
 

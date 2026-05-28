@@ -12,11 +12,12 @@ Auf dieser Seite werden Regeln zusammengefasst, die von allen APIs gemeinsam gen
 | Vom Gateway generierte IDs | 32 hexadezimale Kleinbuchstaben. |
 | Channel Passwort | Normalerweise 8-128 Zeichen. |
 | `op_id` | 1-128 Zeichen; Buchstaben, Ziffern, `_`, `:`, `-`. |
+| `thing_id` / `event_id` | 1-64 Zeichen; Buchstaben, Ziffern, `_`, `:`, `-`. |
 | `images` | Bis zu 32 URLs mit jeweils maximal 2048 Zeichen. |
 | `tags` | Bis zu 32 Tags mit jeweils maximal 64 Zeichen, gekürzt und dedupliziert. |
-| `metadata` | Nur Skalarwerte; Schlüssel max. 64, Wert max. 512. |
-| `attrs` | Objektpatch; `null` entfernt einen Schlüssel; Vermeiden Sie komplexe Verschachtelungen. |
-| `ttl` | Unix-Millisekunden-Zeitstempel; Die TTL für die Zustellung durch den Anbieter ist auf etwa 28 Tage begrenzt. |
+| `metadata` | Nur skalare Werte; Key max. 64, nicht leerer skalarer Wert max. 512; keine verschachtelten Objekte oder Arrays. |
+| `attrs` | Objekt-Patch; `null` entfernt einen Key; Arrays und tiefe Verschachtelung werden abgelehnt. |
+| `ttl` und API-Zeitstempel | Wo dokumentiert, werden Unix-Sekunden oder -Millisekunden akzeptiert und zu Millisekunden normalisiert. |
 | Unbekannte Felder | Die nativen Werkzeugargumente Message, Event, Thing und MCP sind streng; Unbekannte Felder geben 400 zurück. |
 
 ## Antwortumschlag

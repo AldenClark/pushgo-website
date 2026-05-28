@@ -34,11 +34,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 环境变量 | 默认值 | 说明 |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 是否允许 Dynamic Client Registration。 |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 无 | 预置 OAuth 客户端，格式为 `client_id:client_secret`。 |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | access token 有效期。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | refresh token 绝对有效期。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | refresh token 空闲有效期。 |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | 频道绑定页面会话有效期。 |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 无 | 预置 OAuth 客户端，格式为 `client_id:client_secret`；多个客户端用换行或分号分隔。 |
 
 如果客户端不支持 DCR，请关闭或忽略 DCR，并通过 `PUSHGO_MCP_PREDEFINED_CLIENTS` 配置固定客户端。
 
@@ -61,7 +57,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 6. 助手轮询 `pushgo.channel.bind.status`。
 7. 授权完成后，助手可以在已授权频道范围内调用工具。
 
-绑定会话默认有效期由 `PUSHGO_MCP_BIND_SESSION_TTL_SECS` 控制。
+绑定会话和 token 生命周期由当前 Gateway 运行时档位管理；在 v1.2.9 中它们不是公开 CLI/env 参数。
 
 ## 工具能力
 
@@ -110,7 +106,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ## 运维注意事项
 
 - MCP 授权状态会持久化；不要把数据库或存储目录当临时缓存清空。
-- Access token 较短，refresh token 较长；根据客户端风险调整 TTL。
+- Token 与绑定会话生命周期在 v1.2.9 中属于运行时档位内置设置；请选择合适的运行时档位，而不是设置 TTL 环境变量。
 - 定期轮换预置客户端 secret。
 - 高风险频道可以单独创建，避免把所有自动化都授权到同一频道。
 - 运维审计和运行时问题应结合 Gateway 结构化日志与统计指标排查。
@@ -120,7 +116,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 现象 | 检查项 |
 | :--- | :--- |
 | 客户端无法发现 OAuth 元数据 | `PUSHGO_PUBLIC_BASE_URL` 是否设置为 HTTPS 外部地址；反向代理是否转发 well-known 路由。 |
-| 绑定链接打不开 | 公网 DNS、HTTPS 证书、反向代理路径和 `PUSHGO_MCP_BIND_SESSION_TTL_SECS`。 |
+| 绑定链接无法打开 | 公网 DNS、HTTPS 证书、反向代理路径、`PUSHGO_PUBLIC_BASE_URL`，以及绑定会话是否已过期。 |
 | DCR 失败 | 客户端是否支持 DCR；`PUSHGO_MCP_DCR_ENABLED` 是否开启。 |
 | 工具调用要求 `password` | 当前可能是 Legacy 模式，或 OAuth 授权未完成。 |
 | 已授权但看不到频道 | 绑定会话是否完成；scope 是否足够；频道是否被撤销授权。 |

@@ -54,19 +54,19 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 
 | Field | Type | Rules |
 | :--- | :--- | :--- |
-| `event_id` | `string` | Required for update and close; must not be sent on create. |
+| `event_id` | `string` | Required for update and close; must not be sent on create; 1-64 chars, letters/digits/`_`/`:`/`-`. |
 | `title` | `string` | Required on create; optional on update and close. |
 | `description` | `string` | Optional; empty strings are treated as missing. |
 | `status` | `string` | Required; non-empty, max 24 chars. |
 | `message` | `string` | Required; non-empty, max 512 chars. |
 | `severity` | `string` | Required; only `critical`, `high`, `normal`, `low`. |
-| `event_time` | `number` | Required; when this update happened, Unix milliseconds. |
-| `started_at` | `number` | Create only; overall event start time. |
-| `ended_at` | `number` | Close only; overall event end time. |
+| `event_time` | `number` | Required; when this update happened; Unix seconds or milliseconds accepted and normalized to milliseconds. |
+| `started_at` | `number` | Create only; defaults to `event_time` when omitted and is rejected on update/close. |
+| `ended_at` | `number` | Close only; defaults to `event_time` when omitted and is rejected on create/update. |
 | `tags` | `string[]` | Up to 32 items, max 64 chars each, trimmed and deduplicated. |
 | `images` | `string[]` | Up to 32 image URLs, max 2048 chars each. |
 | `attrs` | `object` | Object patch; `null` removes a key; arrays are not allowed. |
-| `metadata` | `object` | Scalar values only; key <= 64, value <= 512. |
+| `metadata` | `object` | No | Custom scalar key-values; key <= 64, non-empty scalar value <= 512; nested objects and arrays are rejected. |
 
 ## Create an Event
 

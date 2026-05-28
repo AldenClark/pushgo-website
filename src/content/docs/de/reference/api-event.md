@@ -53,19 +53,19 @@ Der Anfragebody muss JSON sein und unbekannte Felder werden abgelehnt. Wenn ein 
 
 | Feld | Geben Sie | ein Regeln |
 | :--- | :--- | :--- |
-| `event_id` | `string` | Erforderlich zum Aktualisieren und Schließen; Darf nicht beim Erstellen gesendet werden. |
+| `event_id` | `string` | Erforderlich für update/close; darf bei create nicht gesendet werden; 1-64 Zeichen, Buchstaben/Ziffern/`_`/`:`/`-`. |
 | `title` | `string` | Erforderlich beim Erstellen; optional beim Aktualisieren und Schließen. |
 | `description` | `string` | Optional; Leere Zeichenfolgen werden als fehlend behandelt. |
 | `status` | `string` | Erforderlich; nicht leer, maximal 24 Zeichen. |
 | `message` | `string` | Erforderlich; nicht leer, max. 512 Zeichen. |
 | `severity` | `string` | Erforderlich; nur `critical`, `high`, `normal`, `low`. |
-| `event_time` | `number` | Erforderlich; als dieses Update stattfand, Unix-Millisekunden. |
-| `started_at` | `number` | Nur erstellen; Gesamtstartzeit der Veranstaltung. |
-| `ended_at` | `number` | Nur schließen; Gesamtendzeit der Veranstaltung. |
+| `event_time` | `number` | Erforderlich; Zeitpunkt dieses Updates; Unix-Sekunden oder -Millisekunden werden akzeptiert und zu Millisekunden normalisiert. |
+| `started_at` | `number` | Nur create; Standard ist `event_time`; wird bei update/close abgelehnt. |
+| `ended_at` | `number` | Nur close; Standard ist `event_time`; wird bei create/update abgelehnt. |
 | `tags` | `string[]` | Bis zu 32 Elemente mit jeweils maximal 64 Zeichen, gekürzt und dedupliziert. |
 | `images` | `string[]` | Bis zu 32 Bild-URLs mit jeweils maximal 2048 Zeichen. |
 | `attrs` | `object` | Objektpatch; `null` entfernt einen Schlüssel; Arrays sind nicht zulässig. |
-| `metadata` | `object` | Nur Skalarwerte; Schlüssel <= 64, Wert <= 512. |
+| `metadata` | `object` | Nein | Benutzerdefinierte skalare Key-Values; Key <= 64, nicht leerer skalarer Wert <= 512; verschachtelte Objekte und Arrays werden abgelehnt. |
 
 ## Event erstellen
 

@@ -1033,12 +1033,13 @@ async function patchIndex(locale) {
 			: path.join(docsRoot, locale, 'index.mdx');
 	if (!existsSync(indexPath)) return;
 	let content = await readFile(indexPath, 'utf8');
-	if (content.includes('/guides/ai-agent-notifications/') || content.includes('/zh/guides/ai-agent-notifications/')) {
+	const prefix = locales[locale].prefix;
+	if (content.includes(`${prefix}/guides/ai-agent-notifications/`)) {
 		return;
 	}
-	const marker = '</div>\n\n## Downloads and Endpoints';
+	const marker = '</div>\n\n## ';
 	if (!content.includes(marker)) return;
-	content = content.replace(marker, `${localizedCards(locale)}\n</div>\n\n## Downloads and Endpoints`);
+	content = content.replace(marker, `${localizedCards(locale)}\n</div>\n\n## `);
 	await writeFile(indexPath, content, 'utf8');
 }
 

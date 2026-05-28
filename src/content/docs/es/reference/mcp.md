@@ -33,11 +33,7 @@ Configuraciones comunes:
 | Variable de entorno | Predeterminado | Descripción |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | Habilita el registro dinámico de clientes. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | ninguno | Clientes OAuth predefinidos en formato `client_id:client_secret`. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Duración del token de acceso. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Vida útil absoluta del refresh token. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Tiempo de inactividad permitido para el refresh token. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Duración de la sesión de vinculación de Channel. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | ninguno | Clientes OAuth predefinidos en formato `client_id:client_secret`; separe varios clientes con salto de línea o punto y coma. |
 
 Si el cliente no admite DCR, utilice `PUSHGO_MCP_PREDEFINED_CLIENTS`.
 
@@ -60,7 +56,7 @@ Prefiera la autorización OAuth2 en producción.
 6. El asistente consulta `pushgo.channel.bind.status`.
 7. Después de la autorización, el asistente puede llamar a herramientas dentro del alcance del canal vinculado.
 
-La duración de la sesión de vinculación está controlada por `PUSHGO_MCP_BIND_SESSION_TTL_SECS`.
+Las sesiones de vinculación y las vidas de tokens las gestiona el perfil de ejecución actual del Gateway; en v1.2.9 no son opciones públicas CLI/env.
 
 ## Herramientas
 
@@ -109,7 +105,7 @@ La duración de la sesión de vinculación está controlada por `PUSHGO_MCP_BIND
 ## Operaciones
 
 - Se mantienen las subvenciones MCP; no trate la base de datos o el directorio de almacenamiento como caché desechable.
-- Los tokens de acceso son de corta duración; Los tokens de actualización tienen una vida más larga. Ajuste los TTL según el riesgo del cliente.
+- En v1.2.9, las vidas de tokens y sesiones de vinculación son ajustes internos del perfil; elija el perfil de ejecución adecuado en lugar de definir variables TTL.
 - Rotar periódicamente los secretos de cliente predefinidos.
 - Utilice canales separados para la automatización de alto riesgo en lugar de autorizar todo en un solo canal.
 - Utilice registros estructurados y estadísticas de Gateway para la depuración operativa.
@@ -119,7 +115,7 @@ La duración de la sesión de vinculación está controlada por `PUSHGO_MCP_BIND
 | Síntoma | Comprobación |
 | :--- | :--- |
 | El cliente no puede descubrir los metadatos de OAuth | `PUSHGO_PUBLIC_BASE_URL` debe ser una URL externa de HTTPS; El proxy inverso debe reenviar rutas conocidas. |
-| El enlace de enlace no se abre | DNS público, certificado HTTPS, ruta de proxy inverso y `PUSHGO_MCP_BIND_SESSION_TTL_SECS`. |
+| El enlace de vinculación no abre | DNS público, certificado HTTPS, ruta del proxy inverso, `PUSHGO_PUBLIC_BASE_URL` y si la sesión de vinculación expiró. |
 | DCR falla | Soporte de cliente DCR y `PUSHGO_MCP_DCR_ENABLED`. |
 | Llamada de herramienta solicita `password` | Es posible que esté en modo Legacy o que la autorización OAuth esté incompleta. |
 | Autorizado, pero no aparecen canales | Finalización de la sesión de vinculación, alcances y si se revocó la autorización del Channel. |

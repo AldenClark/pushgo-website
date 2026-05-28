@@ -54,19 +54,19 @@ POST /event/close
 
 | 字段 | 类型 | 规则 |
 | :--- | :--- | :--- |
-| `event_id` | `string` | 更新和关闭必填；创建时不能传，由 Gateway 生成。 |
+| `event_id` | `string` | update/close 必填；create 时不得传入；1-64 个字符，可用字母、数字、`_`、`:`、`-`。 |
 | `title` | `string` | 创建必填；更新和关闭可选。 |
 | `description` | `string` | 可选；空字符串按缺省处理。 |
 | `status` | `string` | 必填；非空，最大 24 字符。 |
 | `message` | `string` | 必填；非空，最大 512 字符。 |
 | `severity` | `string` | 必填；仅允许 `critical`、`high`、`normal`、`low`。 |
-| `event_time` | `number` | 必填；本次变化发生时间，Unix 毫秒时间戳。 |
-| `started_at` | `number` | 仅 create 允许；整个事件开始时间。 |
-| `ended_at` | `number` | 仅 close 允许；整个事件结束时间。 |
+| `event_time` | `number` | 必填；本次更新发生时间；接受 Unix 秒或毫秒，并归一化为毫秒。 |
+| `started_at` | `number` | 仅 create；省略时默认为 `event_time`，update/close 会拒绝。 |
+| `ended_at` | `number` | 仅 close；省略时默认为 `event_time`，create/update 会拒绝。 |
 | `tags` | `string[]` | 最多 32 项，每项最多 64 字符，trim 后去重。 |
 | `images` | `string[]` | 最多 32 项，每项最多 2048 字符，trim 后去重。 |
 | `attrs` | `object` | 对象补丁；value 为 `null` 表示删键；不允许数组。 |
-| `metadata` | `object` | 仅支持标量值；key <= 64，value <= 512。 |
+| `metadata` | `object` | 否 | 自定义标量键值；key <= 64，非空标量 value <= 512；拒绝嵌套对象和数组。 |
 
 ## 创建事件
 

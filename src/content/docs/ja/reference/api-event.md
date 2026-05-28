@@ -53,19 +53,19 @@ POST /event/close
 
 |フィールド |タイプ |ルール |
 | :--- | :--- | :--- |
-| `event_id` | `string` |更新と終了には必須です。作成時に送信してはなりません。 |
+| `event_id` | `string` | update/close で必須。create では送信不可。1-64 文字、英数字/`_`/`:`/`-`。 |
 | `title` | `string` |作成時に必須。更新時と終了時のオプション。 |
 | `description` | `string` |オプション。空の文字列は欠落しているものとして扱われます。 |
 | `status` | `string` |必須;空ではなく、最大 24 文字。 |
 | `message` | `string` |必須;空ではなく、最大 512 文字。 |
 | `severity` | `string` |必須; `critical`、`high`、`normal`、`low`のみ。 |
-| `event_time` | `number` |必須;この更新が行われたとき、Unix ミリ秒。 |
-| `started_at` | `number` |作成のみ。Event全体の開始時間。 |
-| `ended_at` | `number` |閉じるだけ。Event全体の終了時間。 |
+| `event_time` | `number` | 必須。この更新の発生時刻。Unix 秒またはミリ秒を受け付け、ミリ秒へ正規化します。 |
+| `started_at` | `number` | create のみ。省略時は `event_time`。update/close では拒否されます。 |
+| `ended_at` | `number` | close のみ。省略時は `event_time`。create/update では拒否されます。 |
 | `tags` | `string[]` |最大 32 項目、それぞれ最大 64 文字、トリミングおよび重複排除。 |
 | `images` | `string[]` |最大 32 個の画像 URL、それぞれ最大 2048 文字。 |
 | `attrs` | `object` |オブジェクトパッチ; `null` はキーを削除します。配列は許可されません。 |
-| `metadata` | `object` | スカラー値のみ。キー <= 64、値 <= 512。 |
+| `metadata` | `object` | いいえ | カスタムのスカラー key-value。key <= 64、空でないスカラー value <= 512。ネストしたオブジェクトと配列は拒否されます。 |
 
 ## Event を作成する
 

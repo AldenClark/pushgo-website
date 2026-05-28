@@ -53,19 +53,19 @@ El cuerpo de la petición debe ser JSON y los campos desconocidos se rechazan. S
 
 | Campo | Tipo | Reglas |
 | :--- | :--- | :--- |
-| `event_id` | `string` | Requerido para actualizar y cerrar; no debe enviarse al crear. |
+| `event_id` | `string` | Obligatorio para update/close; no debe enviarse en create; 1-64 caracteres, letras/dígitos/`_`/`:`/`-`. |
 | `title` | `string` | Requerido al crear; Opcional al actualizar y cerrar. |
 | `description` | `string` | Opcional; las cadenas vacías se consideran faltantes. |
 | `status` | `string` | Requerido; no vacío, máximo 24 caracteres. |
 | `message` | `string` | Requerido; no vacío, máximo 512 caracteres. |
 | `severity` | `string` | Requerido; Sólo `critical`, `high`, `normal`, `low`. |
-| `event_time` | `number` | Requerido; cuando ocurrió esta actualización, Unix milisegundos. |
-| `started_at` | `number` | Crear únicamente; hora general de inicio del evento. |
-| `ended_at` | `number` | Sólo cerrar; hora general de finalización del evento. |
+| `event_time` | `number` | Obligatorio; momento de esta actualización; acepta segundos o milisegundos Unix y normaliza a milisegundos. |
+| `started_at` | `number` | Solo create; por defecto usa `event_time`; se rechaza en update/close. |
+| `ended_at` | `number` | Solo close; por defecto usa `event_time`; se rechaza en create/update. |
 | `tags` | `string[]` | Hasta 32 elementos, con un máximo de 64 caracteres cada uno, recortados y sin duplicados. |
 | `images` | `string[]` | Hasta 32 URL de imágenes, con un máximo de 2048 caracteres cada una. |
 | `attrs` | `object` | Parche de objetos; `null` quita una llave; No se permiten matrices. |
-| `metadata` | `object` | Sólo valores escalares; clave <= 64, valor <= 512. |
+| `metadata` | `object` | No | Pares clave-valor escalares; clave <= 64, valor escalar no vacío <= 512; objetos anidados y arrays se rechazan. |
 
 ## Crea un Event
 

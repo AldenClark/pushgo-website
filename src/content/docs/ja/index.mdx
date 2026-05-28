@@ -16,6 +16,8 @@ hero:
       icon: document
 ---
 
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
 PushGo は、通知と状態同期のためのオープンソースシステムです。最初の通知は公開 Gateway から送信できます。データ経路、認証、プライベート transport、MCP/OAuth を自分で管理したい場合は、独自の Gateway を運用できます。
 
 ## 目的別の入口
@@ -51,46 +53,56 @@ PushGo は、通知と状態同期のためのオープンソースシステム�
     <strong class="path-card__title">MCP リファレンス</strong>
     <span class="path-card__text">MCP クライアントが許可された Channel 内で Message、Event、Thing を扱えるようにします。</span>
   </a>
+  <a class="path-card" href="/ja/guides/ai-agent-notifications/">
+    <span class="path-card__label">AI agent 経路</span>
+    <strong class="path-card__title">AI Agent 通知</strong>
+    <span class="path-card__text">MCP と OAuth で agent やチャットボットから Message、Event、Thing を扱います。</span>
+  </a>
+  <a class="path-card" href="/ja/guides/notification-api/">
+    <span class="path-card__label">HTTP 入口</span>
+    <strong class="path-card__title">通知 API</strong>
+    <span class="path-card__text">curl、スクリプト、Webhook、CI/CD、NAS、自動化サービスから通知します。</span>
+  </a>
 </div>
 
 ## ダウンロードとエンドポイント
 
-### 公開済みコンポーネント
-
-- **iOS / macOS / watchOS**: [App Store からダウンロード](https://apps.apple.com/app/pushgo)
-- **Android**: [APK をダウンロード](https://github.com/AldenClark/pushgo-android/releases)
-- **Gateway**: [バイナリと Docker イメージ](https://github.com/AldenClark/pushgo-gateway/releases)
-
-### 公開 Gateway
-
-- **Global**: `https://gateway.pushgo.dev`
-- **中国本土**: `https://gateway.pushgo.cn`
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### 公開済みコンポーネント
+    - **iOS / macOS / watchOS**: [App Store からダウンロード](https://apps.apple.com/app/pushgo)
+    - **Android**: [APK をダウンロード](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [バイナリと Docker イメージ](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### 公開 Gateway
+    - **Global**: `https://gateway.pushgo.dev`
+    - **中国本土**: `https://gateway.pushgo.cn`
+  </div>
+</div>
 
 ## PushGo を使う理由
 
-### 3 つのデータモデル
-
-Message は一度きりの通知に使います。Event は更新できるライフサイクルを表します。Thing はデバイス、サービス、タスクの現在状態を保持します。
-
-### ネイティブ通知
-
-Apple クライアントは APNs 経由でシステム通知を受け取ります。Android クライアントは FCM とプライベート transport を組み合わせ、より柔軟な同期を行えます。
-
-### セルフホスティング
-
-Gateway は、永続データベース、Gateway 認証、プライベート transport、可観測性、リバースプロキシ構成を含めて、自分のインフラで運用できます。
-
-### エンドツーエンド暗号化フィールド
-
-機密情報は `ciphertext` に置き、クライアント側で復号できます。Gateway は認証、転送、配信だけを担当し、平文を理解する必要はありません。
-
-### 段階的な移行
-
-ntfy、Bark、ServerChan 互換エンドポイントを使うと、既存スクリプトを維持したまま PushGo のネイティブモデルへ移行できます。
-
-### MCP/OAuth
-
-Gateway は MCP HTTP Server として動作できます。AI アシスタントは、認可されたチャンネル範囲内で Message の送信、Event の管理、Thing の更新を実行できます。
+<CardGrid stagger>
+  <Card title="3 つのデータモデル" icon="document">
+    Message は一度きりの通知に使います。Event は更新できるライフサイクルを表します。Thing はデバイス、サービス、タスクの現在状態を保持します。
+  </Card>
+  <Card title="ネイティブ通知" icon="rocket">
+    Apple クライアントは APNs 経由でシステム通知を受け取ります。Android クライアントは FCM とプライベート transport を組み合わせ、より柔軟な同期を行えます。
+  </Card>
+  <Card title="セルフホスティング" icon="setting">
+    Gateway は、永続データベース、Gateway 認証、プライベート transport、可観測性、リバースプロキシ構成を含めて、自分のインフラで運用できます。
+  </Card>
+  <Card title="エンドツーエンド暗号化フィールド" icon="heart">
+    機密情報は `ciphertext` に置き、クライアント側で復号できます。Gateway は認証、転送、配信だけを担当し、平文を理解する必要はありません。
+  </Card>
+  <Card title="段階的な移行" icon="star">
+    ntfy、Bark、ServerChan 互換エンドポイントを使うと、既存スクリプトを維持したまま PushGo のネイティブモデルへ移行できます。
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Gateway は MCP HTTP Server として動作できます。AI アシスタントは、認可されたチャンネル範囲内で Message の送信、Event の管理、Thing の更新を実行できます。
+  </Card>
+</CardGrid>
 
 ## 最小リクエスト
 

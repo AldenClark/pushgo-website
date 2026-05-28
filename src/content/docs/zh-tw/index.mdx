@@ -16,6 +16,8 @@ hero:
       icon: document
 ---
 
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
 PushGo 是一個開源通知與狀態同步系統。你可以直接使用公共 Gateway 傳送第一則通知，也可以部署自己的 Gateway，把資料路徑、驗證、私人通道和 MCP/OAuth 控制在自己的基礎架構中。
 
 ## 先走哪一條路徑
@@ -51,46 +53,56 @@ PushGo 是一個開源通知與狀態同步系統。你可以直接使用公共 
     <strong class="path-card__title">MCP 參考</strong>
     <span class="path-card__text">讓 MCP 用戶端在授權 Channel 範圍內傳送 Message、管理 Event、更新 Thing。</span>
   </a>
+  <a class="path-card" href="/zh-tw/guides/ai-agent-notifications/">
+    <span class="path-card__label">AI Agent 路徑</span>
+    <strong class="path-card__title">AI Agent 通知</strong>
+    <span class="path-card__text">用 MCP 和 OAuth 讓 agent 與聊天機器人傳送通知、更新 Event、同步 Thing。</span>
+  </a>
+  <a class="path-card" href="/zh-tw/guides/notification-api/">
+    <span class="path-card__label">HTTP 接入口</span>
+    <strong class="path-card__title">通知 API</strong>
+    <span class="path-card__text">從 curl、指令碼、Webhook、CI/CD、NAS 和自動化服務傳送通知。</span>
+  </a>
 </div>
 
 ## 下載與端點
 
-### 已釋出元件
-
-- **iOS / macOS / watchOS**: [在 App Store 下載](https://apps.apple.com/app/pushgo)
-- **Android**: [下載 APK](https://github.com/AldenClark/pushgo-android/releases)
-- **Gateway**: [二進位與 Docker 映像](https://github.com/AldenClark/pushgo-gateway/releases)
-
-### 公共 Gateway
-
-- **Global**: `https://gateway.pushgo.dev`
-- **中國大陸**: `https://gateway.pushgo.cn`
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### 已釋出元件
+    - **iOS / macOS / watchOS**: [在 App Store 下載](https://apps.apple.com/app/pushgo)
+    - **Android**: [下載 APK](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [二進位與 Docker 映像](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### 公共 Gateway
+    - **Global**: `https://gateway.pushgo.dev`
+    - **中國大陸**: `https://gateway.pushgo.cn`
+  </div>
+</div>
 
 ## 為什麼選擇 PushGo
 
-### 三類資料模型
-
-Message 處理一次性提醒，Event 追蹤可多次更新的生命週期，Thing 維護裝置、服務或任務的目前狀態。
-
-### 平台原生投遞
-
-Apple 用戶端透過 APNs 接收系統通知，Android 用戶端可結合 FCM 和私人通道取得更靈活的同步能力。
-
-### 可私人部署
-
-Gateway 可執行在自己的基礎架構上，支援持久化資料庫、Gateway 驗證、私人通道、可觀測性和反向代理部署。
-
-### 端對端加密欄位
-
-敏感展示欄位可以放入 `ciphertext`，由用戶端本地解密。Gateway 只負責透傳、驗證和分發，不需要理解明文內容。
-
-### 遷移成本低
-
-相容 ntfy、Bark 和 ServerChan 的入口，適合先保留現有指令碼，再逐步升級到 PushGo 原生資料模型。
-
-### MCP/OAuth
-
-Gateway 可作為 MCP HTTP Server，讓 AI 助理在使用者授權 Channel 範圍內傳送 Message、管理 Event 和更新 Thing。
+<CardGrid stagger>
+  <Card title="三類資料模型" icon="document">
+    Message 處理一次性提醒，Event 追蹤可多次更新的生命週期，Thing 維護裝置、服務或任務的目前狀態。
+  </Card>
+  <Card title="平台原生投遞" icon="rocket">
+    Apple 用戶端透過 APNs 接收系統通知，Android 用戶端可結合 FCM 和私人通道取得更靈活的同步能力。
+  </Card>
+  <Card title="可私人部署" icon="setting">
+    Gateway 可執行在自己的基礎架構上，支援持久化資料庫、Gateway 驗證、私人通道、可觀測性和反向代理部署。
+  </Card>
+  <Card title="端對端加密欄位" icon="heart">
+    敏感展示欄位可以放入 `ciphertext`，由用戶端本地解密。Gateway 只負責透傳、驗證和分發，不需要理解明文內容。
+  </Card>
+  <Card title="遷移成本低" icon="star">
+    相容 ntfy、Bark 和 ServerChan 的入口，適合先保留現有指令碼，再逐步升級到 PushGo 原生資料模型。
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Gateway 可作為 MCP HTTP Server，讓 AI 助理在使用者授權 Channel 範圍內傳送 Message、管理 Event 和更新 Thing。
+  </Card>
+</CardGrid>
 
 ## 最小請求範例
 

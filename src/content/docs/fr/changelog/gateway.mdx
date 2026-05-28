@@ -2,6 +2,16 @@
 title: Journal des modifications du Gateway
 description: Historique des versions de PushGo Gateway.
 ---
+
+## v1.2.9
+*2026-05-26*
+
+### Amélioré
+- Fiabilité améliorée du rafraîchissement des identifiants fournisseur : les chemins de nouvelle tentative ciblés forcent une récupération fraîche auprès du token-provider, tandis que l'envoi normal reste prioritaire sur le cache.
+- Sélection explicite du profil d'exécution : `small` reste le profil par défaut pour les déploiements privés ou légers, et `public` cible les fortes charges.
+- Les réglages fins des files, du dispatch, des fournisseurs, des pools de base de données et de SQLite sont désormais des valeurs internes au profil afin de réduire les risques de mauvaise configuration.
+- Les lignes de statistiques conservées après échec de persistance sont bornées, ce qui évite une croissance mémoire non limitée en cas de pression temporaire sur le stockage.
+
 ## v1.2.8
 *2026-05-13*
 
@@ -23,7 +33,7 @@ description: Historique des versions de PushGo Gateway.
 ### Amélioré
 - Introduction de l'instantané Gateway actuel après la v1.2.5 dans la ligne de version et alignement de la version d'exécution, des métadonnées du package et de l'étiquetage de diagnostic.
 
-##v1.2.5
+## v1.2.5
 *2026-04-22*
 
 ### Corrigé
@@ -54,7 +64,7 @@ description: Historique des versions de PushGo Gateway.
 ### Amélioré
 - Intégration des modifications accumulées de Gateway après la v1.2.1 dans la version de base de la version de production et synchronisation de la documentation de la version avec les métadonnées de la version de diagnostic.
 
-##v1.2.1
+## v1.2.1
 *2026-04-15*
 
 ### Amélioré

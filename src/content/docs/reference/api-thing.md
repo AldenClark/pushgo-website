@@ -57,7 +57,7 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 
 | Field | Type | Rules |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | Required for update, archive, and delete; must not be sent on create. |
+| `thing_id` | `string` | Required for update, archive, and delete; must not be sent on create; 1-64 chars, letters/digits/`_`/`:`/`-`. |
 | `title` | `string` | Recommended on create; the Gateway currently does not reject missing `title`. |
 | `description` | `string` | Optional; empty strings are treated as missing. |
 | `tags` | `string[]` | Up to 32 items, max 64 chars each, trimmed and deduplicated. |
@@ -65,11 +65,11 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 | `images` | `string[]` | Up to 32 image URLs, max 2048 chars each. |
 | `created_at` | `number` | Create only; falls back to `observed_at` when omitted. |
 | `deleted_at` | `number` | Delete only; falls back to `observed_at` when omitted. |
-| `observed_at` | `number` | Required; observation time for this state update, Unix milliseconds. |
-| `external_ids` | `object` | key pattern `[A-Za-z0-9_:.\-]`, key <= 64; value is `string` or `null`. |
-| `location_type` + `location_value` | `string` + `string` | Must appear together; type is `physical`, `geo`, `cloud`, `datacenter`, or `logical`. |
+| `observed_at` | `number` | Required; observation time for this state update; Unix seconds or milliseconds accepted and normalized to milliseconds. |
+| `external_ids` | `object` | Key pattern `[A-Za-z0-9_:.-]`, key <= 64 and lowercased; value is non-empty `string` <= 256 or `null` to remove. |
+| `location_type` + `location_value` | `string` + `string` | Must appear together; type is `physical`, `geo`, `cloud`, `datacenter`, or `logical`. Formats: `geo` is `lat,lng`, `cloud` is `provider:region[:zone]`, `datacenter` is `site[:room[:rack]]`, `logical` is slash-separated tokens. |
 | `attrs` | `object` | Object patch; `null` removes a key; arrays are not allowed; only one nested object level. |
-| `metadata` | `object` | Scalar values only; key <= 64, value <= 512. |
+| `metadata` | `object` | No | Custom scalar key-values; key <= 64, non-empty scalar value <= 512; nested objects and arrays are rejected. |
 
 ## Create a Thing
 

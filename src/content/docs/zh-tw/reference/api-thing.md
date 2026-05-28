@@ -56,7 +56,7 @@ POST /thing/delete
 
 | 欄位 | 型別 | 規則 |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | 更新、歸檔和刪除必填；建立時不能傳，由 Gateway 生成。 |
+| `thing_id` | `string` | update/archive/delete 必填；create 時不得傳入；1-64 個字元，可用字母、數字、`_`、`:`、`-`。 |
 | `title` | `string` | 建立時建議傳；當前 Gateway 不因缺少 `title` 拒絕建立。 |
 | `description` | `string` | 可選；空字串依預設處理。 |
 | `tags` | `string[]` | 最多 32 項，每項最多 64 字元，trim 後去重。 |
@@ -64,11 +64,11 @@ POST /thing/delete
 | `images` | `string[]` | 最多 32 項，每項最多 2048 字元，trim 後去重。 |
 | `created_at` | `number` | 僅 create 允許；不傳時回退為 `observed_at`。 |
 | `deleted_at` | `number` | 僅 delete 允許；不傳時回退為 `observed_at`。 |
-| `observed_at` | `number` | 必填；本次狀態觀測時間，Unix 毫秒時間戳記。 |
-| `external_ids` | `object` | key 僅允許 `[A-Za-z0-9_:.\-]`，key <= 64；value 僅 `string` 或 `null`。 |
-| `location_type` + `location_value` | `string` + `string` | 必須成對出現；`location_type` 僅允許 `physical`、`geo`、`cloud`、`datacenter`、`logical`。 |
+| `observed_at` | `number` | 必填；本次狀態觀測時間；接受 Unix 秒或毫秒，並歸一化為毫秒。 |
+| `external_ids` | `object` | key 格式 `[A-Za-z0-9_:.-]`、<= 64 並會轉小寫；value 為非空 `string` <= 256，或用 `null` 刪除。 |
+| `location_type` + `location_value` | `string` + `string` | 必須同時出現；type 為 `physical`、`geo`、`cloud`、`datacenter` 或 `logical`。格式：`geo` 為 `lat,lng`，`cloud` 為 `provider:region[:zone]`，`datacenter` 為 `site[:room[:rack]]`，`logical` 為斜線分隔 token。 |
 | `attrs` | `object` | 物件補丁；value 為 `null` 表示刪鍵；不允許陣列；物件巢狀僅支援一層。 |
-| `metadata` | `object` | 僅支援標量值；key <= 64，value <= 512。 |
+| `metadata` | `object` | 否 | 自訂標量鍵值；key <= 64，非空標量 value <= 512；拒絕巢狀物件和陣列。 |
 
 ## 建立實體
 

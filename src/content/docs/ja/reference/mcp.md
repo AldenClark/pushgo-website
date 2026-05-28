@@ -34,10 +34,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 動的クライアント登録を有効にします。 |
 | `PUSHGO_MCP_PREDEFINED_CLIENTS` |なし | `client_id:client_secret` 形式の事前定義された OAuth クライアント。 |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` |アクセストークンの有効期間。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` |リフレッシュトークンの絶対有効期間。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` |リフレッシュトークンのアイドル期間。 |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel バインド ページ セッションの有効期間。 |
+バインドセッションとトークン寿命は現在の Gateway ランタイムプロファイルで管理されます。v1.2.9 では公開 CLI/env 設定ではありません。
 
 クライアントが DCR をサポートしていない場合は、`PUSHGO_MCP_PREDEFINED_CLIENTS` を使用します。
 
@@ -60,7 +57,6 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 6. アシスタントは `pushgo.channel.bind.status` をポーリングします。
 7. 承認後、アシスタントはバインドされたチャネル スコープ内でツールを呼び出すことができます。
 
-バインド セッションの有効期間は、`PUSHGO_MCP_BIND_SESSION_TTL_SECS` によって制御されます。
 
 ## ツール
 
@@ -109,7 +105,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ## 操作
 
 - MCP 許可は永続化されます。データベースまたはストレージ ディレクトリを使い捨てキャッシュとして扱わないでください。
-- アクセス トークンの有効期間は短くなります。リフレッシュ トークンの有効期間は長くなります。クライアントのリスクに基づいて TTL を調整します。
+- v1.2.9 では token とバインドセッションの寿命はプロファイル管理のランタイム設定です。TTL 環境変数ではなく適切なランタイムプロファイルを選択してください。
 - 事前定義されたクライアント シークレットを定期的にローテーションします。
 - リスクの高い自動化には、すべてを 1 つのチャネルに許可するのではなく、別のチャネルを使用します。
 - 操作デバッグには、Gateway 構造化ログと統計を使用します。
@@ -119,7 +115,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 症状 | 確認項目 |
 | :--- | :--- |
 | クライアントが OAuth メタデータを検出できない | `PUSHGO_PUBLIC_BASE_URL` は外部 HTTPS URL である必要があります。リバースプロキシが well-known ルートを転送しているか確認します。 |
-|バインドリンクが開かない |パブリック DNS、HTTPS 証明書、リバース プロキシ パス、および `PUSHGO_MCP_BIND_SESSION_TTL_SECS`。 |
+| バインドリンクが開かない | 公開 DNS、HTTPS 証明書、リバースプロキシパス、`PUSHGO_PUBLIC_BASE_URL`、バインドセッションの期限切れ有無。 |
 | DCR が失敗する |クライアント DCR サポートおよび `PUSHGO_MCP_DCR_ENABLED`。 |
 |ツール呼び出しで `password` が要求される |レガシー モードであるか、OAuth 認証が不完全である可能性があります。 |
 |承認されていますが、チャンネルが表示されません |バインド セッションの完了、スコープ、およびチャネル許可が取り消されたかどうか。 |

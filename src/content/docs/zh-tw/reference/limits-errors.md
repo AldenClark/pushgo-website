@@ -12,11 +12,12 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 | Gateway 產生 ID | 32 位元小寫十六進位字串。 |
 | Channel 密碼 | 通常為 8-128 字元。 |
 | `op_id` | 1-128 字元，只允許字母、數字、`_`、`:`、`-`。 |
+| `thing_id` / `event_id` | 1-64 字元，只允許字母、數字、`_`、`:`、`-`。 |
 | `images` | 最多 32 項，每項 URL 最大 2048 字元。 |
 | `tags` | 最多 32 項，每項最大 64 字元，trim 後去重。 |
-| `metadata` | 只支援標量值；key 最大 64，value 最大 512。 |
-| `attrs` | 物件補丁；`null` 表示刪鍵；複雜巢狀應避免。 |
-| `ttl` | Unix 毫秒時間戳記；provider 投遞 TTL 會被裁切到最大約 28 天。 |
+| `metadata` | 僅允許標量值；key 最大 64，非空標量 value 最大 512；不允許巢狀物件或陣列。 |
+| `attrs` | 物件 patch；`null` 刪除 key；陣列和深層巢狀會被拒絕。 |
+| `ttl` 與 API 時間戳 | 文件註明的時間欄位接受 Unix 秒或毫秒，並歸一化為毫秒。 |
 | 未知欄位 | 原生 Message、Event、Thing 和 MCP 工具引數都採用嚴格解析，未知欄位會傳回 400。 |
 
 ## 回應 envelope

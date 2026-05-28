@@ -30,14 +30,10 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 
 Paramètres communs :
 
-| Variable d'environnement | Par défaut | Descriptif |
+| Variable d'environnement | Par défaut | Description |
 | :--- | :--- | :--- |
-| `PUSHGO_MCP_DCR_ENABLED` | `true` | Permet l'enregistrement dynamique des clients. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | aucun | Clients OAuth prédéfinis au format `client_id:client_secret`. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Durée de vie du jeton d’accès. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Durée de vie absolue du refresh token. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Durée d'inactivité du refresh token. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Durée de vie de la session de page de liaison Channel. |
+| `PUSHGO_MCP_DCR_ENABLED` | `true` | Active l'enregistrement dynamique des clients. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | aucun | Clients OAuth prédéfinis au format `client_id:client_secret` ; séparez plusieurs clients par retour à la ligne ou point-virgule. |
 
 Si le client ne prend pas en charge DCR, utilisez `PUSHGO_MCP_PREDEFINED_CLIENTS`.
 
@@ -60,7 +56,7 @@ Préférez l’autorisation OAuth2 en production.
 6. L'assistant interroge `pushgo.channel.bind.status`.
 7. Après autorisation, l'assistant peut appeler des outils dans la portée du Channel lié.
 
-La durée de vie de la session de liaison est contrôlée par `PUSHGO_MCP_BIND_SESSION_TTL_SECS`.
+Les sessions de liaison et durées de vie des tokens sont gérées par le profil d'exécution Gateway courant ; en v1.2.9, ce ne sont pas des options CLI/env publiques.
 
 ## Outils
 
@@ -109,7 +105,7 @@ La durée de vie de la session de liaison est contrôlée par `PUSHGO_MCP_BIND_S
 ## Opérations
 
 - Les subventions MCP sont conservées ; ne traitez pas la base de données ou le répertoire de stockage comme un cache jetable.
-- Les jetons d'accès sont de courte durée  ; les jetons d’actualisation ont une durée de vie plus longue. Ajustez les TTL en fonction du risque client.
+- Les durées de vie des tokens et sessions de liaison sont des réglages internes au profil en v1.2.9 ; choisissez le bon profil d'exécution au lieu de définir des variables TTL.
 - Faites régulièrement pivoter les secrets clients prédéfinis.
 - Utilisez des canaux séparés pour une automatisation à haut risque au lieu de tout autoriser sur un seul Channel.
 - Utilisez les journaux et statistiques structurés Gateway pour le débogage opérationnel.
@@ -119,7 +115,7 @@ La durée de vie de la session de liaison est contrôlée par `PUSHGO_MCP_BIND_S
 | Symptôme | Vérifier |
 | :--- | :--- |
 | Le client ne peut pas découvrir les métadonnées OAuth | `PUSHGO_PUBLIC_BASE_URL` doit être une URL HTTPS externe ; le proxy inverse doit transmettre des itinéraires bien connus. |
-| Le lien de liaison ne s'ouvre pas | DNS public, certificat HTTPS, chemin de proxy inverse et `PUSHGO_MCP_BIND_SESSION_TTL_SECS`. |
+| Le lien de liaison ne s'ouvre pas | DNS public, certificat HTTPS, chemin du reverse proxy, `PUSHGO_PUBLIC_BASE_URL` et expiration éventuelle de la session de liaison. |
 | DCR échoue | Prise en charge client DCR et `PUSHGO_MCP_DCR_ENABLED`. |
 | L’appel d’outil demande `password` | Vous êtes peut-être en mode hérité ou l’autorisation OAuth est incomplète. |
 | Autorisé mais aucune Channel visible | Vérifiez la fin de la session de liaison, les scopes et l’éventuelle révocation de l’accès au Channel. |

@@ -169,11 +169,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 环境变量 | 默认值 | 说明 |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 是否允许 Dynamic Client Registration。 |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 无 | 预置 OAuth 客户端，格式为 `client_id:client_secret`。 |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | access token 有效期。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | refresh token 绝对有效期。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | refresh token 空闲有效期。 |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | 频道绑定页面会话有效期。 |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 无 | 预置 OAuth 客户端，格式为 `client_id:client_secret`；多个客户端用换行或分号分隔。 |
 
 更多工具和授权流程见 [MCP 参考](/zh/reference/mcp/)。
 
@@ -183,6 +179,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP API、WSS、MCP/OAuth 的监听地址。 |
 | `--db-url` / `PUSHGO_DB_URL` | 无，必填 | 数据库 URL，支持 SQLite、PostgreSQL 和 MySQL。 |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | 运行时容量档位：`small` 用于私有/轻量部署，`public` 用于高负载部署。 |
 | `--token` / `PUSHGO_TOKEN` | 无 | 网关级 Bearer Token；为空时不启用网关级 Token 鉴权。 |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | token-service 地址，生产环境建议显式设置。 |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | 无 | 对外 HTTPS 根地址。 |
@@ -198,18 +195,9 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 - 生产排障优先使用 `PUSHGO_OBSERVABILITY_PROFILE=ops`，临时深查再切到 `incident` 或 `debug`。
 - Android 私有通道问题先检查 `/gateway/profile` 宣告的端口和外部可访问性。
 
-常用容量相关变量：
+运行时容量：
 
-| 环境变量 | 说明 |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | 分发 worker 数量覆盖值。 |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | 分发队列容量覆盖值。 |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | 私有通道 fallback 调度队列容量。 |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | 单连接私有投递队列容量。 |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | APNs 进程内最大发送并发数。 |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | 分发目标缓存 TTL。 |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite page-cache 目标值。 |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL 自动 checkpoint 页数。 |
+Gateway v1.2.9 的运行容量由运行时档位管理。私有或轻量部署使用 `PUSHGO_RUNTIME_PROFILE=small`，高负载公网部署使用 `PUSHGO_RUNTIME_PROFILE=public`。队列、分发、提供商、数据库连接池和 SQLite 等底层调优值现在是档位内置默认值，不再作为公开环境变量配置。
 
 ## 升级与回滚
 

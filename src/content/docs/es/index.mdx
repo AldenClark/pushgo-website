@@ -1,6 +1,6 @@
 ---
 title: PushGo
-description: Sincronización de notificaciónes, eventos y estados para automatización personal, operaciones, IoT y flujos de trabajo de IA.
+description: Sincronización de notificaciones, eventos y estados para automatización personal, operaciones, IoT y flujos de trabajo de IA.
 template: splash
 hero:
   tagline: Modele alertas, procesos y estados con Message, Event y Thing.
@@ -16,7 +16,9 @@ hero:
       icon: document
 ---
 
-PushGo es un sistema open source para notificaciónes y sincronización de estado. Puede usar el Gateway publico para enviar la primera notificación o ejecutar su propio Gateway cuando necesite controlar rutas de datos, autenticación, transportes privados y MCP/OAuth.
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+PushGo es un sistema open source para notificaciones y sincronización de estado. Puede usar el Gateway público para enviar la primera notificación o ejecutar su propio Gateway cuando necesite controlar rutas de datos, autenticación, transportes privados y MCP/OAuth.
 
 ## Elija el punto de partida
 
@@ -51,46 +53,56 @@ PushGo es un sistema open source para notificaciónes y sincronización de estad
     <strong class="path-card__title">Referencia MCP</strong>
     <span class="path-card__text">Permita que clientes MCP envíen Message, gestionen Event y actualicen Thing en Channels autorizados.</span>
   </a>
+  <a class="path-card" href="/es/guides/ai-agent-notifications/">
+    <span class="path-card__label">Ruta agente IA</span>
+    <strong class="path-card__title">Notificaciones de agentes IA</strong>
+    <span class="path-card__text">Use MCP y OAuth para que agentes y chatbots envíen Message, Event y Thing.</span>
+  </a>
+  <a class="path-card" href="/es/guides/notification-api/">
+    <span class="path-card__label">Entrada HTTP</span>
+    <strong class="path-card__title">API de notificación</strong>
+    <span class="path-card__text">Envíe notificaciones desde curl, scripts, webhooks, CI/CD, NAS y automatización.</span>
+  </a>
 </div>
 
 ## Descargas y endpoints
 
-### Componentes publicados
-
-- **iOS / macOS / watchOS**: [Descargar desde App Store](https://apps.apple.com/app/pushgo)
-- **Android**: [Descargar APK](https://github.com/AldenClark/pushgo-android/releases)
-- **Gateway**: [Binarios e imágenes Docker](https://github.com/AldenClark/pushgo-gateway/releases)
-
-### Gateways públicos
-
-- **Global**: `https://gateway.pushgo.dev`
-- **China continental**: `https://gateway.pushgo.cn`
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### Componentes publicados
+    - **iOS / macOS / watchOS**: [Descargar desde App Store](https://apps.apple.com/app/pushgo)
+    - **Android**: [Descargar APK](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [Binarios e imágenes Docker](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### Gateways públicos
+    - **Global**: `https://gateway.pushgo.dev`
+    - **China continental**: `https://gateway.pushgo.cn`
+  </div>
+</div>
 
 ## Por qué PushGo
 
-### Tres modelos de datos
-
-Message sirve para notificaciónes puntuales. Event describe un ciclo de vida actualizable. Thing mantiene el estado actual de un dispositivo, servicio o trabajo.
-
-### Entrega nativa
-
-Los clientes Apple reciben notificaciónes del sistema mediante APNs. Los clientes Android pueden combinar FCM con transportes privados para una sincronización más flexible.
-
-### Autoalojamiento
-
-Gateway puede ejecutarse en su propia infraestructura con base de datos persistente, autenticación de Gateway, transportes privados, observabilidad y soporte para reverse proxy.
-
-### Campos cifrables de extremo a extremo
-
-El contenido sensible puede colocarse en `ciphertext` y descifrarse localmente en el cliente. Gateway autentica, retransmite y distribuye sin necesitar entender el contenido en claro.
-
-### Migración gradual
-
-Los endpoints compatibles con ntfy, Bark y ServerChan permiten conservar scripts existentes mientras migra gradualmente a los modelos nativos de PushGo.
-
-### MCP/OAuth
-
-Gateway puede actuar como MCP HTTP Server. Los asistentes de IA pueden enviar Message, administrar Event y actualizar Thing dentro del alcance de canales autorizado.
+<CardGrid stagger>
+  <Card title="Tres modelos de datos" icon="document">
+    Message sirve para notificaciones puntuales. Event describe un ciclo de vida actualizable. Thing mantiene el estado actual de un dispositivo, servicio o trabajo.
+  </Card>
+  <Card title="Entrega nativa" icon="rocket">
+    Los clientes Apple reciben notificaciones del sistema mediante APNs. Los clientes Android pueden combinar FCM con transportes privados para una sincronización más flexible.
+  </Card>
+  <Card title="Autoalojamiento" icon="setting">
+    Gateway puede ejecutarse en su propia infraestructura con base de datos persistente, autenticación de Gateway, transportes privados, observabilidad y soporte para reverse proxy.
+  </Card>
+  <Card title="Campos cifrables de extremo a extremo" icon="heart">
+    El contenido sensible puede colocarse en `ciphertext` y descifrarse localmente en el cliente. Gateway autentica, retransmite y distribuye sin necesitar entender el contenido en claro.
+  </Card>
+  <Card title="Migración gradual" icon="star">
+    Los endpoints compatibles con ntfy, Bark y ServerChan permiten conservar scripts existentes mientras migra gradualmente a los modelos nativos de PushGo.
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Gateway puede actuar como MCP HTTP Server. Los asistentes de IA pueden enviar Message, administrar Event y actualizar Thing dentro del alcance de canales autorizados.
+  </Card>
+</CardGrid>
 
 ## Petición mínima
 
@@ -105,4 +117,4 @@ curl -X POST https://gateway.pushgo.dev/message \
   }'
 ```
 
-Continue con [Empezar](/es/guides/getting-started/) para enviar esta petición con un canal real.
+Continúe con [Empezar](/es/guides/getting-started/) para enviar esta petición con un canal real.

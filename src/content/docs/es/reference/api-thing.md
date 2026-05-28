@@ -56,7 +56,7 @@ El cuerpo de la petición debe ser JSON y los campos desconocidos se rechazan. S
 
 | Campo | Tipo | Reglas |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | Requerido para actualizar, archivar y eliminar; no debe enviarse al crear. |
+| `thing_id` | `string` | Obligatorio para update/archive/delete; no debe enviarse en create; 1-64 caracteres, letras/dígitos/`_`/`:`/`-`. |
 | `title` | `string` | Recomendado para crear; Actualmente, el Gateway no rechaza el `title` faltante. |
 | `description` | `string` | Opcional; las cadenas vacías se consideran faltantes. |
 | `tags` | `string[]` | Hasta 32 elementos, con un máximo de 64 caracteres cada uno, recortados y sin duplicados. |
@@ -64,11 +64,11 @@ El cuerpo de la petición debe ser JSON y los campos desconocidos se rechazan. S
 | `images` | `string[]` | Hasta 32 URL de imágenes, con un máximo de 2048 caracteres cada una. |
 | `created_at` | `number` | Crear únicamente; vuelve a `observed_at` cuando se omite. |
 | `deleted_at` | `number` | Eliminar sólo; vuelve a `observed_at` cuando se omite. |
-| `observed_at` | `number` | Requerido; Tiempo de observación para esta actualización de estado, milisegundos Unix. |
-| `external_ids` | `object` | patrón de clave `[A-Za-z0-9_:.\-]`, clave <= 64; El valor es `string` o `null`. |
-| `location_type` + `location_value` | `string` + `string` | Deben presentarse juntos; El tipo es `physical`, `geo`, `cloud`, `datacenter` o `logical`. |
+| `observed_at` | `number` | Obligatorio; momento de observación de este estado; acepta segundos o milisegundos Unix y normaliza a milisegundos. |
+| `external_ids` | `object` | Patrón de clave `[A-Za-z0-9_:.-]`, clave <= 64 y en minúsculas; valor `string` no vacío <= 256 o `null` para eliminar. |
+| `location_type` + `location_value` | `string` + `string` | Deben aparecer juntos; tipo `physical`, `geo`, `cloud`, `datacenter` o `logical`. Formatos: `geo` es `lat,lng`, `cloud` es `provider:region[:zone]`, `datacenter` es `site[:room[:rack]]`, `logical` son tokens separados por `/`. |
 | `attrs` | `object` | Parche de objetos; `null` quita una llave; no se permiten matrices; sólo un nivel de objeto anidado. |
-| `metadata` | `object` | Sólo valores escalares; clave <= 64, valor <= 512. |
+| `metadata` | `object` | No | Pares clave-valor escalares; clave <= 64, valor escalar no vacío <= 512; objetos anidados y arrays se rechazan. |
 
 ## Crear un Thing
 

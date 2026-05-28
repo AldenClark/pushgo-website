@@ -169,10 +169,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` |動的クライアント登録を有効にします。 |
 | `PUSHGO_MCP_PREDEFINED_CLIENTS` |なし | `client_id:client_secret` 形式の事前定義された OAuth クライアント。 |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` |アクセストークンの有効期間。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` |リフレッシュトークンの絶対有効期間。 |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` |リフレッシュトークンのアイドル期間。 |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel バインド ページ セッションの有効期間。 |
+バインドセッションとトークン寿命は現在の Gateway ランタイムプロファイルで管理されます。v1.2.9 では公開 CLI/env 設定ではありません。
 
 ツールと認証フローについては、[MCP リファレンス](/ja/reference/mcp/) を参照してください。
 
@@ -182,6 +179,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP API、WSS、および MCP/OAuth リスナー。 |
 | `--db-url` / `PUSHGO_DB_URL` |必須 |データベースの URL。 SQLite、PostgreSQL、MySQLをサポートします。 |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | ランタイム容量プロファイル: プライベート/軽量デプロイは `small`、高負荷デプロイは `public`。 |
 | `--token` / `PUSHGO_TOKEN` |なし |ゲートウェイレベルのBearerトークン。空は無効を意味します。 |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` |トークンサービス URL。本番環境で明示的に設定します。 |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` |なし |外部 HTTPS ルート URL。 |
@@ -197,18 +195,9 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 - 本番環境のトラブルシューティングには `PUSHGO_OBSERVABILITY_PROFILE=ops` を使用します。さらに詳しく調査するために、一時的に `incident` または `debug` に上げます。
 - Android のプライベート トランスポートの問題については、`/gateway/profile` および外部から到達可能なポートから始めます。
 
-容量関連の設定:
+ランタイム容量:
 
-|環境変数 |説明 |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` |派遣労働者の数を上書きします。 |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` |ディスパッチキューの容量をオーバーライドします。 |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` |プライベート トランスポート フォールバック タスク キューの容量。 |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` |接続ごとのプライベート配信キューの容量。 |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` |プロセスごとに最大 APNs が飛行中に送信されます。 |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` |ディスパッチターゲットキャッシュTTL。 |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite ページ キャッシュ ターゲット。 |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL 自動チェックポイントのページ数。 |
+Gateway v1.2.9 ではランタイム容量はプロファイル管理です。プライベートまたは軽量デプロイには `PUSHGO_RUNTIME_PROFILE=small`、高負荷の公開デプロイには `PUSHGO_RUNTIME_PROFILE=public` を使います。キュー、ディスパッチ、プロバイダー、DB プール、SQLite の細かな調整値は公開環境変数ではなく、プロファイル内部の既定値です。
 
 ## アップグレードとロールバック
 

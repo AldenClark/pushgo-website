@@ -9,6 +9,7 @@ const distRoot = path.join(root, 'dist');
 const publicRoot = path.join(root, 'public');
 
 const locales = ['root', 'zh', 'zh-tw', 'de', 'fr', 'ja', 'ko', 'es'];
+const localizedLocales = locales.filter((locale) => locale !== 'root');
 const slugs = [
 	'ai-agent-notifications',
 	'notification-api',
@@ -48,18 +49,97 @@ async function read(file) {
 	return readFile(file, 'utf8');
 }
 
+function stripFrontmatter(content) {
+	return content.replace(/^---[\s\S]*?---\s*/, '');
+}
+
+function structureSignature(content) {
+	const body = stripFrontmatter(content);
+	return {
+		headingLevels: [...body.matchAll(/^(#{2,4})\s+(.+)$/gm)].map((match) => match[1].length),
+		versionHeadings: [...body.matchAll(/^##\s+(v\d+\.\d+\.\d+)/gm)].map((match) => match[1]),
+		codeFences: [...body.matchAll(/^```(\w*)/gm)].map((match) => match[1] || ''),
+		cardCount: [...body.matchAll(/<Card\b/g)].length,
+		cardGridCount: [...body.matchAll(/<CardGrid\b/g)].length,
+		pathCardCount: [...body.matchAll(/class="path-card"/g)].length,
+		tableLineCount: [...body.matchAll(/^\|.*\|$/gm)].length,
+	};
+}
+
+async function docsFilesFor(locale) {
+	const base = locale === 'root' ? docsRoot : path.join(docsRoot, locale);
+	const files = await walk(base);
+	return files
+		.filter((file) => /\.(md|mdx)$/.test(file))
+		.map((file) => path.relative(base, file))
+		.filter((file) => locale !== 'root' || !localizedLocales.some((candidate) => file.startsWith(`${candidate}/`)))
+		.sort();
+}
+
+function assertSameStructure(baseFile, localeFile, baseSignature, localeSignature) {
+	for (const key of Object.keys(baseSignature)) {
+		if (JSON.stringify(baseSignature[key]) !== JSON.stringify(localeSignature[key])) {
+			fail(`${localeFile} structure differs from ${baseFile}: ${key}`);
+		}
+	}
+}
+
 for (const locale of locales) {
 	const supportFile =
 		locale === 'root'
 			? path.join(docsRoot, 'support.md')
 			: path.join(docsRoot, locale, 'support.md');
 	if (!existsSync(supportFile)) fail(`Missing support page: ${supportFile}`);
+
+	const indexFile =
+		locale === 'root'
+			? path.join(docsRoot, 'index.mdx')
+			: path.join(docsRoot, locale, 'index.mdx');
+	if (!existsSync(indexFile)) {
+		fail(`Missing localized homepage: ${indexFile}`);
+	} else {
+		const indexContent = await read(indexFile);
+		const prefix = locale === 'root' ? '' : `/${locale}`;
+		const pathCardCount = [...indexContent.matchAll(/class="path-card"/g)].length;
+		const whyCardCount = [...indexContent.matchAll(/<Card title=/g)].length;
+		for (const token of [
+			"import { Card, CardGrid } from '@astrojs/starlight/components';",
+			'<div class="hero-columns">',
+			'<CardGrid stagger>',
+			`${prefix}/guides/ai-agent-notifications/`,
+			`${prefix}/guides/notification-api/`,
+		]) {
+			if (!indexContent.includes(token)) fail(`${indexFile} missing homepage layout token: ${token}`);
+		}
+		if (pathCardCount !== 8) fail(`${indexFile} should contain 8 path cards, found ${pathCardCount}`);
+		if (whyCardCount !== 6) fail(`${indexFile} should contain 6 Why PushGo cards, found ${whyCardCount}`);
+	}
+
 	for (const slug of slugs) {
 		const file =
 			locale === 'root'
 				? path.join(docsRoot, 'guides', `${slug}.md`)
 				: path.join(docsRoot, locale, 'guides', `${slug}.md`);
 		if (!existsSync(file)) fail(`Missing SEO/GEO page: ${file}`);
+	}
+}
+
+const rootDocsFiles = await docsFilesFor('root');
+for (const locale of localizedLocales) {
+	const localeDocsFiles = await docsFilesFor(locale);
+	if (JSON.stringify(localeDocsFiles) !== JSON.stringify(rootDocsFiles)) {
+		fail(`${locale} docs file set differs from root locale`);
+		continue;
+	}
+	for (const relativeFile of rootDocsFiles) {
+		const rootFile = path.join(docsRoot, relativeFile);
+		const localeFile = path.join(docsRoot, locale, relativeFile);
+		assertSameStructure(
+			rootFile,
+			localeFile,
+			structureSignature(await read(rootFile)),
+			structureSignature(await read(localeFile)),
+		);
 	}
 }
 

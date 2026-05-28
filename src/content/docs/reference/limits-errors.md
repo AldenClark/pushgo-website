@@ -13,11 +13,12 @@ This page summarizes rules shared across APIs. Required fields, lifecycle behavi
 | Gateway-generated IDs | 32 lowercase hex characters. |
 | Channel password | Usually 8-128 characters. |
 | `op_id` | 1-128 characters; letters, digits, `_`, `:`, `-`. |
+| `thing_id` / `event_id` | 1-64 characters; letters, digits, `_`, `:`, `-`. |
 | `images` | Up to 32 URLs, max 2048 characters each. |
 | `tags` | Up to 32 tags, max 64 characters each, trimmed and deduplicated. |
-| `metadata` | Scalar values only; key max 64, value max 512. |
-| `attrs` | Object patch; `null` removes a key; avoid complex nesting. |
-| `ttl` | Unix-millisecond timestamp; provider delivery TTL is capped around 28 days. |
+| `metadata` | Scalar values only; key max 64, non-empty scalar value max 512; no nested objects or arrays. |
+| `attrs` | Object patch; `null` removes a key; arrays and deep nesting are rejected. |
+| `ttl` and API timestamps | Unix seconds or milliseconds accepted where documented; values normalize to milliseconds. |
 | Unknown fields | Native Message, Event, Thing, and MCP tool arguments are strict; unknown fields return 400. |
 
 ## Response Envelope
@@ -88,6 +89,7 @@ Treat `accepted` as Gateway acceptance and dispatch status, not as an end-device
 - Header must be `Authorization: Bearer <token>`.
 - Do not confuse channel password with Gateway token.
 - Ensure the reverse proxy does not strip Authorization headers.
+- If a private Gateway sets `PUSHGO_TOKEN`, `/healthz` and `/readyz` also require the Bearer token.
 
 ### Request Succeeds but Device Does Not Notify
 

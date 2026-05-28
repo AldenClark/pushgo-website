@@ -49,7 +49,7 @@ Los transportes privados se seleccionan del perfil Gateway y de las condiciones 
 
 Los transportes privados requieren que el Gateway habilite el transporte coincidente y anuncie los puertos accesibles, los certificados y la URL base pública. Consulte [Autoalojamiento](/es/guides/self-hosting/).
 
-##Gateway
+## Gateway
 
 El Gateway es el componente del servidor del PushGo. Eso:
 

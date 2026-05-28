@@ -83,6 +83,8 @@ Authorization: Bearer replace-with-gateway-token
 
 The channel ID and channel password still belong in the request body. See [Authentication](/reference/auth/) for the difference between the two layers.
 
+When `PUSHGO_TOKEN` is set, `/healthz` and `/readyz` also require the same Bearer token; MCP/OAuth discovery routes are the exception when MCP is enabled.
+
 ## Public Region Endpoints
 
 If the Gateway needs token-service, configure the region explicitly.
@@ -169,11 +171,7 @@ Common settings:
 | Environment variable | Default | Description |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | Enables Dynamic Client Registration. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | none | Predefined OAuth clients in `client_id:client_secret` format. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Access token lifetime. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Refresh token absolute lifetime. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Refresh token idle lifetime. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel bind page session lifetime. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | none | Predefined OAuth clients in `client_id:client_secret` format; separate multiple clients by newline or semicolon. |
 
 See [MCP Reference](/reference/mcp/) for tools and authorization flow.
 
@@ -183,6 +181,7 @@ See [MCP Reference](/reference/mcp/) for tools and authorization flow.
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP API, WSS, and MCP/OAuth listener. |
 | `--db-url` / `PUSHGO_DB_URL` | required | Database URL; supports SQLite, PostgreSQL, and MySQL. |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | Runtime sizing profile: `small` for private/light deployments, `public` for high-load deployments. |
 | `--token` / `PUSHGO_TOKEN` | none | Gateway-level Bearer token. Empty means disabled. |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | token-service URL. Set explicitly in production. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | none | External HTTPS root URL. |
@@ -194,22 +193,13 @@ See [MCP Reference](/reference/mcp/) for tools and authorization flow.
 
 - Include the database in backups; channels, devices, MCP grants, and entity state depend on persistent storage.
 - SQLite is suitable for personal or light deployments; prefer PostgreSQL for multi-user or high-concurrency use.
-- For high load, inspect dispatch queues and workers before assuming a provider or database problem.
+- For high load, check the active `PUSHGO_RUNTIME_PROFILE`, Gateway logs, and downstream provider or database health before tuning infrastructure.
 - Use `PUSHGO_OBSERVABILITY_PROFILE=ops` for production troubleshooting; temporarily raise to `incident` or `debug` for deeper investigation.
 - For Android private transport issues, start with `/gateway/profile` and externally reachable ports.
 
-Capacity-related settings:
+Runtime capacity:
 
-| Environment variable | Description |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | Overrides dispatch worker count. |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | Overrides dispatch queue capacity. |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | Private transport fallback task queue capacity. |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | Per-connection private delivery queue capacity. |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | Max APNs sends in flight per process. |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | Dispatch target cache TTL. |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite page-cache target. |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL autocheckpoint page count. |
+Runtime capacity is profile-owned in Gateway v1.2.9. Use `PUSHGO_RUNTIME_PROFILE=small` for private or light deployments and `PUSHGO_RUNTIME_PROFILE=public` for high-load public deployments. Low-level queue, dispatch, provider, DB-pool, and SQLite tuning values are internal profile defaults instead of public env vars.
 
 ## Upgrade and Rollback
 

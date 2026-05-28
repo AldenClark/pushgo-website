@@ -16,6 +16,8 @@ hero:
       icon: document
 ---
 
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
 PushGo est un système open source de notification et de synchronisation d'état. Vous pouvez utiliser le Gateway public pour envoyer une première notification, ou exploiter votre propre Gateway afin de garder la maîtrise des chemins de données, de l'authentification, des transports privés et de MCP/OAuth.
 
 ## Quel point d'entrée choisir ?
@@ -51,46 +53,56 @@ PushGo est un système open source de notification et de synchronisation d'état
     <strong class="path-card__title">Référence MCP</strong>
     <span class="path-card__text">Permettre aux clients MCP d’envoyer Message, gérer Event et mettre à jour Thing dans les Channels autorisés.</span>
   </a>
+  <a class="path-card" href="/fr/guides/ai-agent-notifications/">
+    <span class="path-card__label">Parcours agent IA</span>
+    <strong class="path-card__title">Notifications agents IA</strong>
+    <span class="path-card__text">Utiliser MCP et OAuth pour relier agents et chatbots à Message, Event et Thing.</span>
+  </a>
+  <a class="path-card" href="/fr/guides/notification-api/">
+    <span class="path-card__label">Entrée HTTP</span>
+    <strong class="path-card__title">API de notification</strong>
+    <span class="path-card__text">Envoyer des notifications depuis curl, scripts, webhooks, CI/CD, NAS et automatisations.</span>
+  </a>
 </div>
 
 ## Téléchargements et points d'accès
 
-### Composants publiés
-
-- **iOS / macOS / watchOS** : [Télécharger depuis l'App Store](https://apps.apple.com/app/pushgo)
-- **Android** : [Télécharger l'APK](https://github.com/AldenClark/pushgo-android/releases)
-- **Gateway** : [Binaires et images Docker](https://github.com/AldenClark/pushgo-gateway/releases)
-
-### Gateways publics
-
-- **Global** : `https://gateway.pushgo.dev`
-- **Chine continentale** : `https://gateway.pushgo.cn`
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### Composants publiés
+    - **iOS / macOS / watchOS** : [Télécharger depuis l'App Store](https://apps.apple.com/app/pushgo)
+    - **Android** : [Télécharger l'APK](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway** : [Binaires et images Docker](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### Gateways publics
+    - **Global** : `https://gateway.pushgo.dev`
+    - **Chine continentale** : `https://gateway.pushgo.cn`
+  </div>
+</div>
 
 ## Pourquoi PushGo ?
 
-### Trois modèles de données
-
-Message sert aux notifications ponctuelles. Event décrit un cycle de vie qui peut être mis a jour. Thing conserve l'état courant d'un appareil, d'un service ou d'une tâche.
-
-### Distribution native
-
-Les clients Apple reçoivent les notifications système via APNs. Les clients Android peuvent combiner FCM avec des transports privés pour une synchronisation plus flexible.
-
-### Auto-hébergement
-
-Le Gateway peut fonctionner dans votre propre infrastructure avec base persistante, authentification de Gateway, transports privés, observabilité et prise en charge des reverse proxies.
-
-### Champs chiffrables de bout en bout
-
-Les contenus sensibles peuvent être placés dans `ciphertext` et déchiffrés localement par le client. Le Gateway authentifie, relaie et distribue sans devoir comprendre le contenu en clair.
-
-### Migration progressive
-
-Les points d'accès compatibles avec ntfy, Bark et ServerChan permettent de conserver les scripts existants pendant la transition vers les modèles natifs de PushGo.
-
-### MCP/OAuth
-
-Le Gateway peut fonctionner comme serveur MCP HTTP afin que des assistants IA puissent envoyer des Message, gérer des Event et mettre a jour des Thing dans le perimêtre de canaux autorisé.
+<CardGrid stagger>
+  <Card title="Trois modèles de données" icon="document">
+    Message sert aux notifications ponctuelles. Event décrit un cycle de vie qui peut être mis à jour. Thing conserve l’état courant d’un appareil, d’un service ou d’une tâche.
+  </Card>
+  <Card title="Distribution native" icon="rocket">
+    Les clients Apple reçoivent les notifications système via APNs. Les clients Android peuvent combiner FCM avec des transports privés pour une synchronisation plus flexible.
+  </Card>
+  <Card title="Auto-hébergement" icon="setting">
+    Le Gateway peut fonctionner dans votre propre infrastructure avec base persistante, authentification de Gateway, transports privés, observabilité et prise en charge des reverse proxies.
+  </Card>
+  <Card title="Champs chiffrables de bout en bout" icon="heart">
+    Les contenus sensibles peuvent être placés dans `ciphertext` et déchiffrés localement par le client. Le Gateway authentifie, relaie et distribue sans devoir comprendre le contenu en clair.
+  </Card>
+  <Card title="Migration progressive" icon="star">
+    Les points d’accès compatibles avec ntfy, Bark et ServerChan permettent de conserver les scripts existants pendant la transition vers les modèles natifs de PushGo.
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Le Gateway peut fonctionner comme serveur MCP HTTP afin que des assistants IA puissent envoyer des Message, gérer des Event et mettre à jour des Thing dans le périmètre de canaux autorisé.
+  </Card>
+</CardGrid>
 
 ## Requête minimale
 
@@ -105,4 +117,4 @@ curl -X POST https://gateway.pushgo.dev/message \
   }'
 ```
 
-Continuez avec [Bien démarrer](/fr/guides/getting-started/) pour exécuter cette requete avec un Channel réel.
+Continuez avec [Bien démarrer](/fr/guides/getting-started/) pour exécuter cette requête avec un Channel réel.

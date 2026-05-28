@@ -29,15 +29,15 @@ POST /message
 | `title` | `string` | 是 | 消息标题，不能为空。 |
 | `body` | `string` | 否 | 消息正文，可包含 Markdown。 |
 | `op_id` | `string` | 否 | 幂等键，1-128 个字符，只允许字母、数字、`_`、`:`、`-`。 |
-| `thing_id` | `string` | 否 | 关联到已有 Thing。 |
-| `occurred_at` | `number` | 否 | 本次消息发生时间，Unix 毫秒时间戳。 |
+| `thing_id` | `string` | 否 | 关联到已有 Thing；1-64 个字符，可用字母、数字、`_`、`:`、`-`。 |
+| `occurred_at` | `number` | 否 | 消息发生时间；接受 Unix 秒或毫秒。传入 `thing_id` 时必填。 |
 | `severity` | `string` | 否 | `critical`、`high`、`normal`、`low`；未知值按 `normal` 处理。 |
 | `ttl` | `number` | 否 | Unix 毫秒过期时间；provider 投递 TTL 最大约 28 天。 |
 | `url` | `string` | 否 | 点击跳转 URL。 |
 | `images` | `string[]` | 否 | 最多 32 个图片 URL，每个最长 2048 字符。 |
 | `tags` | `string[]` | 否 | 最多 32 个标签，每个最长 64 字符，trim 后去重。 |
 | `ciphertext` | `string` | 否 | 可选 E2EE 密文载荷。 |
-| `metadata` | `object` | 否 | 自定义标量键值；key <= 64，value <= 512。 |
+| `metadata` | `object` | 否 | 自定义标量键值；key <= 64，非空标量 value <= 512；拒绝嵌套对象和数组。 |
 
 ## 优先级映射
 

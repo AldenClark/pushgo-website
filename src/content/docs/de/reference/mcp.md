@@ -33,11 +33,7 @@ Allgemeine Einstellungen:
 | Umgebungsvariable | Standard | Beschreibung |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | Aktiviert die dynamische Client-Registrierung. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | keine | Vordefinierte OAuth-Clients im `client_id:client_secret`-Format. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Lebensdauer des Access Tokens. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Absolute Lebensdauer des Refresh Tokens. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Leerlaufzeit des Refresh Tokens. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Lebensdauer der Channel-Bindungssitzung. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | keine | Vordefinierte OAuth-Clients im Format `client_id:client_secret`; mehrere Clients per Zeilenumbruch oder Semikolon trennen. |
 
 Wenn der Client DCR nicht unterstützt, verwenden Sie `PUSHGO_MCP_PREDEFINED_CLIENTS`.
 
@@ -60,7 +56,7 @@ Bevorzugen Sie die OAuth2-Autorisierung in der Produktion.
 6. Der Assistent fragt `pushgo.channel.bind.status` ab.
 7. Nach der Autorisierung kann der Assistent Tools innerhalb des gebundenen Channelbereichs aufrufen.
 
-Die Lebensdauer der Bindungssitzung wird von `PUSHGO_MCP_BIND_SESSION_TTL_SECS` gesteuert.
+Bind-Sessions und Token-Laufzeiten werden vom aktuellen Gateway-Laufzeitprofil verwaltet; in v1.2.9 sind sie keine öffentlichen CLI-/Env-Optionen.
 
 ## Werkzeuge
 
@@ -109,7 +105,7 @@ Die Lebensdauer der Bindungssitzung wird von `PUSHGO_MCP_BIND_SESSION_TTL_SECS` 
 ## Operationen
 
 - MCP-Zuschüsse bleiben bestehen; Behandeln Sie die Datenbank oder das Speicherverzeichnis nicht als verfügbaren Cache.
-- Access Tokens sind kurzlebig; Refresh Tokens sind langlebiger. Passen Sie die TTLs basierend auf dem Clientsrisiko an.
+- Token- und Bind-Session-Laufzeiten sind in v1.2.9 profilgesteuerte Laufzeiteinstellungen; wählen Sie das passende Laufzeitprofil statt TTL-Env-Variablen zu setzen.
 - Rotieren Sie vordefinierte Client-Geheimnisse regelmäßig.
 - Verwenden Sie separate Channels für die Automatisierung mit hohem Risiko, anstatt alles in einem Channel zu autorisieren.
 - Verwenden Sie strukturierte Gateway-Protokolle und -Statistiken für das betriebliche Debugging.
@@ -119,7 +115,7 @@ Die Lebensdauer der Bindungssitzung wird von `PUSHGO_MCP_BIND_SESSION_TTL_SECS` 
 | Symptom | Prüfen |
 | :--- | :--- |
 | Client kann OAuth-Metadaten nicht erkennen | `PUSHGO_PUBLIC_BASE_URL` muss eine externe HTTPS-URL sein; Reverse-Proxy muss bekannte Routen weiterleiten. |
-| Bindungslink lässt sich nicht öffnen | Öffentliches DNS, HTTPS-Zertifikat, Reverse-Proxy-Pfad und `PUSHGO_MCP_BIND_SESSION_TTL_SECS`. |
+| Bind-Link öffnet sich nicht | Öffentliches DNS, HTTPS-Zertifikat, Reverse-Proxy-Pfad, `PUSHGO_PUBLIC_BASE_URL` und ob die Bind-Session abgelaufen ist. |
 | DCR schlägt fehl | Client-DCR-Unterstützung und `PUSHGO_MCP_DCR_ENABLED`. |
 | Werkzeugaufruf fragt nach `password` | Möglicherweise befinden Sie sich im Legacy-Modus oder die OAuth-Autorisierung ist unvollständig. |
 | Autorisiert, aber keine Channels sichtbar | Abschluss der Bindungssitzung, Scopes und ob die Channel-Freigabe widerrufen wurde. |

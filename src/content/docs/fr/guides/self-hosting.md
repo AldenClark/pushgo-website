@@ -53,7 +53,7 @@ curl -X POST http://127.0.0.1:6666/message \
 
 La configuration minimale est utile pour la validation. Ne l’exposez pas directement à l’Internet public.
 
-##Base de production
+## Base de production
 
 Pour la production, au moins :
 
@@ -165,14 +165,10 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 
 Paramètres communs :
 
-| Variable d'environnement | Par défaut | Descriptif |
+| Variable d'environnement | Par défaut | Description |
 | :--- | :--- | :--- |
-| `PUSHGO_MCP_DCR_ENABLED` | `true` | Permet l'enregistrement dynamique des clients. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | aucun | Clients OAuth prédéfinis au format `client_id:client_secret`. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Durée de vie du jeton d’accès. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Durée de vie absolue du refresh token. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Durée d'inactivité du refresh token. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Durée de vie de la session de page de liaison Channel. |
+| `PUSHGO_MCP_DCR_ENABLED` | `true` | Active l'enregistrement dynamique des clients. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | aucun | Clients OAuth prédéfinis au format `client_id:client_secret` ; séparez plusieurs clients par retour à la ligne ou point-virgule. |
 
 Voir [Référence MCP](/fr/reference/mcp/) pour les outils et le flux d'autorisation.
 
@@ -182,6 +178,7 @@ Voir [Référence MCP](/fr/reference/mcp/) pour les outils et le flux d'autorisa
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | API HTTP, écouteur WSS et MCP/OAuth. |
 | `--db-url` / `PUSHGO_DB_URL` | requis | URL de la base de données ; prend en charge SQLite, PostgreSQL et MySQL. |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | Profil de dimensionnement runtime : `small` pour les déploiements privés/légers, `public` pour les fortes charges. |
 | `--token` / `PUSHGO_TOKEN` | aucun | Jeton Bearer au niveau du Gateway. Vide signifie désactivé. |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | URL du service de jetons. Défini explicitement en production. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | aucun | URL racine externe HTTPS. |
@@ -199,16 +196,9 @@ Voir [Référence MCP](/fr/reference/mcp/) pour les outils et le flux d'autorisa
 
 Paramètres liés à la capacité :
 
-| Variable d'environnement | Descriptif |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | Remplace le nombre de répartiteurs. |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | Remplace la capacité de la file d’attente de répartition. |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | Capacité de la file d’attente des tâches de secours du transport privé. |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | Capacité de file d’attente de livraison privée par connexion. |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | Max APNs envoie en vol par processus. |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | Répartir la durée de vie du cache cible. |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | Cible du cache de pages SQLite. |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | Nombre de pages du point de contrôle automatique SQLite WAL. |
+Capacité runtime :
+
+Depuis Gateway v1.2.9, la capacité runtime est pilotée par profil. Utilisez `PUSHGO_RUNTIME_PROFILE=small` pour les déploiements privés ou légers, et `PUSHGO_RUNTIME_PROFILE=public` pour les déploiements publics à forte charge. Les réglages fins de files, dispatch, fournisseurs, pools DB et SQLite sont des valeurs internes au profil plutôt que des variables d'environnement publiques.
 
 ## Mise à niveau et restauration
 

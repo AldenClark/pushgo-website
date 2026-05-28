@@ -3,6 +3,15 @@ title: Gateway Changelog
 description: Version history for PushGo Gateway.
 ---
 
+## v1.2.9
+*2026-05-26*
+
+### Improved
+- Improved provider credential refresh reliability: targeted retry paths now force a fresh token-provider fetch, while normal delivery remains cache-first for lower latency.
+- Added explicit runtime profile selection: `small` remains the default for private or light deployments, and `public` is for high-load deployments.
+- Moved low-level queue, dispatch, provider, database-pool, and SQLite tuning into profile-owned defaults to reduce misconfiguration risk.
+- Bound retained stats rows after persistence failures so transient storage pressure cannot grow memory without limit.
+
 ## v1.2.8
 *2026-05-13*
 

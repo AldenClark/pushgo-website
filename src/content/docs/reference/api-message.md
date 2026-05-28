@@ -29,15 +29,15 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 | `title` | `string` | Yes | Message title, must not be empty. |
 | `body` | `string` | No | Message body, Markdown is supported. |
 | `op_id` | `string` | No | Idempotency key, 1-128 chars, letters/digits/`_`/`:`/`-`. |
-| `thing_id` | `string` | No | Associate the message with an existing Thing. |
-| `occurred_at` | `number` | No | Time the message occurred, Unix milliseconds. |
+| `thing_id` | `string` | No | Associate the message with an existing Thing; 1-64 chars, letters/digits/`_`/`:`/`-`. |
+| `occurred_at` | `number` | No | When the message occurred; Unix seconds or milliseconds accepted. Required when `thing_id` is present. |
 | `severity` | `string` | No | `critical`, `high`, `normal`, `low`; unknown values normalize to `normal`. |
 | `ttl` | `number` | No | Unix-millisecond expiration time; provider TTL is capped around 28 days. |
 | `url` | `string` | No | Optional click-through URL. |
 | `images` | `string[]` | No | Up to 32 image URLs, max 2048 chars each. |
 | `tags` | `string[]` | No | Up to 32 tags, max 64 chars each, trimmed and deduplicated. |
 | `ciphertext` | `string` | No | Optional E2EE ciphertext payload. |
-| `metadata` | `object` | No | Custom scalar key-values; key <= 64, value <= 512. |
+| `metadata` | `object` | No | Custom scalar key-values; key <= 64, non-empty scalar value <= 512; nested objects and arrays are rejected. |
 
 ## Severity Mapping
 
@@ -64,7 +64,7 @@ curl -X POST https://gateway.pushgo.dev/message \
 
 ## Associate with a Thing
 
-If the alert belongs to a persistent entity, pass `thing_id`.
+If the alert belongs to a persistent entity, pass `thing_id` and an explicit `occurred_at`.
 
 ```json
 {

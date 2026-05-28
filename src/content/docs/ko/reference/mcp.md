@@ -33,11 +33,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 환경 변수 | 기본값 | 설명 |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 동적 클라이언트 등록을 활성화합니다. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 없음 | `client_id:client_secret` 형식의 사전 정의된 OAuth 클라이언트입니다. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | 액세스 토큰 수명. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Refresh Token의 절대 수명입니다. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Refresh Token의 유휴 수명입니다. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel 바인드 페이지 세션 수명. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 없음 | `client_id:client_secret` 형식의 사전 정의 OAuth 클라이언트입니다. 여러 클라이언트는 줄바꿈이나 세미콜론으로 구분합니다. |
 
 클라이언트가 DCR을 지원하지 않으면 `PUSHGO_MCP_PREDEFINED_CLIENTS`를 사용하십시오.
 
@@ -60,7 +56,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 6. 어시스턴트는 `pushgo.channel.bind.status`를 폴링합니다.
 7. 승인 후 보조자는 바인딩된 채널 범위 내에서 도구를 호출할 수 있습니다.
 
-바인드 세션 수명은 `PUSHGO_MCP_BIND_SESSION_TTL_SECS`에 의해 제어됩니다.
+바인드 세션과 token 수명은 현재 Gateway 런타임 프로필이 관리합니다. v1.2.9에서는 공개 CLI/env 옵션이 아닙니다.
 
 ## 도구
 
@@ -109,7 +105,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ## 작업
 
 - MCP 부여는 지속됩니다. 데이터베이스나 저장소 디렉터리를 일회용 캐시로 취급하지 마십시오.
-- 액세스 토큰은 수명이 짧습니다. 새로 고침 토큰은 수명이 더 깁니다. 클라이언트 위험에 따라 TTL을 조정합니다.
+- v1.2.9에서 token 및 바인드 세션 수명은 프로필 소유 런타임 설정입니다. TTL 환경 변수를 설정하지 말고 적절한 런타임 프로필을 선택하세요.
 - 사전 정의된 클라이언트 비밀을 정기적으로 교체합니다.
 - 고위험 자동화를 위해 모든 것을 하나의 채널에 승인하는 대신 별도의 채널을 사용하십시오.
 - 운영 디버깅을 위해 Gateway 구조화된 로그 및 통계를 사용합니다.
@@ -119,7 +115,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 증상 | 확인 사항 |
 | :--- | :--- |
 | 클라이언트가 OAuth 메타데이터를 검색할 수 없습니다. | `PUSHGO_PUBLIC_BASE_URL`는 외부 HTTPS URL이어야 합니다. 역방향 프록시는 잘 알려진 경로를 전달해야 합니다. |
-| 바인드 링크가 열리지 않습니다 | 공용 DNS, HTTPS 인증서, 역방향 프록시 경로 및 `PUSHGO_MCP_BIND_SESSION_TTL_SECS`. |
+| 바인드 링크가 열리지 않음 | 공용 DNS, HTTPS 인증서, reverse proxy 경로, `PUSHGO_PUBLIC_BASE_URL`, 바인드 세션 만료 여부. |
 | DCR 실패 | 클라이언트 DCR 지원 및 `PUSHGO_MCP_DCR_ENABLED`. |
 | 도구 호출로 `password` 요청 | 레거시 모드에 있거나 OAuth 인증이 불완전할 수 있습니다. |
 | 승인되었지만 Channel이 보이지 않음 | 바인딩 세션 완료 여부, scope, Channel 권한 취소 여부를 확인합니다. |

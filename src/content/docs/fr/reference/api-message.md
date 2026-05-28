@@ -28,15 +28,15 @@ Le corps de la requête doit être JSON et les champs inconnus sont rejetés. Si
 | `title` | `string` | Oui | Titre Message, ne doit pas être vide. |
 | `body` | `string` | Non | Corps Message, Markdown est pris en charge. |
 | `op_id` | `string` | Non | Clé d'idempotence, 1 à 128 caractères, lettres/chiffres/`_`/`:`/`-`. |
-| `thing_id` | `string` | Non | Associez le message à un Thing existant. |
-| `occurred_at` | `number` | Non | Heure à laquelle le message s'est produit, en millisecondes Unix. |
+| `thing_id` | `string` | Non | Associe le message à un Thing existant ; 1-64 caractères, lettres/chiffres/`_`/`:`/`-`. |
+| `occurred_at` | `number` | Non | Moment du message ; secondes ou millisecondes Unix acceptées. Obligatoire quand `thing_id` est présent. |
 | `severity` | `string` | Non | `critical`, `high`, `normal`, `low`  ; les valeurs inconnues se normalisent en `normal`. |
 | `ttl` | `number` | Non | Délai d'expiration Unix en millisecondes ; La durée de vie du fournisseur est plafonnée à environ 28 jours. |
 | `url` | `string` | Non | URL de destination facultative. |
 | `images` | `string[]` | Non | Jusqu'à 32 URL d'images, de 2 048 caractères maximum chacune. |
 | `tags` | `string[]` | Non | Jusqu'à 32 balises, 64 caractères maximum chacune, découpées et dédupliquées. |
 | `ciphertext` | `string` | Non | Charge utile de texte chiffré E2EE en option. |
-| `metadata` | `object` | Non | Valeurs-clés scalaires personnalisées ; clé <= 64, valeur <= 512. |
+| `metadata` | `object` | Non | Paires clé-valeur scalaires personnalisées ; clé <= 64, valeur scalaire non vide <= 512 ; objets imbriqués et tableaux rejetés. |
 
 ## Cartographie de la gravité
 

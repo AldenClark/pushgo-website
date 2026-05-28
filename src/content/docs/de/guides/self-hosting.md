@@ -82,6 +82,8 @@ Authorization: Bearer replace-with-gateway-token
 
 Die Channel-ID und das Channel-Passwort gehören weiterhin in den Anfragetext. Informationen zum Unterschied zwischen den beiden Ebenen finden Sie unter [Authentifizierung](/de/reference/auth/).
 
+Wenn `PUSHGO_TOKEN` gesetzt ist, benötigen auch `/healthz` und `/readyz` denselben Bearer-Token; MCP/OAuth-Discovery-Routen sind bei aktiviertem MCP die Ausnahme.
+
 ## Endpunkte der öffentlichen Region
 
 Wenn der Gateway einen Token-Service benötigt, konfigurieren Sie die Region explizit.
@@ -168,11 +170,7 @@ Allgemeine Einstellungen:
 | Umgebungsvariable | Standard | Beschreibung |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | Aktiviert die dynamische Client-Registrierung. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | keine | Vordefinierte OAuth-Clients im `client_id:client_secret`-Format. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | Lebensdauer des Access Tokens. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | Absolute Lebensdauer des Refresh Tokens. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | Leerlaufzeit des Refresh Tokens. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Lebensdauer der Channel-Bindungssitzung. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | keine | Vordefinierte OAuth-Clients im Format `client_id:client_secret`; mehrere Clients per Zeilenumbruch oder Semikolon trennen. |
 
 Informationen zu Tools und Autorisierungsablauf finden Sie in der [MCP-Referenz](/de/reference/mcp/).
 
@@ -182,6 +180,7 @@ Informationen zu Tools und Autorisierungsablauf finden Sie in der [MCP-Referenz]
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP-API, WSS und MCP/OAuth-Listener. |
 | `--db-url` / `PUSHGO_DB_URL` | erforderlich | Datenbank-URL; unterstützt SQLite, PostgreSQL und MySQL. |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | Laufzeitprofil: `small` für private/leichte Deployments, `public` für hohe Last. |
 | `--token` / `PUSHGO_TOKEN` | keine | Bearer-Token auf Gateway-Ebene. Leer bedeutet deaktiviert. |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | Token-Service-URL. Wird in der Produktion explizit festgelegt. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | keine | Externe HTTPS-Root-URL. |
@@ -197,18 +196,9 @@ Informationen zu Tools und Autorisierungsablauf finden Sie in der [MCP-Referenz]
 - Verwenden Sie `PUSHGO_OBSERVABILITY_PROFILE=ops` zur Fehlerbehebung in der Produktion. Zur eingehenderen Untersuchung vorübergehend auf `incident` oder `debug` erhöhen.
 - Beginnen Sie bei Problemen mit dem privaten Android-Transport mit `/gateway/profile` und extern erreichbaren Ports.
 
-Kapazitätsbezogene Einstellungen:
+Laufzeitkapazität:
 
-| Umgebungsvariable | Beschreibung |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | Überschreibt die Anzahl der Disponenten. |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | Überschreibt die Kapazität der Versandwarteschlange. |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | Kapazität der Fallback-Aufgabenwarteschlange für den privaten Transport. |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | Kapazität der privaten Zustellungswarteschlange pro Verbindung. |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | Max. APNs sendet Flug pro Prozess. |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | Ziel-Cache-TTL versenden. |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite Seiten-Cache-Ziel. |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL-Autocheckpoint-Seitenanzahl. |
+Die Laufzeitkapazität ist seit Gateway v1.2.9 profilgesteuert. Nutzen Sie `PUSHGO_RUNTIME_PROFILE=small` für private oder leichte Deployments und `PUSHGO_RUNTIME_PROFILE=public` für öffentliche Deployments mit hoher Last. Niedrige Queue-, Dispatch-, Provider-, DB-Pool- und SQLite-Tuningwerte sind interne Profil-Defaults statt öffentlicher Env-Variablen.
 
 ## Upgrade und Rollback
 

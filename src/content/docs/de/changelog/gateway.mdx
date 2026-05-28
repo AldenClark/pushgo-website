@@ -2,6 +2,16 @@
 title: Gateway-Änderungsprotokoll
 description: Versionsverlauf für PushGo Gateway.
 ---
+
+## v1.2.9
+*2026-05-26*
+
+### Verbessert
+- Verbesserte Zuverlässigkeit beim Aktualisieren von Provider-Zugangsdaten: gezielte Wiederholungen erzwingen einen frischen Token-Provider-Abruf, während normale Zustellung cache-first bleibt.
+- Explizite Laufzeitprofile eingeführt: `small` bleibt Standard für private oder leichte Deployments, `public` ist für hohe Last gedacht.
+- Feingranulare Queue-, Dispatch-, Provider-, DB-Pool- und SQLite-Abstimmung wurde in profilgesteuerte Defaults verlagert, um Fehlkonfigurationen zu reduzieren.
+- Zurückgehaltene Statistikzeilen nach Persistenzfehlern werden begrenzt, damit temporärer Speicherdruck nicht zu unbegrenztem Speicherwachstum führt.
+
 ## v1.2.8
 *13.05.2026*
 

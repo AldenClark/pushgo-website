@@ -16,6 +16,8 @@ hero:
       icon: document
 ---
 
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
 PushGo ist ein Open-Source-System für Benachrichtigungen und Zustandsynchronisierung. Sie können den öffentlichen Gateway für die erste Nachricht verwenden oder einen eigenen Gateway betreiben, wenn Datenwege, Authentifizierung, private Transporte und MCP/OAuth unter Ihrer Kontrolle bleiben sollen.
 
 ## Welcher Einstieg passt?
@@ -51,46 +53,56 @@ PushGo ist ein Open-Source-System für Benachrichtigungen und Zustandsynchronisi
     <strong class="path-card__title">MCP-Referenz</strong>
     <span class="path-card__text">MCP-Clients können innerhalb autorisierter Channels Message senden, Event verwalten und Thing aktualisieren.</span>
   </a>
+  <a class="path-card" href="/de/guides/ai-agent-notifications/">
+    <span class="path-card__label">KI-Agent-Pfad</span>
+    <strong class="path-card__title">KI-Agent-Benachrichtigungen</strong>
+    <span class="path-card__text">MCP und OAuth verbinden Agenten und Chatbots mit Message, Event und Thing.</span>
+  </a>
+  <a class="path-card" href="/de/guides/notification-api/">
+    <span class="path-card__label">HTTP-Einstieg</span>
+    <strong class="path-card__title">Notification API</strong>
+    <span class="path-card__text">Benachrichtigungen aus curl, Skripten, Webhooks, CI/CD, NAS und Automatisierung senden.</span>
+  </a>
 </div>
 
 ## Downloads und Endpunkte
 
-### Veröffentlichte Komponenten
-
-- **iOS / macOS / watchOS**: [Download im App Store](https://apps.apple.com/app/pushgo)
-- **Android**: [APK herunterladen](https://github.com/AldenClark/pushgo-android/releases)
-- **Gateway**: [Binaries und Docker-Images](https://github.com/AldenClark/pushgo-gateway/releases)
-
-### Öffentliche Gateways
-
-- **Global**: `https://gateway.pushgo.dev`
-- **China Mainland**: `https://gateway.pushgo.cn`
+<div class="hero-columns">
+  <div style="flex: 1.2; min-width: 300px;">
+    ### Veröffentlichte Komponenten
+    - **iOS / macOS / watchOS**: [Download im App Store](https://apps.apple.com/app/pushgo)
+    - **Android**: [APK herunterladen](https://github.com/AldenClark/pushgo-android/releases)
+    - **Gateway**: [Binaries und Docker-Images](https://github.com/AldenClark/pushgo-gateway/releases)
+  </div>
+  <div style="flex: 0.8; min-width: 300px;">
+    ### Öffentliche Gateways
+    - **Global**: `https://gateway.pushgo.dev`
+    - **China Mainland**: `https://gateway.pushgo.cn`
+  </div>
+</div>
 
 ## Warum PushGo?
 
-### Drei Datenmodelle
-
-Message ist für einmalige Benachrichtigungen gedacht. Event beschreibt einen aktualisierbaren Lebenszyklus. Thing hält den aktuellen Zustand eines Geräts, Dienstes oder Auftrags.
-
-### Native Zustellung
-
-Apple-Clients erhälten Systembenachrichtigungen über APNs. Android-Clients können FCM mit privaten Transporten kombinieren, wenn flexiblere Synchronisierung gebraucht wird.
-
-### Self-Hosting
-
-Der Gateway kann mit persistenter Datenbank, Gateway-Authentifizierung, privaten Transporten, Observability und Reverse-Proxy-Unterstützung in der eigenen Infrastruktur laufen.
-
-### Ende-zu-Ende verschlüsselbare Felder
-
-Sensible Inhälte können in `ciphertext` liegen und lokal vom Client entschlüsselt werden. Der Gateway authentifiziert, leitet weiter und verteilt, ohne Klartextinhälte verstehen zu müssen.
-
-### Geringe Migrationskosten
-
-Kompatibilitätsendpunkte für ntfy, Bark und ServerChan helfen dabei, bestehende Skripte weiterzuverwenden und schrittweise auf native PushGo-Modelle umzustellen.
-
-### MCP/OAuth
-
-Der Gateway kann als MCP HTTP Server arbeiten, damit KI-Assistenten innerhalb autorisierter Channel-Bereiche Message senden, Event verwalten und Thing aktualisieren können.
+<CardGrid stagger>
+  <Card title="Drei Datenmodelle" icon="document">
+    Message ist für einmalige Benachrichtigungen gedacht. Event beschreibt einen aktualisierbaren Lebenszyklus. Thing hält den aktuellen Zustand eines Geräts, Dienstes oder Auftrags.
+  </Card>
+  <Card title="Native Zustellung" icon="rocket">
+    Apple-Clients erhalten Systembenachrichtigungen über APNs. Android-Clients können FCM mit privaten Transporten kombinieren, wenn flexiblere Synchronisierung gebraucht wird.
+  </Card>
+  <Card title="Self-Hosting" icon="setting">
+    Der Gateway kann mit persistenter Datenbank, Gateway-Authentifizierung, privaten Transporten, Observability und Reverse-Proxy-Unterstützung in der eigenen Infrastruktur laufen.
+  </Card>
+  <Card title="Ende-zu-Ende verschlüsselbare Felder" icon="heart">
+    Sensible Inhalte können in `ciphertext` liegen und lokal vom Client entschlüsselt werden. Der Gateway authentifiziert, leitet weiter und verteilt, ohne Klartextinhalte verstehen zu müssen.
+  </Card>
+  <Card title="Geringe Migrationskosten" icon="star">
+    Kompatibilitätsendpunkte für ntfy, Bark und ServerChan helfen dabei, bestehende Skripte weiterzuverwenden und schrittweise auf native PushGo-Modelle umzustellen.
+  </Card>
+  <Card title="MCP/OAuth" icon="random">
+    Der Gateway kann als MCP HTTP Server arbeiten, damit KI-Assistenten innerhalb autorisierter Channel-Bereiche Message senden, Event verwalten und Thing aktualisieren können.
+  </Card>
+</CardGrid>
 
 ## Minimaler Request
 

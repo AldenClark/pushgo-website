@@ -168,11 +168,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 환경 변수 | 기본값 | 설명 |
 | :--- | :--- | :--- |
 | `PUSHGO_MCP_DCR_ENABLED` | `true` | 동적 클라이언트 등록을 활성화합니다. |
-| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 없음 | `client_id:client_secret` 형식의 사전 정의된 OAuth 클라이언트입니다. |
-| `PUSHGO_MCP_ACCESS_TOKEN_TTL_SECS` | `900` | 액세스 토큰 수명. |
-| `PUSHGO_MCP_REFRESH_TOKEN_ABSOLUTE_TTL_SECS` | `2592000` | 토큰 절대 수명을 새로 고칩니다. |
-| `PUSHGO_MCP_REFRESH_TOKEN_IDLE_TTL_SECS` | `604800` | 토큰 유휴 수명을 새로 고칩니다. |
-| `PUSHGO_MCP_BIND_SESSION_TTL_SECS` | `600` | Channel 바인드 페이지 세션 수명. |
+| `PUSHGO_MCP_PREDEFINED_CLIENTS` | 없음 | `client_id:client_secret` 형식의 사전 정의 OAuth 클라이언트입니다. 여러 클라이언트는 줄바꿈이나 세미콜론으로 구분합니다. |
 
 도구 및 인증 흐름은 [MCP 참조](/ko/reference/mcp/)를 참조하세요.
 
@@ -182,6 +178,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | :--- | :--- | :--- |
 | `--http-addr` / `PUSHGO_HTTP_ADDR` | `127.0.0.1:6666` | HTTP API, WSS 및 MCP/OAuth 리스너. |
 | `--db-url` / `PUSHGO_DB_URL` | 필수 | 데이터베이스 URL; SQLite, PostgreSQL 및 MySQL를 지원합니다. |
+| `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | 런타임 용량 프로필: 개인/경량 배포는 `small`, 고부하 배포는 `public`. |
 | `--token` / `PUSHGO_TOKEN` | 없음 | 게이트웨이 수준 Bearer 토큰. 비어 있으면 비활성화됨을 의미합니다. |
 | `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | 토큰 서비스 URL. 프로덕션에서 명시적으로 설정합니다. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | 없음 | 외부 HTTPS 루트 URL. |
@@ -197,18 +194,9 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 - 생산 문제 해결을 위해 `PUSHGO_OBSERVABILITY_PROFILE=ops`를 사용하십시오. 더 깊은 조사를 위해 일시적으로 `incident` 또는 `debug`로 올립니다.
 - Android private transport 문제의 경우 `/gateway/profile` 및 외부에서 연결할 수 있는 포트로 시작하세요.
 
-용량 관련 설정:
+런타임 용량:
 
-| 환경 변수 | 설명 |
-| :--- | :--- |
-| `PUSHGO_DISPATCH_WORKER_COUNT` | 파견근로자 수를 재정의합니다. |
-| `PUSHGO_DISPATCH_QUEUE_CAPACITY` | 디스패치 대기열 용량을 재정의합니다. |
-| `PUSHGO_PRIVATE_FALLBACK_TASK_QUEUE_CAPACITY` | private transport 대체 작업 대기열 용량입니다. |
-| `PUSHGO_PRIVATE_CONNECTION_QUEUE_CAPACITY` | 연결당 개인 전달 대기열 용량입니다. |
-| `PUSHGO_APNS_MAX_IN_FLIGHT` | Max APNs는 프로세스별로 전송됩니다. |
-| `PUSHGO_DISPATCH_TARGETS_CACHE_TTL_MS` | 디스패치 대상 캐시 TTL. |
-| `PUSHGO_SQLITE_PAGE_CACHE_KIB` | SQLite 페이지 캐시 대상. |
-| `PUSHGO_SQLITE_WAL_AUTOCHECKPOINT` | SQLite WAL 자동 체크포인트 페이지 수입니다. |
+Gateway v1.2.9부터 런타임 용량은 프로필이 관리합니다. 개인 또는 경량 배포에는 `PUSHGO_RUNTIME_PROFILE=small`, 고부하 공개 배포에는 `PUSHGO_RUNTIME_PROFILE=public`을 사용하세요. 큐, 디스패치, 공급자, DB 풀, SQLite 세부 튜닝값은 공개 환경 변수가 아니라 프로필 내부 기본값입니다.
 
 ## 업그레이드 및 롤백
 

@@ -28,15 +28,15 @@ POST /message
 | `title` | `string` | 是 | 訊息標題，不能為空。 |
 | `body` | `string` | 否 | 訊息正文，可包含 Markdown。 |
 | `op_id` | `string` | 否 | 冪等鍵，1-128 個字元，只允許字母、數字、`_`、`:`、`-`。 |
-| `thing_id` | `string` | 否 | 關聯到已有 Thing。 |
-| `occurred_at` | `number` | 否 | 本訊息發生時間，Unix 毫秒時間戳記。 |
+| `thing_id` | `string` | 否 | 關聯到已有 Thing；1-64 個字元，可用字母、數字、`_`、`:`、`-`。 |
+| `occurred_at` | `number` | 否 | 訊息發生時間；接受 Unix 秒或毫秒。傳入 `thing_id` 時必填。 |
 | `severity` | `string` | 否 | `critical`、`high`、`normal`、`low`；未知值依 `normal` 處理。 |
 | `ttl` | `number` | 否 | Unix 毫秒過期時間；provider 投遞 TTL 最約 28 天。 |
 | `url` | `string` | 否 | 點選跳轉 URL。 |
 | `images` | `string[]` | 否 | 最多 32 個圖片 URL，每個最長 2048 字元。 |
 | `tags` | `string[]` | 否 | 最多 32 個標籤，每個最長 64 字元，trim 後去重。 |
 | `ciphertext` | `string` | 否 | 可選 E2EE 密文載重。 |
-| `metadata` | `object` | 否 | 自訂標量鍵值；key <= 64，value <= 512。 |
+| `metadata` | `object` | 否 | 自訂標量鍵值；key <= 64，非空標量 value <= 512；拒絕巢狀物件和陣列。 |
 
 ## 優先權對映
 

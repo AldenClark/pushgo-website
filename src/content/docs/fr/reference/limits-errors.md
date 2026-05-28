@@ -12,11 +12,12 @@ Cette page résume les règles partagées entre les API. Les champs obligatoires
 | ID générés par le Gateway | 32 caractères hexadécimaux minuscules. |
 | Mot de passe Channel | Généralement 8 à 128 caractères. |
 | `op_id` | 1 à 128 caractères ; lettres, chiffres, `_`, `:`, `-`. |
+| `thing_id` / `event_id` | 1 à 64 caractères ; lettres, chiffres, `_`, `:`, `-`. |
 | `images` | Jusqu'à 32 URL, de 2 048 caractères maximum chacune. |
 | `tags` | Jusqu'à 32 balises, de 64 caractères maximum chacune, découpées et dédupliquées. |
-| `metadata` | Valeurs scalaires uniquement ; clé max 64, valeur max 512. |
-| `attrs` | Correctif d'objet ; `null` supprime une clé ; éviter les imbrications complexes. |
-| `ttl` | Horodatage Unix en millisecondes ; Le délai de livraison par le fournisseur est plafonné à environ 28 jours. |
+| `metadata` | Valeurs scalaires uniquement ; clé max 64, valeur scalaire non vide max 512 ; objets imbriqués et tableaux interdits. |
+| `attrs` | Patch objet ; `null` supprime une clé ; tableaux et imbrication profonde sont rejetés. |
+| `ttl` et horodatages API | Lorsque documenté, les secondes ou millisecondes Unix sont acceptées et normalisées en millisecondes. |
 | Champs inconnus | Les arguments des outils natifs Message, Event, Thing et MCP sont stricts  ; les champs inconnus renvoient 400. |
 
 ## Enveloppe de réponse

@@ -28,15 +28,15 @@ Der Anfragebody muss JSON sein und unbekannte Felder werden abgelehnt. Wenn ein 
 | `title` | `string` | Ja | Message-Titel, darf nicht leer sein. |
 | `body` | `string` | Nein | Message-Text; Markdown wird unterstützt. |
 | `op_id` | `string` | Nein | Idempotenzschlüssel, 1-128 Zeichen, Buchstaben/Ziffern/`_`/`:`/`-`. |
-| `thing_id` | `string` | Nein | Ordnen Sie die Nachricht einem vorhandenen Thing zu. |
-| `occurred_at` | `number` | Nein | Zeitpunkt, zu dem die Nachricht aufgetreten ist, Unix-Millisekunden. |
+| `thing_id` | `string` | Nein | Verknüpft die Message mit einem vorhandenen Thing; 1-64 Zeichen, Buchstaben/Ziffern/`_`/`:`/`-`. |
+| `occurred_at` | `number` | Nein | Zeitpunkt der Message; Unix-Sekunden oder -Millisekunden werden akzeptiert. Erforderlich, wenn `thing_id` gesetzt ist. |
 | `severity` | `string` | Nein | `critical`, `high`, `normal`, `low`; Unbekannte Werte normalisieren sich zu `normal`. |
 | `ttl` | `number` | Nein | Unix-Millisekunden-Ablaufzeit; Die TTL des Anbieters ist auf etwa 28 Tage begrenzt. |
 | `url` | `string` | Nein | Optionale Click-through-URL. |
 | `images` | `string[]` | Nein | Bis zu 32 Bild-URLs mit jeweils maximal 2048 Zeichen. |
 | `tags` | `string[]` | Nein | Bis zu 32 Tags mit jeweils maximal 64 Zeichen, gekürzt und dedupliziert. |
 | `ciphertext` | `string` | Nein | Optionale E2EE-Chiffretext-Nutzlast. |
-| `metadata` | `object` | Nein | Benutzerdefinierte skalare Schlüsselwerte; Schlüssel <= 64, Wert <= 512. |
+| `metadata` | `object` | Nein | Benutzerdefinierte skalare Key-Values; Key <= 64, nicht leerer skalarer Wert <= 512; verschachtelte Objekte und Arrays werden abgelehnt. |
 
 ## Schweregradzuordnung
 

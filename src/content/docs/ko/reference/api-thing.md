@@ -56,7 +56,7 @@ POST /thing/delete
 
 | 필드 | 유형 | 규칙 |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | 업데이트, 보관, 삭제에 필요합니다. 생성 시 전송되어서는 안 됩니다. |
+| `thing_id` | `string` | update/archive/delete에 필수이며 create에는 보내면 안 됩니다. 1-64자, 문자/숫자/`_`/`:`/`-`. |
 | `title` | `string` | 생성 시 권장됩니다. Gateway는 현재 누락된 `title`를 거부하지 않습니다. |
 | `description` | `string` | 선택 과목; 빈 문자열은 누락된 것으로 처리됩니다. |
 | `tags` | `string[]` | 최대 32개 항목(각각 최대 64자)이 잘리고 중복이 제거됩니다. |
@@ -64,11 +64,11 @@ POST /thing/delete
 | `images` | `string[]` | 최대 32개의 이미지 URL, 각각 최대 2048자. |
 | `created_at` | `number` | 생성만 가능합니다. 생략되면 `observed_at`로 대체됩니다. |
 | `deleted_at` | `number` | 삭제만 가능합니다. 생략되면 `observed_at`로 대체됩니다. |
-| `observed_at` | `number` | 필수의; 이 상태 업데이트에 대한 관찰 시간은 Unix 밀리초입니다. |
-| `external_ids` | `object` | 키 패턴 `[A-Za-z0-9_:.\-]`, 키 <= 64; 값은 `string` 또는 `null`입니다. |
-| `location_type` + `location_value` | `string` + `string` | 반드시 함께 나타나야 합니다. 유형은 `physical`, `geo`, `cloud`, `datacenter` 또는 `logical`입니다. |
+| `observed_at` | `number` | 필수. 이 상태 업데이트의 관찰 시간입니다. Unix 초 또는 밀리초를 허용하고 밀리초로 정규화합니다. |
+| `external_ids` | `object` | key 패턴 `[A-Za-z0-9_:.-]`, key <= 64 및 소문자화. value는 비어 있지 않은 `string` <= 256 또는 삭제용 `null`. |
+| `location_type` + `location_value` | `string` + `string` | 함께 제공해야 합니다. type은 `physical`, `geo`, `cloud`, `datacenter`, `logical`입니다. 형식: `geo`는 `lat,lng`, `cloud`는 `provider:region[:zone]`, `datacenter`는 `site[:room[:rack]]`, `logical`은 slash로 구분된 token입니다. |
 | `attrs` | `object` | 객체 패치; `null`는 키를 제거합니다. 배열은 허용되지 않습니다. 중첩된 객체 수준은 하나만 있습니다. |
-| `metadata` | `object` | 스칼라 값만; 키 <= 64, 값 <= 512. |
+| `metadata` | `object` | 아니요 | 사용자 지정 scalar key-value입니다. key <= 64, 비어 있지 않은 scalar value <= 512. 중첩 object와 array는 거부됩니다. |
 
 ## Thing 만들기
 

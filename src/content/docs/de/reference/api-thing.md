@@ -56,7 +56,7 @@ Der Anfragebody muss JSON sein und unbekannte Felder werden abgelehnt. Wenn ein 
 
 | Feld | Geben Sie | ein Regeln |
 | :--- | :--- | :--- |
-| `thing_id` | `string` | Erforderlich für Aktualisierung, Archivierung und Löschung; Darf nicht beim Erstellen gesendet werden. |
+| `thing_id` | `string` | Erforderlich für update/archive/delete; darf bei create nicht gesendet werden; 1-64 Zeichen, Buchstaben/Ziffern/`_`/`:`/`-`. |
 | `title` | `string` | Empfohlen beim Erstellen; Der Gateway weist derzeit fehlende `title` nicht zurück. |
 | `description` | `string` | Optional; Leere Zeichenfolgen werden als fehlend behandelt. |
 | `tags` | `string[]` | Bis zu 32 Elemente mit jeweils maximal 64 Zeichen, gekürzt und dedupliziert. |
@@ -64,11 +64,11 @@ Der Anfragebody muss JSON sein und unbekannte Felder werden abgelehnt. Wenn ein 
 | `images` | `string[]` | Bis zu 32 Bild-URLs mit jeweils maximal 2048 Zeichen. |
 | `created_at` | `number` | Nur erstellen; Fällt auf `observed_at` zurück, wenn es weggelassen wird. |
 | `deleted_at` | `number` | Nur löschen; Fällt auf `observed_at` zurück, wenn es weggelassen wird. |
-| `observed_at` | `number` | Erforderlich; Beobachtungszeit für diese Statusaktualisierung, Unix-Millisekunden. |
-| `external_ids` | `object` | Schlüsselmuster `[A-Za-z0-9_:.\-]`, Schlüssel <= 64; Der Wert ist `string` oder `null`. |
-| `location_type` + `location_value` | `string` + `string` | Müssen zusammen erscheinen; Typ ist `physical`, `geo`, `cloud`, `datacenter` oder `logical`. |
+| `observed_at` | `number` | Erforderlich; Beobachtungszeit dieses Zustandsupdates; Unix-Sekunden oder -Millisekunden werden akzeptiert und zu Millisekunden normalisiert. |
+| `external_ids` | `object` | Key-Muster `[A-Za-z0-9_:.-]`, Key <= 64 und lowercase; Wert ist nicht leerer `string` <= 256 oder `null` zum Entfernen. |
+| `location_type` + `location_value` | `string` + `string` | Müssen zusammen erscheinen; Typ ist `physical`, `geo`, `cloud`, `datacenter` oder `logical`. Formate: `geo` ist `lat,lng`, `cloud` ist `provider:region[:zone]`, `datacenter` ist `site[:room[:rack]]`, `logical` sind Slash-getrennte Tokens. |
 | `attrs` | `object` | Objektpatch; `null` entfernt einen Schlüssel; Arrays sind nicht erlaubt; nur eine verschachtelte Objektebene. |
-| `metadata` | `object` | Nur Skalarwerte; Schlüssel <= 64, Wert <= 512. |
+| `metadata` | `object` | Nein | Benutzerdefinierte skalare Key-Values; Key <= 64, nicht leerer skalarer Wert <= 512; verschachtelte Objekte und Arrays werden abgelehnt. |
 
 ## Thing erstellen
 
