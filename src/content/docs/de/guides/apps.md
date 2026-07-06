@@ -11,7 +11,7 @@ PushGo veröffentlicht derzeit Apple-Plattform-Clients, einen Android-Client und
 | iOS | App Store | iOS 18+ | APNs | Nein |
 | macOS | App Store | macOS 15+ | APNs | Nein |
 | watchOS | App Store | watchOS 11+ | APNs | Nein |
-| Android | GitHub-Veröffentlichungen | Android 12+ | FCM + Privattransporte | Ja, QUIC / Raw TCP / WSS |
+| Android | GitHub-Veröffentlichungen | Android 9+ | FCM + Privattransporte | Ja, QUIC / Raw TCP / WSS |
 
 ## Apple-Clients
 

@@ -18,7 +18,7 @@ description: 从安装客户端到收到第一条 PushGo 通知的最短路径�
 | 平台 | 获取方式 | 系统要求 |
 | :--- | :--- | :--- |
 | iOS / macOS / watchOS | [App Store](https://apps.apple.com/app/pushgo) | iOS 18+、macOS 15+、watchOS 11+ |
-| Android | [GitHub Releases](https://github.com/AldenClark/pushgo-android/releases) | Android 12+ |
+| Android | [GitHub Releases](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ |
 
 ## 2. 创建或订阅频道
 

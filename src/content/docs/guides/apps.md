@@ -12,7 +12,7 @@ PushGo currently publishes Apple platform clients, an Android client, and the Ga
 | iOS | App Store | iOS 18+ | APNs | No |
 | macOS | App Store | macOS 15+ | APNs | No |
 | watchOS | App Store | watchOS 11+ | APNs | No |
-| Android | GitHub Releases | Android 12+ | FCM + private transports | Yes, QUIC / Raw TCP / WSS |
+| Android | GitHub Releases | Android 9+ | FCM + private transports | Yes, QUIC / Raw TCP / WSS |
 
 ## Apple Clients
 

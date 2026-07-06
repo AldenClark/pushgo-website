@@ -12,7 +12,7 @@ PushGo 目前对外发布 Apple 平台客户端、Android 客户端和 Gateway�
 | iOS | App Store | iOS 18+ | APNs | 否 |
 | macOS | App Store | macOS 15+ | APNs | 否 |
 | watchOS | App Store | watchOS 11+ | APNs | 否 |
-| Android | GitHub Releases | Android 12+ | FCM + 私有通道 | 是，支持 QUIC / Raw TCP / WSS |
+| Android | GitHub Releases | Android 9+ | FCM + 私有通道 | 是，支持 QUIC / Raw TCP / WSS |
 
 ## Apple 平台客户端
 

@@ -17,7 +17,7 @@ description: 클라이언트를 설치하고, 채널을 만들고, 첫 번째 Pu
 | 플랫폼 | 다운로드 | 요구사항 |
 | :--- | :--- | :--- |
 | iOS/macOS/watchOS | [앱스토어](https://apps.apple.com/app/pushgo) | iOS 18+, macOS 15+, watchOS 11+ |
-| Android | [GitHub 릴리스](https://github.com/AldenClark/pushgo-android/releases) | Android 12 이상 |
+| Android | [GitHub 릴리스](https://github.com/AldenClark/pushgo-android/releases) | Android 9 이상 |
 
 ## 2. Channel 생성 또는 구독
 

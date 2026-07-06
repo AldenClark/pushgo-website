@@ -17,7 +17,7 @@ Installieren Sie einen der freigegebenen Clients.
 | Plattform | Herunterladen | Anforderung |
 | :--- | :--- | :--- |
 | iOS / macOS / watchOS | [App Store](https://apps.apple.com/app/pushgo) | iOS 18+, macOS 15+, watchOS 11+ |
-| Android | [GitHub-Veröffentlichungen](https://github.com/AldenClark/pushgo-android/releases) | Android 12+ |
+| Android | [GitHub-Veröffentlichungen](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ |
 
 ## 2. Erstellen oder abonnieren Sie einen Channel
 

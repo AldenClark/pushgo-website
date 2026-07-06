@@ -11,7 +11,7 @@ PushGo は現在、Apple プラットフォーム クライアント、Android �
 | iOS |アプリストア | iOS 18+ | APNs |いいえ |
 | macOS |アプリストア | macOS 15+ | APNs |いいえ |
 |ウォッチOS |アプリストア | watchOS 11+ | APNs |いいえ |
-|アンドロイド | GitHub リリース | Android 12+ | FCM + 専用トランスポート |はい、QUIC / Raw TCP / WSS |
+|アンドロイド | GitHub リリース | Android 9+ | FCM + 専用トランスポート |はい、QUIC / Raw TCP / WSS |
 
 ## Apple クライアント
 

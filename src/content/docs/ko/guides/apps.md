@@ -11,7 +11,7 @@ PushGo는 현재 Apple 플랫폼 클라이언트, Android 클라이언트 및 Ga
 | iOS | 앱 스토어 | iOS 18 이상 | APNs | 아니요 |
 | macOS | 앱 스토어 | 맥OS 15+ | APNs | 아니요 |
 | 워치OS | 앱 스토어 | watchOS 11+ | APNs | 아니요 |
-| Android | GitHub 릴리스 | Android 12 이상 | FCM + Private transport | 예, QUIC / Raw TCP / WSS |
+| Android | GitHub 릴리스 | Android 9 이상 | FCM + Private transport | 예, QUIC / Raw TCP / WSS |
 
 ## Apple 클라이언트
 

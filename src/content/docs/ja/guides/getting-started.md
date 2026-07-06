@@ -17,7 +17,7 @@ description: クライアントをインストールし、チャネルを作成�
 |プラットフォーム |ダウンロード |要件 |
 | :--- | :--- | :--- |
 | iOS / macOS / watchOS | [App Store](https://apps.apple.com/app/pushgo) | iOS 18 以降、macOS 15 以降、watchOS 11 以降 |
-|アンドロイド | [GitHub リリース](https://github.com/AldenClark/pushgo-android/releases) | Android 12+ |
+|アンドロイド | [GitHub リリース](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ |
 
 ## 2. Channel を作成またはサブスクライブする
 
