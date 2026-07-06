@@ -8,7 +8,7 @@ const docsRoot = path.join(root, 'src/content/docs');
 const distRoot = path.join(root, 'dist');
 const publicRoot = path.join(root, 'public');
 
-const locales = ['root', 'zh', 'zh-tw', 'de', 'fr', 'ja', 'ko', 'es'];
+const locales = ['root', 'zh', 'zh-tw'];
 const localizedLocales = locales.filter((locale) => locale !== 'root');
 const slugs = [
 	'ai-agent-notifications',
@@ -179,7 +179,7 @@ if (existsSync(distRoot) && (await stat(distRoot)).isDirectory()) {
 		'reference/mcp/index.html',
 		'zh/support/index.html',
 		'zh/guides/ai-agent-notifications/index.html',
-		'de/guides/self-hosted-notification-server/index.html',
+		'zh-tw/guides/self-hosted-notification-server/index.html',
 	];
 	for (const sample of samples) {
 		const file = path.join(distRoot, sample);

@@ -26,8 +26,3 @@
 - [English](https://pushgo.dev/)
 - [简体中文](https://pushgo.dev/zh)
 - [繁體中文](https://pushgo.dev/zh-tw)
-- [Deutsch](https://pushgo.dev/de)
-- [Français](https://pushgo.dev/fr)
-- [日本語](https://pushgo.dev/ja)
-- [한국어](https://pushgo.dev/ko)
-- [Español](https://pushgo.dev/es)
