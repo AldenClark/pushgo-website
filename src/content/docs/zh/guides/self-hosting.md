@@ -89,6 +89,12 @@ Authorization: Bearer replace-with-gateway-token
 
 公共 Gateway 为 `https://gateway.pushgo.dev/`（全球）和 `https://gateway.pushgo.cn/`（中国大陆）。Gateway 的 token-service 默认地址是 `https://token.pushgo.cn/`。使用自托管 token-service 或全球端点（`https://token.pushgo.dev/`）时，请显式设置 `PUSHGO_TOKEN_SERVICE_URL`。Gateway 向 token-service 发起请求时不使用 Bearer 鉴权。自托管 token-service 应仅监听本机或私有网络，或放在限制访问的 HTTPS 反向代理后面。`PUSHGO_TOKEN` 只用于 Gateway API。
 
+### Token Service 刷新请求
+
+对 `/provider/token?provider=fcm`（或 `provider=wns`）的 `GET`/`POST` 请求默认返回缓存的 token。FCM 或 WNS 拒绝 token 后，Gateway 可附加 `force_refresh=true` 请求 OAuth 刷新。更新后的 Token Service 会合并并发刷新；强制刷新成功后有 60 秒冷却期，期间请求返回当前仍有效的 token。强制刷新失败或处于共用退避期时会返回错误，不会退回此前被拒绝的缓存 token。APNs 不使用此参数。
+
+自托管部署需要更新 Token Service 才能获得这项恢复能力。旧版会忽略可选参数，请求仍兼容，但可能继续返回被拒绝的缓存 token。OAuth 成功响应也不保证 provider 一定接受该 token。
+
 ## 反向代理
 
 HTTP API、WSS、MCP/OAuth 共用 HTTP listener。反向代理需要支持普通 HTTP 和 WebSocket upgrade。

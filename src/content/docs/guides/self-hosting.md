@@ -89,6 +89,12 @@ When `PUSHGO_TOKEN` is set, `/healthz` and `/readyz` also require the same Beare
 
 Public Gateways are `https://gateway.pushgo.dev/` (global) and `https://gateway.pushgo.cn/` (Mainland China). The Gateway defaults its token-service URL to `https://token.pushgo.cn/`. Set `PUSHGO_TOKEN_SERVICE_URL` explicitly for a self-hosted token service or the global endpoint (`https://token.pushgo.dev/`). Gateway-to-token-service requests do not use Bearer authentication. Restrict access to a self-hosted token service with a loopback or private-network listener, or a restricted HTTPS reverse proxy. `PUSHGO_TOKEN` applies only to the Gateway API.
 
+### Token Service refresh requests
+
+`GET`/`POST` requests to `/provider/token?provider=fcm` (or `provider=wns`) use the cached token by default. After FCM or WNS rejects a token, Gateway can add `force_refresh=true` to request an OAuth refresh. The updated Token Service coalesces concurrent refreshes and limits successful forced refreshes to one per 60 seconds; requests during the cooldown receive its current valid token. A forced refresh failure or shared backoff returns an error instead of falling back to the rejected cache entry. APNs does not use this parameter.
+
+Self-hosted deployments need an updated Token Service for this recovery behavior. Older versions ignore the optional parameter and keep accepting the request, but may return the rejected cached token. A successful OAuth response does not guarantee that the provider will accept the token.
+
 ## Reverse Proxy
 
 HTTP APIs, WSS, and MCP/OAuth share the HTTP listener. The reverse proxy must support normal HTTP and WebSocket upgrade.

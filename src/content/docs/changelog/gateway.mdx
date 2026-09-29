@@ -10,6 +10,7 @@ description: Version history for PushGo Gateway.
 - Route recovery can compare the active provider token's SHA-256 fingerprint without exposing the token.
 
 ### Fixed
+- After FCM or WNS rejects a cached provider token, Gateway requests a forced Token Service refresh before retrying delivery. This recovery requires an updated Token Service.
 - Provider-token ownership and delivery routes stay consistent when a device takes over a token or subscription, retirement, and route changes overlap.
 - Pending private deliveries remain available when a route deletion cannot be saved.
 - Completed route changes can be retried after expiry or a later change, and failed retries no longer leave an incorrect active route in memory.

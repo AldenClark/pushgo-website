@@ -10,6 +10,7 @@ description: PushGo Gateway 版本更新歷史。
 - 路由恢復可透過目前 provider token 的 SHA-256 指紋核對狀態，而不暴露 token 本身。
 
 ### 修復
+- FCM 或 WNS 拒絕已快取的 provider token 後，Gateway 會要求 Token Service 強制重新整理，再重試投遞。此恢復能力需要更新 Token Service。
 - 裝置接管 provider token，或訂閱、退役與路由切換同時發生時，token 歸屬和投遞路由保持一致。
 - 路由刪除無法持久化時，待投遞的私人訊息仍會保留。
 - 已完成的路由切換在過期或後續切換後仍可安全重試；失敗的重試不會讓記憶體中的活動路由出錯。

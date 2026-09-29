@@ -88,6 +88,12 @@ Channel ID 和 Channel 密碼仍然需要放在請求 body 中。兩層驗證的
 
 公共 Gateway 為 `https://gateway.pushgo.dev/`（全球）和 `https://gateway.pushgo.cn/`（中國大陸）。Gateway 的 token-service 預設位址是 `https://token.pushgo.cn/`。使用自架 token-service 或全球端點（`https://token.pushgo.dev/`）時，請明確設定 `PUSHGO_TOKEN_SERVICE_URL`。Gateway 向 token-service 發出請求時不使用 Bearer 驗證。自架 token-service 應只監聽本機或私人網路，或設於限制存取的 HTTPS 反向代理後方。`PUSHGO_TOKEN` 僅用於 Gateway API。
 
+### Token Service 重新整理請求
+
+對 `/provider/token?provider=fcm`（或 `provider=wns`）的 `GET`/`POST` 請求預設回傳快取的 token。FCM 或 WNS 拒絕 token 後，Gateway 可附加 `force_refresh=true` 要求 OAuth 重新整理。更新後的 Token Service 會合併並行重新整理；強制重新整理成功後有 60 秒冷卻期，期間請求回傳目前仍有效的 token。強制重新整理失敗或處於共用退避期時會回傳錯誤，不會退回先前被拒絕的快取 token。APNs 不使用此參數。
+
+自架部署需要更新 Token Service 才能取得這項恢復能力。舊版會忽略可選參數，請求仍相容，但可能繼續回傳被拒絕的快取 token。OAuth 成功回應也不保證 provider 一定接受該 token。
+
 ## 反向代理
 
 HTTP API、WSS、MCP/OAuth 共用 HTTP listener。反向代理需要支援普通 HTTP 和 WebSocket upgrade。
