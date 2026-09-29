@@ -5,9 +5,17 @@ description: Version history for PushGo iOS, macOS, and watchOS apps.
 
 ## v1.3.3
 
+### Improved
+- Search and message loading show clearer progress and retry feedback on iPhone and Mac.
+- The Mac status item restores the main window more reliably.
+
 ### Fixed
 - Refreshing message content preserves the user's local read or unread state.
 - Expired provider acknowledgement leases can be reclaimed so interrupted notification processing can resume.
+- Deliveries from different Gateways remain separate even when they share a delivery identifier.
+- Changing Gateways validates the replacement before switching and keeps the save result visible.
+- Opening an unavailable object on Mac no longer shows an unrelated object's detail.
+- Rich message images no longer retain stale attachments or stop a restarted animation.
 
 ## v1.3.0
 *2026-08-23*
