@@ -12,7 +12,7 @@ PushGo 的三類資料模型對應三種不同的商業語意。選對模型之�
 | 「一件事從開始到結束，中間可能多次變更」 | Event | 同一個 `event_id` 可以多次更新，最後關閉。 |
 | 「一個裝置、服務、房間或任務的目前狀態」 | Thing | 同一個 `thing_id` 可以長期更新屬性。 |
 | 「某個實體上發生了一次警告」 | Thing + Message | Thing 表示實體，Message 關聯 `thing_id` 表示此提醒。 |
-| “某個實體正在經歷一個過程” | Thing + Event | Thing 表示物件，Event 關聯 `thing_id` 表示過程。 |
+| 「某個實體正在經歷一個過程」 | Thing + Event | Thing 表示物件，Event 關聯 `thing_id` 表示過程。 |
 
 ## Message：一次性提醒
 
@@ -35,7 +35,7 @@ Message 是最直接的通知模型。它適合不需要後續合併或關閉的
 
 | 分組 | 欄位 |
 | :--- | :--- |
-| 驗證與路由 | `channel_id`、`password`、`op_id`、`thing_id` |
+| 驗證與路由 | `channel_id`、`password`、可選的客戶端 `op_id`、`thing_id` |
 | 展示內容 | `title`、`body`、`severity`、`url`、`images`、`tags` |
 | 時效與安全 | `occurred_at`、`ttl`、`ciphertext` |
 | 擴充資料 | `metadata` |
@@ -77,7 +77,7 @@ Event 表示一個過程，而不是一條孤立通知。建立後會得到 `eve
 
 | 分組 | 欄位 |
 | :--- | :--- |
-| 驗證與路由 | `channel_id`、`password`、`op_id`、`thing_id` |
+| 驗證與路由 | `channel_id`、`password`、`thing_id`；`op_id` 僅在回應中傳回 |
 | 生命週期 | `event_id`、`event_time`、`started_at`、`ended_at` |
 | 展示內容 | `title`、`description`、`status`、`message`、`severity`、`tags`、`images` |
 | 擴充資料 | `attrs`、`metadata`、`ciphertext` |
@@ -85,14 +85,14 @@ Event 表示一個過程，而不是一條孤立通知。建立後會得到 `eve
 ### 建模建議
 
 - `status` 用短狀態，例如 `running`、`degraded`、`success`、`failed`。
-- `message` 寫本次變化，例如「映象推送完成」。
+- `message` 寫本次變化，例如「映像推送完成」。
 - `event_time` 表示本次變更發生的時間。
 - `started_at` 表示整個事件的開始時間，只在建立時需要。
 - `ended_at` 表示整個事件的結束時間，只在關閉時需要。
 
 ## Thing：長期實體狀態
 
-Thing 表示一個長期存在的物件。它的價值在於“同一個物件被反覆更新”，而不是每次都產生一個新通知物件。
+Thing 表示一個長期存在的物件。它的價值在於「同一個物件被反覆更新」，而不是每次都產生一個新通知物件。
 
 ### 適合
 
@@ -117,7 +117,7 @@ Thing 表示一個長期存在的物件。它的價值在於“同一個物件�
 
 | 分組 | 欄位 |
 | :--- | :--- |
-| 驗證與路由 | `channel_id`、`password`、`op_id` |
+| 驗證與路由 | `channel_id`、`password`；`op_id` 僅在回應中傳回 |
 | 身份與展示 | `thing_id`、`title`、`description`、`tags`、`primary_image`、`images` |
 | 時間 | `created_at`、`observed_at`、`deleted_at` |
 | 位置與外部系統 | `external_ids`、`location_type`、`location_value` |
@@ -140,4 +140,4 @@ PushGo 的三類模型可以組合。
 | Thing + Event | 「生產資料庫」這個實體正在經歷一次「主從延遲」事件。 |
 | Event + Message | Event 記錄完整過程，Message 用於某個關鍵節點的強提醒。 |
 
-如果你不確定該選哪一個，先從 Message 開始；當你發現同一個指令碼在反覆傳送“開始/更新/結束”或“當前值變化”時，再升級為 Event 或 Thing。
+如果你不確定該選哪一個，先從 Message 開始；當你發現同一個指令碼在反覆傳送「開始/更新/結束」或「目前值變化」時，再升級為 Event 或 Thing。

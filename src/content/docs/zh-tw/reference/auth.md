@@ -30,7 +30,7 @@ Channel 授權和 Gateway 授權是兩層不同邊界。開啟私人 Gateway Tok
 | 欄位 | 說明 |
 | :--- | :--- |
 | `channel_id` | 目標 Channel。 |
-| `password` | Channel 密碼，通常為 8-128 個字元。 |
+| `password` | Channel 密碼；先 trim，再按 8-128 位元組驗證。 |
 
 Channel 密碼決定「誰能寫入這個 Channel」。它不是 Gateway 管理員密碼，也不應該寫入公開倉庫、日誌或前端程式碼。
 
@@ -67,6 +67,7 @@ curl -X POST https://gateway.example.com/message \
 - Token 型必須是 `Bearer`。
 - Token 最大長度為 4096 個字元。
 - `PUSHGO_TOKEN` 為空時不啟用 Gateway 級 Token 驗證。
+- 設定後，`/healthz` 和 `/readyz` 也受該 Token 保護；僅當 MCP 開啟時，MCP/OAuth discovery 入口才繞過這層共享 Token middleware。
 
 ## 公共 Gateway
 

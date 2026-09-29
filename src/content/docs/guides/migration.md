@@ -17,8 +17,9 @@ Migrating to PushGo does not require rewriting every script at once. Start with 
 | Source | Method | PushGo path | Key location |
 | :--- | :--- | :--- | :--- |
 | ntfy | `POST` / `PUT` | `/ntfy/{topic}` | `{topic}` = `<channel_id>:<password>` |
+| ntfy action aliases | `GET` / `POST` / `PUT` | `/ntfy/{topic}/publish`, `/send`, or `/trigger` | `{topic}` = `<channel_id>:<password>` |
 | ServerChan | `GET` / `POST` | `/serverchan/{sendkey}` | `{sendkey}` = `<channel_id>:<password>` |
-| Bark v1 | `GET` | `/bark/{device_key}/{body}` | `{device_key}` = `<channel_id>:<password>` |
+| Bark v1 | `GET` | `/bark/{device_key}/{body}` or `/bark/{device_key}/{title}/{body}` | `{device_key}` = `<channel_id>:<password>` |
 | Bark v2 | `POST` | `/bark/push` | JSON field `device_key` |
 
 Compatibility endpoints reduce migration cost. They do not express the full PushGo data model. Use native APIs when you need `thing_id`, Event lifecycles, or full Thing state.

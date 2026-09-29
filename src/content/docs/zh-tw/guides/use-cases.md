@@ -153,7 +153,7 @@ CREATE_RESPONSE=$(curl -s -X POST https://gateway.pushgo.cn/event/create \
 
 ### 服務健康狀態：Thing
 
-服務是否線上上、延遲多少、目前版本是什麼，屬於目前狀態。
+服務是否在線上、延遲多少、目前版本是什麼，屬於目前狀態。
 
 ```json
 {

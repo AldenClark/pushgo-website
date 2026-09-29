@@ -20,7 +20,7 @@ MCP should not replace user confirmation. High-impact workflows should still kee
 https://your-gateway-domain/mcp
 ```
 
-If a public Gateway enables MCP/OAuth, use that region's `/mcp` endpoint. Self-hosted deployments must set an externally reachable `PUSHGO_PUBLIC_BASE_URL`.
+If a public Gateway enables MCP/OAuth, use that region's `/mcp` endpoint. Non-loopback self-hosted deployments must set an externally reachable HTTPS `PUSHGO_PUBLIC_BASE_URL`; omitting it is supported only for loopback-bound local development.
 
 ## Enable MCP on a Private Gateway
 
@@ -57,7 +57,7 @@ Prefer OAuth2 authorization in production.
 6. The assistant polls `pushgo.channel.bind.status`.
 7. After authorization, the assistant can call tools within the bound channel scope.
 
-Bind sessions and token lifetimes are managed by the current Gateway runtime profile; they are not public CLI/env knobs in v1.2.9.
+Bind sessions and token lifetimes are managed by the current Gateway runtime profile; they are not public CLI/env knobs in v1.3.0.
 
 ## Tools
 
@@ -72,17 +72,17 @@ Bind sessions and token lifetimes are managed by the current Gateway runtime pro
 | Tool | Purpose |
 | :--- | :--- |
 | `pushgo.event.create` | Creates a lifecycle event and returns `event_id`. |
-| `pushgo.event.update` | Updates an existing event. |
-| `pushgo.event.close` | Closes an existing event. |
+| `pushgo.event.update` | Sends an update patch for an `event_id`. |
+| `pushgo.event.close` | Sends a close patch for an `event_id`. |
 
 ### Thing
 
 | Tool | Purpose |
 | :--- | :--- |
 | `pushgo.thing.create` | Creates a persistent entity and returns `thing_id`. |
-| `pushgo.thing.update` | Updates entity attributes. |
-| `pushgo.thing.archive` | Archives an entity. |
-| `pushgo.thing.delete` | Deletes or retires an entity. |
+| `pushgo.thing.update` | Sends an attribute patch for a `thing_id`. |
+| `pushgo.thing.archive` | Sends an archive patch for a `thing_id`. |
+| `pushgo.thing.delete` | Sends a delete/retire patch for a `thing_id`. |
 
 ### Channel
 
@@ -95,18 +95,28 @@ Bind sessions and token lifetimes are managed by the current Gateway runtime pro
 | `pushgo://channels` | Authorized channel resource list. |
 | `pushgo://channels/{channel_id}` | Basic information for one channel. |
 
+## Action-specific Inputs
+
+| Tool family | Required business inputs | Important exclusions |
+| :--- | :--- | :--- |
+| Message | `channel_id`, `title`; `occurred_at` is also required with `thing_id` | The published MCP schema marks `op_id` as Gateway-generated, so omit it for contract compatibility. Native HTTP Message explicitly supports client-supplied `op_id`. |
+| Event | `channel_id`, `event_time`; update/close also require `event_id` | Omit `op_id`; `ended_at` is close-only and `started_at` is create-only. |
+| Thing | `channel_id`, `observed_at`; update/archive/delete also require `thing_id` | Omit `op_id` and `state`; `deleted_at` is delete-only. |
+
+OAuth mode forbids `password` and requires a bound channel. Legacy mode requires `password`. Send tools require the `mcp:tools` scope; channel-management tools and resources require `mcp:channels:manage`.
+
 ## Client Configuration Notes
 
 - MCP endpoint is `https://your-gateway-domain/mcp`.
 - Reverse proxies must pass `Host` and `X-Forwarded-Proto` correctly.
-- Self-hosted deployments must set `PUSHGO_PUBLIC_BASE_URL` to an externally reachable HTTPS root URL.
+- Non-loopback self-hosted deployments must set `PUSHGO_PUBLIC_BASE_URL` to an externally reachable HTTPS root URL. Loopback-only local development is the sole omission exception.
 - If OAuth issuer metadata or bind links contain internal addresses, check `PUSHGO_PUBLIC_BASE_URL` first.
 - If a client does not support DCR, use predefined clients.
 
 ## Operations
 
 - MCP grants are persisted; do not treat the database or storage directory as disposable cache.
-- Token and bind-session lifetimes are profile-owned runtime settings in v1.2.9; choose the appropriate runtime profile instead of setting TTL env vars.
+- Token and bind-session lifetimes are profile-owned runtime settings in v1.3.0; choose the appropriate runtime profile instead of setting TTL env vars.
 - Rotate predefined client secrets regularly.
 - Use separate channels for high-risk automation instead of authorizing everything into one channel.
 - Use Gateway structured logs and stats for operational debugging.
@@ -115,7 +125,7 @@ Bind sessions and token lifetimes are managed by the current Gateway runtime pro
 
 | Symptom | Check |
 | :--- | :--- |
-| Client cannot discover OAuth metadata | `PUSHGO_PUBLIC_BASE_URL` must be an external HTTPS URL; reverse proxy must forward well-known routes. |
+| Client cannot discover OAuth metadata | For non-loopback deployment, `PUSHGO_PUBLIC_BASE_URL` must be an external HTTPS URL; the reverse proxy must forward well-known routes. |
 | Bind link does not open | Public DNS, HTTPS certificate, reverse-proxy path, `PUSHGO_PUBLIC_BASE_URL`, and whether the bind session has expired. |
 | DCR fails | Client DCR support and `PUSHGO_MCP_DCR_ENABLED`. |
 | Tool call asks for `password` | You may be in Legacy mode, or OAuth authorization is incomplete. |

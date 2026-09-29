@@ -173,6 +173,8 @@ for (const file of await walk(publicRoot)) {
 if (existsSync(distRoot) && (await stat(distRoot)).isDirectory()) {
 	const samples = [
 		'index.html',
+		'guides/getting-started/index.html',
+		'changelog/android/index.html',
 		'support/index.html',
 		'guides/ai-agent-notifications/index.html',
 		'guides/notification-api/index.html',
@@ -190,6 +192,26 @@ if (existsSync(distRoot) && (await stat(distRoot)).isDirectory()) {
 		const html = await read(file);
 		for (const token of ['hreflang="x-default"', 'application/ld+json', 'og:image']) {
 			if (!html.includes(token)) fail(`${sample} missing ${token}`);
+		}
+		const jsonLd = html.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+		if (!jsonLd) {
+			fail(`${sample} missing JSON-LD`);
+			continue;
+		}
+		try {
+			const breadcrumbs = JSON.parse(jsonLd)['@graph']?.find((node) => node['@type'] === 'BreadcrumbList');
+			if (sample !== 'index.html' && !breadcrumbs) {
+				fail(`${sample} missing breadcrumb list`);
+			}
+			for (const crumb of breadcrumbs?.itemListElement ?? []) {
+				const url = new URL(crumb.item);
+				const builtPage = path.join(distRoot, url.pathname.replace(/^\/+/, ''), 'index.html');
+				if (url.origin !== 'https://pushgo.dev' || !existsSync(builtPage)) {
+					fail(`${sample} breadcrumb points to missing built page: ${crumb.item}`);
+				}
+			}
+		} catch {
+			fail(`${sample} contains invalid breadcrumb JSON-LD`);
 		}
 	}
 	for (const locale of locales) {

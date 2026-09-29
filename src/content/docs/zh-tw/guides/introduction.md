@@ -31,7 +31,7 @@ PushGo Gateway
         +-- 私人通道 -> Android 低延遲同步
 ```
 
-Gateway 負責驗證、受理 API、維護狀態並分發到已訂閱裝置。用戶端負責接收、展示、解密和管理 Channel。
+Gateway 負責驗證、持久受理 API、儲存投遞運行狀態並分發。用戶端負責接收、展示、解密、持久化歷史、投影 Event/Thing 狀態和管理 Channel。
 
 ## 適合誰
 

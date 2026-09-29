@@ -3,6 +3,39 @@ title: Apple Changelog
 description: Version history for PushGo iOS, macOS, and watchOS apps.
 ---
 
+## v1.3.0
+*2026-08-23*
+
+### Improved
+- Pulled deliveries are acknowledged only after safe local persistence, using grouped ACK batches with beta-Gateway compatibility.
+- Added widgets and controls, system search indexing, App Shortcuts, and WidgetKit push updates across iPhone, Mac, and Apple Watch.
+- Reworked the Apple Watch receiver, improved cached images and localization, and added automatic retry for persisted notification ingestion.
+- Background work now reports completion accurately, with durable retry and safer upgrade/rollback state.
+
+### Fixed
+- Fixed notification-open navigation, background completion, and delayed local visibility edge cases.
+
+## v1.2.7
+*2026-06-15*
+
+### Improved
+- Refined selectable Markdown detail rendering on iOS and macOS and added a watchOS-specific plain-text detail path.
+
+## v1.2.6
+*2026-06-12*
+
+### Fixed
+- Fixed iOS message-detail text-selection crashes and made selectable Markdown text consistent on macOS.
+
+## v1.2.5
+*2026-06-09*
+
+### Improved
+- Lowered requirements to iOS 17, macOS 14, and watchOS 10; added customizable notification sounds and improved entity patch projection.
+
+### Fixed
+- Fixed compatibility and state-sync regressions found while lowering deployment targets.
+
 ## v1.2.4
 *2026-05-26*
 

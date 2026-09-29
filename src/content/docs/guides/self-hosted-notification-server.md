@@ -1,6 +1,6 @@
 ---
 title: Self-hosted Open-source Notification Server
-description: Deploy PushGo Gateway as a self-hosted open-source notification server with private transports, persistent state, E2EE, and MCP/OAuth.
+description: Deploy PushGo Gateway as a self-hosted open-source notification server with private transports, durable delivery state, E2EE, and MCP/OAuth.
 ---
 
 Self-host PushGo when you want the notification path, data storage, Gateway authentication, private transport policy, and MCP/OAuth endpoint to stay under your control.
@@ -8,7 +8,7 @@ Self-host PushGo when you want the notification path, data storage, Gateway auth
 ## Good Fits
 
 - Operate a private notification Gateway for personal or team automation.
-- Keep notification, event, and entity-state data out of a public Gateway.
+- Keep notification payloads and Event/Thing patches out of a public Gateway.
 - Expose your own HTTPS `/mcp` endpoint for AI assistant workflows.
 - Use backups, reverse proxies, logs, and observability as part of production operations.
 
@@ -22,7 +22,7 @@ Self-host PushGo when you want the notification path, data storage, Gateway auth
 
 ## Minimal example
 
-Set `PUSHGO_PUBLIC_BASE_URL` to the externally reachable HTTPS origin before enabling MCP/OAuth, otherwise issuer metadata and bind links may contain internal addresses.
+For a non-loopback deployment, set `PUSHGO_PUBLIC_BASE_URL` to the externally reachable HTTPS origin before enabling MCP/OAuth. Omitting it is supported only when the HTTP listener is loopback-bound for local development.
 
 ```bash
 curl -X POST https://gateway.pushgo.dev/message \
@@ -38,8 +38,8 @@ curl -X POST https://gateway.pushgo.dev/message \
 ## Questions this page answers
 
 - **Can PushGo run as a self-hosted notification server?** Yes. The Gateway is designed for private deployment with persistent storage and configurable transport listeners.
-- **Does self-hosting enable MCP?** Yes. A private Gateway can expose `/mcp` and OAuth routes when configured with a public HTTPS base URL.
-- **Do I still need backups?** Yes. Channels, devices, MCP grants, Event state, and Thing state depend on persistent storage.
+- **Does self-hosting enable MCP?** Yes. A private Gateway can expose `/mcp` and OAuth routes. Non-loopback deployments require a public HTTPS base URL.
+- **Do I still need backups?** Yes. Back up channels, devices/routes, pending delivery state, sender status, MCP grants/sessions, and Widget/Live Activity subscriptions. Event/Thing projections and history live on subscribed clients.
 
 ## Security and operations
 

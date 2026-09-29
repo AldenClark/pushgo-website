@@ -36,7 +36,7 @@ Message 是最直接的通知模型。它适合不需要后续合并或关闭的
 
 | 分组 | 字段 |
 | :--- | :--- |
-| 认证与路由 | `channel_id`、`password`、`op_id`、`thing_id` |
+| 认证与路由 | `channel_id`、`password`、可选的客户端 `op_id`、`thing_id` |
 | 展示内容 | `title`、`body`、`severity`、`url`、`images`、`tags` |
 | 时效与安全 | `occurred_at`、`ttl`、`ciphertext` |
 | 扩展数据 | `metadata` |
@@ -78,7 +78,7 @@ Event 表示一个过程，而不是一条孤立通知。创建后会得到 `eve
 
 | 分组 | 字段 |
 | :--- | :--- |
-| 认证与路由 | `channel_id`、`password`、`op_id`、`thing_id` |
+| 认证与路由 | `channel_id`、`password`、`thing_id`；`op_id` 仅在响应中返回 |
 | 生命周期 | `event_id`、`event_time`、`started_at`、`ended_at` |
 | 展示内容 | `title`、`description`、`status`、`message`、`severity`、`tags`、`images` |
 | 扩展数据 | `attrs`、`metadata`、`ciphertext` |
@@ -118,7 +118,7 @@ Thing 表示一个长期存在的对象。它的价值在于“同一个对象�
 
 | 分组 | 字段 |
 | :--- | :--- |
-| 认证与路由 | `channel_id`、`password`、`op_id` |
+| 认证与路由 | `channel_id`、`password`；`op_id` 仅在响应中返回 |
 | 身份与展示 | `thing_id`、`title`、`description`、`tags`、`primary_image`、`images` |
 | 时间 | `created_at`、`observed_at`、`deleted_at` |
 | 位置与外部系统 | `external_ids`、`location_type`、`location_value` |

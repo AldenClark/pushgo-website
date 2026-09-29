@@ -3,6 +3,23 @@ title: Gateway 更新记录
 description: PushGo Gateway 版本更新历史。
 ---
 
+## v1.3.0
+*2026-08-23*
+
+### 改进
+- 新增非破坏性分页 Pull v2 与持久原子批量 ACK；破坏性旧路由仅保留用于 beta 兼容。
+- 新增 MQTT 5 私有传输和持久 QoS 1 重连，并使私有/provider 路由切换保持原子性。
+- 新增绑定 Message payload 的 `op_id` 幂等、发送状态和前向兼容请求解析，同时继续拒绝动作禁止字段。
+- 规范 APNs/FCM/WNS token，修正 APNs 过期时间，并把 provider 成功状态移动到真实发送完成之后。
+- Widget 与 Live Activity 最新状态投递在重启和恢复期间保持持久、有序且不会倒退过期时间。
+- 强化受管数据库升级并确立 schema v12 回滚边界。
+
+## v1.2.10
+*2026-06-10*
+
+### 改进
+- 拆分 Event/Thing 生命周期请求结构，使每个动作只接受有效字段，避免跨模型携带无关 patch 数据。
+
 ## v1.2.9
 *2026-05-26*
 

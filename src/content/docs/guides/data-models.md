@@ -36,7 +36,7 @@ Message is the simplest notification model. Use it for content that does not nee
 
 | Group | Fields |
 | :--- | :--- |
-| Auth and routing | `channel_id`, `password`, `op_id`, `thing_id` |
+| Auth and routing | `channel_id`, `password`, optional client `op_id`, `thing_id` |
 | Display | `title`, `body`, `severity`, `url`, `images`, `tags` |
 | Time and security | `occurred_at`, `ttl`, `ciphertext` |
 | Extensions | `metadata` |
@@ -78,7 +78,7 @@ Event represents a process. Creating it returns an `event_id`; subsequent update
 
 | Group | Fields |
 | :--- | :--- |
-| Auth and routing | `channel_id`, `password`, `op_id`, `thing_id` |
+| Auth and routing | `channel_id`, `password`, `thing_id`; `op_id` is response-only |
 | Lifecycle | `event_id`, `event_time`, `started_at`, `ended_at` |
 | Display | `title`, `description`, `status`, `message`, `severity`, `tags`, `images` |
 | Extensions | `attrs`, `metadata`, `ciphertext` |
@@ -118,7 +118,7 @@ Thing represents a long-lived object. Its value comes from updating the same obj
 
 | Group | Fields |
 | :--- | :--- |
-| Auth and routing | `channel_id`, `password`, `op_id` |
+| Auth and routing | `channel_id`, `password`; `op_id` is response-only |
 | Identity and display | `thing_id`, `title`, `description`, `tags`, `primary_image`, `images` |
 | Time | `created_at`, `observed_at`, `deleted_at` |
 | External systems | `external_ids`, `location_type`, `location_value` |

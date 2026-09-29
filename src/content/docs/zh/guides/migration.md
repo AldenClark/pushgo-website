@@ -17,8 +17,9 @@ description: 从 ntfy、Bark、ServerChan 或普通 Webhook 迁移到 PushGo。
 | 来源 | 方法 | PushGo 路径 | 兼容 key 位置 |
 | :--- | :--- | :--- | :--- |
 | ntfy | `POST` / `PUT` | `/ntfy/{topic}` | `{topic}` = `<channel_id>:<password>` |
+| ntfy 动作别名 | `GET` / `POST` / `PUT` | `/ntfy/{topic}/publish`、`/send` 或 `/trigger` | `{topic}` = `<channel_id>:<password>` |
 | ServerChan | `GET` / `POST` | `/serverchan/{sendkey}` | `{sendkey}` = `<channel_id>:<password>` |
-| Bark v1 | `GET` | `/bark/{device_key}/{body}` | `{device_key}` = `<channel_id>:<password>` |
+| Bark v1 | `GET` | `/bark/{device_key}/{body}` 或 `/bark/{device_key}/{title}/{body}` | `{device_key}` = `<channel_id>:<password>` |
 | Bark v2 | `POST` | `/bark/push` | JSON 字段 `device_key` |
 
 兼容接口的目标是降低迁移成本，不是覆盖 PushGo 的完整数据模型。如果你需要 `thing_id`、Event 生命周期或完整 Thing 状态，请使用原生 API。
@@ -60,7 +61,7 @@ curl -X POST https://gateway.pushgo.cn/message \
 Bark 常见用法是把 device key 放进路径。迁移时把 device key 换成 `<channel_id>:<password>`。
 
 ```bash
-curl "https://gateway.pushgo.cn/bark/YOUR_CHANNEL_ID:YOUR_CHANNEL_PASSWORD/服务器告警?title=CPU%20High&level=timeSensitive"
+curl "https://gateway.pushgo.cn/bark/YOUR_CHANNEL_ID:YOUR_CHANNEL_PASSWORD/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%91%8A%E8%AD%A6?title=CPU%20High&level=timeSensitive"
 ```
 
 如果你已经在使用 JSON 请求，建议直接改成原生 Message。原生 API 对 `images`、`tags`、`metadata`、`thing_id` 和 E2EE 更清晰。

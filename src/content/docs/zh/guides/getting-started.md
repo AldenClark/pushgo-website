@@ -17,7 +17,7 @@ description: 从安装客户端到收到第一条 PushGo 通知的最短路径�
 
 | 平台 | 获取方式 | 系统要求 |
 | :--- | :--- | :--- |
-| iOS / macOS / watchOS | [App Store](https://apps.apple.com/app/pushgo) | iOS 18+、macOS 15+、watchOS 11+ |
+| iOS / macOS / watchOS | [App Store](https://apps.apple.com/cn/app/pushgo/id6757907675) | iOS 17+、macOS 14+、watchOS 10+ |
 | Android | [GitHub Releases](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ |
 
 ## 2. 创建或订阅频道
@@ -29,7 +29,7 @@ description: 从安装客户端到收到第一条 PushGo 通知的最短路径�
 1. 打开客户端。
 2. 点击新增入口。
 3. 选择创建频道。
-4. 输入一个容易识别的名称和 8-128 个字符的密码。
+4. 输入一个容易识别的名称和 8-128 字节的密码。
 5. 保存生成的频道 ID 和密码。
 
 ### 订阅已有频道
@@ -70,17 +70,13 @@ curl -X POST https://gateway.pushgo.cn/message \
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
     "op_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "message_id": "3b7fd2e87d7d4d6d9c7f3a318ac21f02",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "message_id": "3b7fd2e87d7d4d6d9c7f3a318ac21f02"
+  }
 }
 ```
 
-`success=true` 表示 Gateway 接受了请求。`accepted=true` 表示 Gateway 已进入分发流程；系统通知展示仍由设备在线状态、系统推送服务和私有通道状态决定。
+`success=true` 表示 Gateway 已持久受理请求。保存 `op_id` 可查询 `GET /send_status/{op_id}`；最终展示仍取决于 provider、设备状态、通知权限和私有通道。
 
 ## 常见问题
 
@@ -90,7 +86,7 @@ curl -X POST https://gateway.pushgo.cn/message \
 | 返回 `401` | 私有 Gateway 是否启用了 `PUSHGO_TOKEN`；Bearer Token 是否正确。 |
 | 返回 `404` | 频道 ID 是否正确；设备是否已经创建或订阅该频道。 |
 | 返回 `success=true` 但没看到通知 | 设备通知权限、系统网络、Android 私有通道或 APNs/FCM 投递状态。 |
-| 请求体过大 | 单次 JSON 请求最大 32KB，图片请传 URL，不要把二进制直接塞进 JSON。 |
+| 请求体过大 | 单次 JSON 请求最大 32 KiB（32,768 字节），图片请传 URL，不要把二进制直接塞进 JSON。 |
 
 更多状态码见 [限制与错误](/zh/reference/limits-errors/)。
 

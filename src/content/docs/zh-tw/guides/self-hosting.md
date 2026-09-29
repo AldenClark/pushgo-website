@@ -6,7 +6,7 @@ description: 從最小可用到生產運維，部署自己的 PushGo Gateway。
 
 ## 什麼時候需要私人部署
 
-- 不希望通知、事件或實體狀態經過公共 Gateway。
+- 不希望通知載荷或 Event/Thing patch 經過公共 Gateway。
 - 需要自己的資料庫、備份、日誌、監控和容量策略。
 - 需要 Android 私人通道的低延遲同步。
 - 希望用自己的網域啟用 MCP/OAuth。
@@ -20,7 +20,7 @@ description: 從最小可用到生產運維，部署自己的 PushGo Gateway。
 | :--- | :--- | :--- |
 | 最小可用 | 本機測試、單一使用者指令碼 | SQLite + HTTP API |
 | 生產基礎 | 長期運作、公開網域 | HTTPS 反向代理 + 持久化資料庫 + Bearer Token |
-| 私人通道 | Android 低延遲同步 | WSS，按需增加 QUIC / Raw TCP |
+| 私人通道 | Android 低延遲同步 | WSS，按需增加 QUIC / Raw TCP / MQTT 5 |
 | AI 整合 | MCP 用戶端與 AI 助理 | MCP/OAuth + `PUSHGO_PUBLIC_BASE_URL` |
 
 ## 最小可用部署
@@ -70,28 +70,24 @@ docker run -d --name pushgo-gateway \
   -e PUSHGO_DB_URL='postgres://user:pass@db:5432/pushgo' \
   -e PUSHGO_TOKEN='replace-with-gateway-token' \
   -e PUSHGO_PUBLIC_BASE_URL='https://gateway.example.com' \
-  -e PUSHGO_TOKEN_SERVICE_URL='https://token.pushgo.dev' \
+  -e PUSHGO_TOKEN_SERVICE_URL='https://token.example.com' \
+  -e PUSHGO_TOKEN_SERVICE_AUTH_TOKEN='replace-with-a-separate-token-service-token' \
   ghcr.io/aldenclark/pushgo-gateway:latest
 ```
 
-設定 `PUSHGO_TOKEN` 後，所有 API 請求都需要：
+設定 `PUSHGO_TOKEN` 後，一般 API 以及 `/healthz`、`/readyz` 都需要：
 
 ```http
 Authorization: Bearer replace-with-gateway-token
 ```
 
-Channel ID 和 Channel 密碼仍然需要放在請求 body中。兩層驗證的差異請參考 [驗證](/zh-tw/reference/auth/)。
+Channel ID 和 Channel 密碼仍然需要放在請求 body 中。兩層驗證的差異請參考 [驗證](/zh-tw/reference/auth/)。
+
+啟用 MCP 時，MCP/OAuth discovery 入口是共享 Token middleware 的例外；它們使用自己的 OAuth 授權流程。
 
 ## 公共區域端點
 
-如果 Gateway 需要聯絡 token-service，建議按區域明確設定。
-
-| 區域 | Gateway | token-service |
-| :--- | :--- | :--- |
-| Global | `https://gateway.pushgo.dev/` | `https://token.pushgo.dev/` |
-| 中國大陸 | `https://gateway.pushgo.cn/` | `https://token.pushgo.cn/` |
-
-私人部署可以繼續使用公用 token-service，也可以根據專案後續部署策略切換到自己的服務。
+公共 Gateway 為 `https://gateway.pushgo.dev/`（全球）和 `https://gateway.pushgo.cn/`（中國大陸）。自架 Gateway 的 token-service 預設位址是 `http://127.0.0.1:6766`；非同機部署請設定自己的可達服務。任何非 loopback token-service 都必須設定僅支援環境變數的 `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`，且必須使用獨立 Bearer Token，不能重用 `PUSHGO_TOKEN`。
 
 ## 反向代理
 
@@ -118,7 +114,7 @@ server {
 }
 ```
 
-`PUSHGO_PUBLIC_BASE_URL` 必須是外部可存取的 HTTPS 根位址，否則 MCP issuer、繫結連結和用戶端 profile 可能會產生內部位址。
+`PUSHGO_PUBLIC_BASE_URL` 應指向外部可存取的 HTTPS 根位址。啟用 MCP 時，除僅綁定 loopback 的本機開發外，該值必填且必須使用 HTTPS；否則無法安全產生 MCP issuer 和綁定連結。
 
 ## Android 私人通道
 
@@ -129,30 +125,37 @@ PUSHGO_PRIVATE_TRANSPORTS=wss
 PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ```
 
-需要更低延遲或控制網路時，再增加 QUIC / Raw TCP。
+需要時再增加 QUIC、Raw TCP 或 MQTT 5。
 
 ```bash
-PUSHGO_PRIVATE_TRANSPORTS=quic,tcp,wss
+PUSHGO_PRIVATE_TRANSPORTS=quic,tcp,wss,mqtt
 PUSHGO_PRIVATE_QUIC_BIND=0.0.0.0:5223
 PUSHGO_PRIVATE_QUIC_PORT=5223
 PUSHGO_PRIVATE_TCP_BIND=0.0.0.0:5223
 PUSHGO_PRIVATE_TCP_PORT=5223
+PUSHGO_MQTT_BIND=0.0.0.0:1883
+PUSHGO_MQTT_PORT=1883
 PUSHGO_PRIVATE_TLS_CERT=/certs/fullchain.pem
 PUSHGO_PRIVATE_TLS_KEY=/certs/privkey.pem
 ```
 
 | 配置 | 說明 |
 | :--- | :--- |
-| `PUSHGO_PRIVATE_TRANSPORTS` | `false`、`true`、`none` 或明確列表，例如 `wss`、`quic,tcp,wss`。 |
+| `PUSHGO_PRIVATE_TRANSPORTS` | `false`/`off`/`disabled`/`none` 關閉全部；`true`/`on`/`enabled`/`all` 開啟 `quic,tcp,wss,mqtt`；也可用逗號、分號、豎線或空白分隔列表。預設 `false`。開啟全部也會開啟 QUIC，因此必須設定 TLS 憑證和私鑰。 |
 | `PUSHGO_PRIVATE_QUIC_BIND` | Gateway 實際監聽的 UDP 位址。 |
 | `PUSHGO_PRIVATE_QUIC_PORT` | 對用戶端宣告的 QUIC 連線埠。 |
 | `PUSHGO_PRIVATE_TCP_BIND` | Gateway 實際監聽的 TCP 位址。 |
 | `PUSHGO_PRIVATE_TCP_PORT` | 對用戶端宣告的 Raw TCP 連線埠。 |
-| `PUSHGO_PRIVATE_TLS_CERT` / `PUSHGO_PRIVATE_TLS_KEY` | QUIC 必填；Raw TCP 未做 TLS offload 時也必填。 |
-| `PUSHGO_PRIVATE_TCP_TLS_OFFLOAD` | Raw TCP 是否由邊緣代理處理 TLS。 |
-| `PUSHGO_PRIVATE_TCP_PROXY_PROTOCOL` | Raw TCP 入口是否期待 PROXY protocol v1。 |
+| `PUSHGO_PRIVATE_TLS_CERT` / `PUSHGO_PRIVATE_TLS_KEY` | QUIC 必填；Gateway 終止 TCP/MQTT TLS 時也需要。 |
+| `PUSHGO_PRIVATE_TCP_TLS_ENABLED` | Gateway 是否終止 Raw TCP TLS；預設 `false`。 |
+| `PUSHGO_PRIVATE_TCP_PROXY_PROTOCOL` | Raw TCP 入口是否期待 PROXY protocol v1；預設 `false`。 |
+| `PUSHGO_MQTT_BIND` / `PUSHGO_MQTT_PORT` | MQTT 監聽和廣播連線埠；預設 `127.0.0.1:1883` 與 `1883`。 |
+| `PUSHGO_MQTT_TLS_ENABLED` | Gateway 是否終止 MQTT TLS；預設 `false`。 |
+| `PUSHGO_MQTT_MAX_PACKET_BYTES` | MQTT 最大封包，預設 `32768`。 |
 
 QUIC 使用自訂 ALPN (`pushgo-quic`)，不能簡單地和 HTTP/3 共用同一個 UDP/443 入口。若邊緣代理已在 `443/udp` 提供 HTTP/3，請為 PushGo QUIC 使用獨立 UDP 埠，或確認代理能夠正確分流。
+
+容器部署必須發布所選監聽連線埠：預設範例為 HTTP `6666/tcp`、QUIC `5223/udp`、Raw TCP `5223/tcp`、MQTT `1883/tcp`。MQTT 用戶端必須使用 MQTT 5 和 QoS 1。
 
 ## MCP / OAuth
 
@@ -162,6 +165,8 @@ QUIC 使用自訂 ALPN (`pushgo-quic`)，不能簡單地和 HTTP/3 共用同一�
 PUSHGO_MCP_ENABLED=true
 PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ```
+
+非 loopback 部署必須提供 public base URL；它必須是絕對 HTTPS URL，且不能包含憑據、query 或 fragment。只有 HTTP listener 綁定 loopback 的本機開發環境可以省略，此時 Gateway 會派生 loopback HTTP issuer。
 
 常用配置：
 
@@ -180,28 +185,30 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | `--db-url` / `PUSHGO_DB_URL` | 無，必填 | 資料庫 URL，支援 SQLite、PostgreSQL 和 MySQL。 |
 | `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | 執行階段容量設定檔：`small` 用於私有/輕量部署，`public` 用於高負載部署。 |
 | `--token` / `PUSHGO_TOKEN` | 無 | Gateway 級 Bearer Token；為空時不啟用 Gateway 級 Token 驗證。 |
-| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | token-service 位址，生產環境建議明確設定。 |
+| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `http://127.0.0.1:6766` | token-service 位址；非 loopback 服務還需 `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`。 |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | 無 | 對外 HTTPS 根位址。 |
 | `--sandbox-mode` / `PUSHGO_SANDBOX_MODE` | `false` | 沙箱模式，包括 APNs sandbox endpoint。 |
-| `--observability-profile` / `PUSHGO_OBSERVABILITY_PROFILE` | `prod_min` | 可觀測性檔位：`prod_min`、`ops`、`incident`、`debug`。 |
 | `--observability-log-level` / `PUSHGO_OBSERVABILITY_LOG_LEVEL` | `warn` | 原生 tracing 日誌等級。 |
+| `--db-upgrade` / `PUSHGO_DB_UPGRADE` | 無 | 僅執行資料庫升級 `plan` 或 `run` 後退出。 |
 
 ## 維運建議
 
-- 資料庫必須納入備份；Channel、裝置、MCP 授權和實體狀態都依賴持久化儲存。
+- 資料庫必須納入備份；其中包含 Channel、裝置/路由、待投遞狀態、傳送狀態、MCP 授權/工作階段以及 Widget/Live Activity 訂閱。Event/Thing 投影和歷史由已訂閱用戶端儲存，不是 Gateway 中的規範實體記錄。
 - SQLite 適合個人或輕量部署；多人或高並發場景優先使用 PostgreSQL。
 - 高負載先觀察分發佇列和 worker，然後再評估資料庫和 provider 限流。
-- 生產排障優先使用 `PUSHGO_OBSERVABILITY_PROFILE=ops`，臨時深查再切到 `incident` 或 `debug`。
+- 排障時暫時提高 `PUSHGO_OBSERVABILITY_LOG_LEVEL`，完成後恢復一般等級。
 - Android 私人通道問題先檢查 `/gateway/profile` 宣告的連線埠和外部可存取性。
 
 執行階段容量：
 
-Gateway v1.2.9 的執行容量由執行階段設定檔管理。私有或輕量部署使用 `PUSHGO_RUNTIME_PROFILE=small`，高負載公開部署使用 `PUSHGO_RUNTIME_PROFILE=public`。佇列、分發、提供者、資料庫連線池和 SQLite 等底層調校值現在是設定檔內建預設值，不再作為公開環境變數配置。
+Gateway v1.3.0 的執行容量由執行階段設定檔管理。私有或輕量部署使用 `PUSHGO_RUNTIME_PROFILE=small`，高負載公開部署使用 `PUSHGO_RUNTIME_PROFILE=public`。底層調校值是設定檔內建預設值。
 
 ## 升級與回滾
 
+升級到 schema v12 前，先執行 `--db-upgrade plan`，建立並驗證 v11 快照，再執行 `--db-upgrade run`。v12 Gateway 一旦受理持久工作，就不要讓舊二進位檔直接使用該資料庫：保留資料庫，並使用完全匹配、支援 v12 的緊急構件向前恢復。要退回 v12 之前的版本，必須還原 v12 寫入前的 v11 快照。不要竄改 schema 標記或刪除待投遞狀態。
+
 - 升級前備份資料庫和執行配置。
-- 保持 Gateway 映象/二進位、環境變數和反向代理配置可追蹤。
+- 保持 Gateway 映像檔/二進位、環境變數和反向代理設定可追蹤。
 - 先在測試 Channel 驗證 `/message`、`/event/create` 和 `/thing/create`。
 - 如果啟用了私人通道，升級後檢查 Android 用戶端是否能取得新的 `/gateway/profile`。
 - 如果啟用了 MCP，升級後檢查 `/.well-known/*`、`/oauth/*` 和 `/mcp` 是否仍使用外部 HTTPS 位址。

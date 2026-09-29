@@ -2,7 +2,7 @@
 title: 核心概念
 description: 用一套清楚的模型理解 PushGo 的 Channel、Gateway、用戶端與三類資料模型。
 ---
-PushGo 可以理解為一條從指令碼、服務或裝置到已訂閱用戶端的同步路徑。它不只是把文字轉成系統通知，也會保留 Event 的生命週期與 Thing 的目前狀態，讓歷史記錄、篩選與自動化都能維持結構。
+PushGo 可以理解為一條從指令碼、服務或裝置到已訂閱用戶端的同步路徑。它不只是把文字轉成系統通知；用戶端也會根據已受理的 patch 投影 Event 生命週期和 Thing 狀態，讓歷史記錄、篩選與自動化都能維持結構。
 
 ## 概念模型
 
@@ -13,7 +13,7 @@ Sender -> Gateway -> Channel -> Subscribed devices
 ```
 
 - **Sender**：指令碼、伺服器、Home Assistant、CI/CD pipeline 或 AI 助理。
-- **Gateway**：驗證請求、儲存狀態、選擇投遞路徑，並將資料分發給裝置。
+- **Gateway**：驗證並持久受理請求、儲存投遞運行狀態、選擇投遞路徑，並將資料分發給裝置。
 - **Channel**：一組裝置共同訂閱的通訊空間。請求必須提供 `channel_id` 與 `password`。
 - **用戶端**：Apple 平台用戶端透過 APNs 接收通知，Android 用戶端可同時使用 FCM 和私人通道。
 - **資料模型**：PushGo 將一次性提醒、有生命週期的流程、持久狀態分成不同物件。
@@ -30,15 +30,15 @@ Channel 是 PushGo 的基本邊界。多台裝置可以訂閱同一個 Channel�
 
 Channel 密碼不是 Gateway 管理員密碼。公共 Gateway 和私人 Gateway 都仍然使用 Channel 層級授權；私人 Gateway 還可以額外啟用 Gateway 層級 Bearer Token。
 
-## Gateway：受理、狀態與投遞
+## Gateway：受理與投遞
 
 Gateway 收到請求後會依序處理：
 
 1. 驗證請求格式、Channel 憑證，以及可選的 Gateway Bearer Token。
-2. 建立或更新 Message、Event 或 Thing 狀態。
+2. 持久記錄提交和投遞運行狀態；不會把 Event/Thing patch 合併為一份伺服器端規範實體記錄。
 3. 透過 APNs、FCM 或 Android 私人通道投遞到已訂閱裝置。
 
-HTTP 回應代表 Gateway 是否受理請求。真正的系統通知投遞是非同步流程，因此 `accepted` 只表示請求已進入分發路徑，不代表每台裝置都已經顯示通知。
+已訂閱用戶端負責持久化並投影 Event/Thing 歷史和目前狀態。相關 ID 用來關聯 patch；更新路由會驗證格式，但不要求伺服器端曾收到對應 create。傳送回應確認 Gateway 已持久受理。投遞是非同步流程：可用傳回的 `op_id` 查詢粗粒度傳送狀態，但不能把它當成 provider 成功或裝置顯示回執。
 
 ## 三類資料模型
 
@@ -60,7 +60,7 @@ PushGo 不要求不同用戶端使用同一條背景連線。
 | :--- | :--- | :--- |
 | Apple 平台 | APNs | 由系統負責背景投遞，適用於 iOS、macOS 和 watchOS。 |
 | Android | FCM + 私人通道 | FCM 用於背景喚醒，私人通道用於更低延遲的同步。 |
-| 自我託管 Gateway | 由部署設定決定 | 可啟用 WSS、QUIC、Raw TCP 等 Android 私人通道。 |
+| 自我託管 Gateway | 由部署設定決定 | 可啟用 WSS、QUIC、Raw TCP 和 MQTT 5 等 Android 私人通道。 |
 
 用戶端支援能力請見 [App 介紹與平台支援](/zh-tw/guides/apps/)。
 

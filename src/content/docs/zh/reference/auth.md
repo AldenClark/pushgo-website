@@ -31,7 +31,7 @@ PushGo 的鉴权分为四种场景。先判断你调用的是哪类接口，再�
 | 字段 | 说明 |
 | :--- | :--- |
 | `channel_id` | 目标频道。 |
-| `password` | 频道密码，通常为 8-128 个字符。 |
+| `password` | 频道密码；先 trim，再按 8-128 字节校验。 |
 
 频道密码决定“谁能向这个频道写入”。它不是 Gateway 管理员密码，也不应该写入公开仓库、日志或前端代码。
 
@@ -68,6 +68,7 @@ curl -X POST https://gateway.example.com/message \
 - Token 类型必须是 `Bearer`。
 - Token 最大长度为 4096 个字符。
 - `PUSHGO_TOKEN` 为空时不启用网关级 Token 鉴权。
+- 设置后，`/healthz` 和 `/readyz` 也受该 Token 保护；仅当 MCP 开启时，MCP/OAuth discovery 入口才绕过这层共享 Token 中间件。
 
 ## 公共网关
 

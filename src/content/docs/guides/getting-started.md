@@ -17,7 +17,7 @@ Install one of the released clients.
 
 | Platform | Download | Requirement |
 | :--- | :--- | :--- |
-| iOS / macOS / watchOS | [App Store](https://apps.apple.com/app/pushgo) | iOS 18+, macOS 15+, watchOS 11+ |
+| iOS / macOS / watchOS | [App Store](https://apps.apple.com/cn/app/pushgo/id6757907675) | iOS 17+, macOS 14+, watchOS 10+ |
 | Android | [GitHub Releases](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ |
 
 ## 2. Create or Subscribe to a Channel
@@ -29,7 +29,7 @@ A channel is the PushGo write boundary. Requests go to a channel, and subscribed
 1. Open the client.
 2. Use the add action.
 3. Choose create channel.
-4. Enter a recognizable name and an 8-128 character password.
+4. Enter a recognizable name and an 8-128 byte password.
 5. Save the generated channel ID and password.
 
 ### Subscribe to an Existing Channel
@@ -70,17 +70,13 @@ A successful response looks like:
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
     "op_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "message_id": "3b7fd2e87d7d4d6d9c7f3a318ac21f02",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "message_id": "3b7fd2e87d7d4d6d9c7f3a318ac21f02"
+  }
 }
 ```
 
-`success=true` means the Gateway accepted the request. `accepted=true` means it entered dispatch; final notification display still depends on device state, platform push services, and private transport status.
+`success=true` means the Gateway durably accepted the request. Save `op_id` for `GET /send_status/{op_id}`; final display still depends on providers, device state, permissions, and private transports.
 
 ## Common Issues
 
@@ -90,7 +86,7 @@ A successful response looks like:
 | `401` response | Private Gateway `PUSHGO_TOKEN` and `Authorization: Bearer <token>`. |
 | `404` response | Channel ID and whether the device created or subscribed to the channel. |
 | `success=true` but no notification | Device notification permission, network state, Android private transport, APNs/FCM delivery. |
-| Payload too large | JSON body max is 32KB; use image URLs instead of embedding binary data. |
+| Payload too large | JSON body max is 32 KiB (32,768 bytes); use image URLs instead of embedding binary data. |
 
 See [Limits & Errors](/reference/limits-errors/) for more status codes.
 

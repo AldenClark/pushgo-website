@@ -3,6 +3,28 @@ title: Android Changelog
 description: Version history for PushGo Android app.
 ---
 
+## v1.3.0
+*2026-08-24*
+
+### Improved
+- Added non-destructive paged Pull and batch ACK with beta-Gateway compatibility; legacy destructive Pull remains isolated from v2.
+- Pulled notifications and pending local deletions now survive interruption or process restart until durable handling completes.
+- Expanded entity search and filtering, added in-app links to the website guides, and improved documentation-row accessibility.
+- Persisted notification replay restores state silently without replaying system or custom alert sounds.
+
+### Fixed
+- ACKs stay bound to the Gateway that produced them, use the authoritative outer delivery ID, and are removed only after a structurally valid full acknowledgement.
+- Gateway switching, interrupted Pull draining, serialized provider ingress, and retry behavior no longer lose or misdirect pending work.
+
+## v1.2.6
+*2026-06-09*
+
+### Improved
+- Lowered the supported floor to Android 9 and improved entity projection, visible-scope mark-all-read, and pending-deletion refresh behavior.
+
+### Fixed
+- Fixed Android 9 compatibility and stale event/object detail state after patch-driven updates.
+
 ## v1.2.5
 *2026-05-26*
 

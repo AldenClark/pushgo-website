@@ -8,17 +8,21 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 
 | 專案 | 限制 |
 | :--- | :--- |
-| 請求 body大小 | 最大 32KB。 |
-| Gateway 產生 ID | 32 位元小寫十六進位字串。 |
-| Channel 密碼 | 通常為 8-128 字元。 |
-| `op_id` | 1-128 字元，只允許字母、數字、`_`、`:`、`-`。 |
+| 請求 body 大小 | 最大 32 KiB（32,768 位元組）。 |
+| `channel_id` | 128 位元 Crockford Base32；規範輸出為 26 位大寫字元。輸入不區分大小寫，忽略 ASCII 空白和連字號，並接受 Crockford 別名 `O`→`0`、`I`/`L`→`1`。 |
+| Gateway 產生的實體 ID | 32 位小寫十六進位字串；非 create 路由接收的用戶端 Event/Thing ID 也可使用下述通用格式。 |
+| Channel 密碼 | 先 trim，再按 8-128 位元組驗證。 |
+| `op_id` | 客戶端值為 1-128 字元，只允許字母、數字、`_`、`:`、`-`，且僅 Message 接受。目前產生值由 13 位小寫十六進位時間戳、連字號和 32 位小寫十六進位隨機值組成；呼叫方應將其視為不透明字串。 |
 | `thing_id` / `event_id` | 1-64 字元，只允許字母、數字、`_`、`:`、`-`。 |
-| `images` | 最多 32 項，每項 URL 最大 2048 字元。 |
-| `tags` | 最多 32 項，每項最大 64 字元，trim 後去重。 |
-| `metadata` | 僅允許標量值；key 最大 64，非空標量 value 最大 512；不允許巢狀物件或陣列。 |
-| `attrs` | 物件 patch；`null` 刪除 key；陣列和深層巢狀會被拒絕。 |
+| `images` | 最多 32 項，每項 URL 最大 2048 位元組。 |
+| `tags` | 最多 32 項，每項最大 64 位元組，trim 後去重。 |
+| `metadata` | 僅允許標量值；key 最大 64 位元組，非空標量文字最大 512 位元組；不允許巢狀物件、陣列或 null。 |
 | `ttl` 與 API 時間戳 | 文件註明的時間欄位接受 Unix 秒或毫秒，並歸一化為毫秒。 |
-| 未知欄位 | 原生 Message、Event、Thing 和 MCP 工具引數都採用嚴格解析，未知欄位會傳回 400。 |
+| 活躍訂閱者 | 每個 Channel 最多 32 個並行訂閱者。 |
+| 內建密碼請求預算 | 每個 Gateway 程序：公開/密碼敏感介面以及 MCP/OAuth 密碼入口，每 IP 每分鐘 60 次、全域每分鐘 1,200 次。經共享 Bearer Token 驗證的私人請求不受此 limiter 限制。 |
+| 未知欄位 | 原生 Message、Event、Thing 會忽略擴充欄位；動作明確禁止的已知欄位仍傳回 400。 |
+
+Message 的 `tags`、`images`、`severity` 按對應頁面驗證；Event 和 Thing 的 patch 內容不繼承這些限制。
 
 ## 回應 envelope
 
@@ -28,10 +32,9 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 {
   "success": true,
   "data": {
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "op_id": "00191f23cc000-0123456789abcdef0123456789abcdef",
+    "message_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1"
+  }
 }
 ```
 
@@ -40,37 +43,62 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 ```json
 {
   "success": false,
-  "data": null,
   "error": "human readable message",
-  "error_code": "machine_readable_code"
+  "error_code": "machine_readable_code",
+  "problem": {
+    "code": "machine_readable_code",
+    "category": "validation",
+    "status": 400,
+    "title": "Invalid request",
+    "detail": "human readable message",
+    "localized_message": "human readable message",
+    "locale": "zh-TW",
+    "retryable": false,
+    "request_id": "request-id"
+  }
 }
 ```
 
-自動化指令碼應優先判斷 `success` 和 `error_code`，不要只依賴自然語言錯誤訊息。
+無法提供的可選 `problem` 成員會被省略；存在請求作用域 ID 時，回應也會透過 `x-request-id` Header 傳回。
 
-## `accepted` 的意思
+成功 `data` 包含 `op_id` 和 `message_id`、`event_id`、`thing_id` 三者之一，不含 `channel_id` 或 `accepted` 布林值。自動化應結合 HTTP 狀態與 `success`、`error_code` 或 `problem.code`。
 
-`success=true` 表示 Gateway 已處理請求。 `accepted=true` 表示 Gateway 已進入分發流程。
+## 受理與傳送狀態
+
+傳送介面的 `success=true` 表示 Gateway 已持久受理提交，不保證 provider 成功、私人通道投遞、裝置顯示或使用者可見。
 
 它不保證：
 
-- 每台裝置都已經線上上。
+- 每台裝置都已經在線上。
 - APNs 或 FCM 已經展示系統通知。
 - Android 私人通道已經即時送達。
 - 使用者沒有被系統通知許可權、專注模式或省電影響。
 
-因此，`accepted` 是 Gateway 受理和分發狀態，不是終端展示回執。
+使用傳回的 `op_id` 查詢 `GET /send_status/{op_id}`。回應包含 `op_id`、`status`、`model`、`entity_id`、`accepted_at`、`updated_at`、`expires_at`。
+
+狀態值為 `accepted`、`processing`、`provider_queued`、`sent`、`partially_failed`、`failed`。`provider_queued` 只表示進入 Gateway 的 provider worker 佇列，不代表 provider 成功。未知或過期操作傳回 `404 send_status_not_found`；這些狀態也不是終端顯示回執。
+
+| 狀態 | 意義 |
+| :--- | :--- |
+| `accepted` | 提交已被持久受理。 |
+| `processing` | 正在處理分發。 |
+| `provider_queued` | 已進入 Gateway provider worker 佇列；不代表 provider 成功。 |
+| `sent` | 分發完成，未記錄目標失敗。 |
+| `partially_failed` | 至少一個分發目標失敗。 |
+| `failed` | 提交處理失敗。 |
 
 ## 常見 HTTP 狀態
 
 | 狀態碼 | 意義 | 典型原因 | 處理建議 |
 | :--- | :--- | :--- | :--- |
-| `200` | 請求已被 Gateway 處理 | `success=true`，但仍需檢視 `accepted` | 儲存返回的 ID 和 `op_id`。 |
-| `400` | 請求校驗失敗 | 缺少必填欄位、未知欄位、欄位格式錯誤 | 對照 API 欄位表，檢查 JSON 和大小寫。 |
+| `200` | 請求已被 Gateway 處理 | `success=true` | 儲存傳回的 ID 和 `op_id`。 |
+| `400` | 請求校驗失敗 | 必填/格式錯誤，或已知欄位不允許用於目前動作 | 對照 API 欄位表檢查 JSON。 |
 | `401` | Gateway 級驗證失敗 | 私人 Gateway 開啟 `PUSHGO_TOKEN`，Bearer Token 缺失或錯誤 | 檢查 `Authorization: Bearer <token>`。 |
-| `404` | 目標不存在 | Channel、事件或實體不存在 | 檢查 `channel_id`、`event_id`、`thing_id`。 |
-| `413` | 請求 body過大 | JSON 超過 32KB | 圖片使用 URL；減少 metadata 或 attrs。 |
-| `503` | 分發未完整成功 | provider、私人通道、佇列或下游暫時無法使用 | 檢視 Gateway 日誌、統計指標和佇列容量。 |
+| `404` | 目標不存在 | Channel 或傳送狀態記錄不存在 | 檢查 `channel_id` 或 `op_id`。 |
+| `409` | 冪等衝突 | Message `op_id` 用於不同的正規化內容或作用域 | 使用新 ID，或重送原始內容。 |
+| `413` | 請求 body 過大 | JSON 超過 32 KiB（32,768 位元組） | 圖片使用 URL；減少 metadata 或 attrs。 |
+| `429` | 請求過於頻繁 | 超過程序內建的密碼請求預算 | 稍後重試並降低突發請求。 |
+| `503` | 提交未受理 | Gateway 接入或持久提交失敗 | 檢視 Gateway 日誌、儲存健康和容量。 |
 
 ## 按場景排障
 
@@ -78,9 +106,9 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 
 - JSON 是否合法。
 - 是否把 `event_id` 傳給了 `/event/create`，或把 `thing_id` 傳給了 `/thing/create`。
-- 是否傳承了未宣告欄位。
-- `severity` 是否為 `critical`、`high`、`normal`、`low`。
-- `attrs` 是否是物件補丁，而不是陣列或複雜巢狀。
+- Event/Thing 不要傳 `op_id`，create 路由不要傳 Gateway 產生的實體 ID。
+- Message 的未知 `severity` 會正規化為 `normal`。
+- 未知擴充欄位會被忽略；可選欄位未生效時先檢查拼寫。
 
 ### 請求回傳 401
 
@@ -88,6 +116,7 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 - Header 是否是 `Authorization: Bearer <token>`。
 - 是否把 Channel 密碼誤當成 Gateway Token。
 - 反向代理是否剝離了 Authorization Header。
+- 私人 Gateway 設定 `PUSHGO_TOKEN` 後，`/healthz` 和 `/readyz` 也需要 Bearer Token。
 
 ### 請求成功但裝置沒收到
 
@@ -109,7 +138,7 @@ description: PushGo Gateway 的一般限制、回應 envelope、狀態碼和排�
 ### MCP 繫結失敗
 
 - `PUSHGO_MCP_ENABLED` 是否開啟。
-- `PUSHGO_PUBLIC_BASE_URL` 是否為外部 HTTPS 位址。
+- 非 loopback 部署的 `PUSHGO_PUBLIC_BASE_URL` 是否為外部 HTTPS 位址；僅 loopback 本機開發可以省略。
 - 反向代理是否轉送 `/.well-known/*`、`/oauth/*` 和 `/mcp`。
 - DCR 是否與用戶端能力相符。
 - 繫結頁面會話是否過期。

@@ -3,7 +3,7 @@ title: Core Concepts
 description: Understand PushGo's channels, gateway, clients, and three data models.
 ---
 
-PushGo can be understood as a synchronization path from your scripts, services, or devices to the clients subscribed to a channel. It does not only turn text into a system notification; it also preserves event lifecycles and entity state so history, filtering, and automation stay structured.
+PushGo can be understood as a synchronization path from your scripts, services, or devices to the clients subscribed to a channel. It does not only turn text into a system notification; its clients also project Event lifecycles and Thing state from the accepted patches so history, filtering, and automation stay structured.
 
 ## One Mental Model
 
@@ -14,7 +14,7 @@ Sender -> Gateway -> Channel -> Subscribed devices
 ```
 
 - **Sender**: your script, server, Home Assistant, CI/CD pipeline, or AI assistant.
-- **Gateway**: validates requests, stores state, selects delivery paths, and dispatches data.
+- **Gateway**: validates and durably accepts requests, stores operational delivery state, selects delivery paths, and dispatches data.
 - **Channel**: the communication space subscribed to by one or more devices. Requests need a channel ID and password.
 - **Client**: Apple clients receive through APNs; Android clients can use FCM plus private transports.
 - **Data model**: PushGo separates one-off alerts, lifecycle processes, and persistent state into different objects.
@@ -31,15 +31,15 @@ A channel is PushGo's basic boundary. Multiple devices can subscribe to one chan
 
 The channel password is not the gateway administrator password. Public and private gateways both use channel-level authorization; private gateways may also require a gateway-level Bearer token.
 
-## Gateway: Acceptance, State, and Delivery
+## Gateway: Acceptance and Delivery
 
 When the Gateway receives a request, it:
 
 1. Validates the request, channel credentials, and optional gateway Bearer token.
-2. Creates or updates Message, Event, or Thing state.
+2. Durably records the submission and operational delivery state; it does not merge Event/Thing patches into a canonical server-side entity record.
 3. Dispatches to subscribed devices through APNs, FCM, or Android private transports.
 
-The HTTP response means whether the Gateway accepted the request. Actual system notification delivery is asynchronous, so `accepted` means the request entered the dispatch path, not that every device has already displayed it.
+Subscribed clients persist and project Event/Thing history and current state. The IDs correlate those patches; update routes validate their format but do not require a prior server-side create record. The send response acknowledges durable Gateway acceptance. Delivery is asynchronous: use the returned `op_id` for coarse sender status, but do not treat it as a provider-success or device-display receipt.
 
 ## Three Data Models
 
@@ -61,7 +61,7 @@ PushGo does not force every platform through the same background connection.
 | :--- | :--- | :--- |
 | Apple platforms | APNs | System-managed delivery for iOS, macOS, and watchOS. |
 | Android | FCM + private transports | FCM for wake-up; private transports for lower-latency sync. |
-| Self-hosted Gateway | Deployment-dependent | Can enable WSS, QUIC, and Raw TCP for Android private transports. |
+| Self-hosted Gateway | Deployment-dependent | Can enable WSS, QUIC, Raw TCP, and MQTT 5 for Android private transports. |
 
 See [Apps and Platform Support](/guides/apps/) for client capabilities.
 

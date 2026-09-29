@@ -3,6 +3,23 @@ title: Gateway Changelog
 description: Version history for PushGo Gateway.
 ---
 
+## v1.3.0
+*2026-08-23*
+
+### Improved
+- Added non-destructive paged Pull v2 and durable atomic batch ACK while retaining the destructive legacy route only for beta compatibility.
+- Added MQTT 5 as a private transport with durable QoS 1 reconnect behavior, and made private/provider route changes atomic.
+- Added payload-bound Message `op_id` idempotency, sender status, and forward-compatible request decoding that still rejects known action-forbidden fields.
+- Normalized APNs/FCM/WNS tokens, corrected APNs expiration, and moved provider success reporting to actual provider completion.
+- Made Widget and Live Activity latest-state delivery durable, ordered, and expiry-safe across restart and recovery.
+- Strengthened managed database upgrades and established the schema-v12 rollback boundary.
+
+## v1.2.10
+*2026-06-10*
+
+### Improved
+- Split Event and Thing lifecycle request shapes so each action accepts only its valid fields and no longer carries unrelated patch data between models.
+
 ## v1.2.9
 *2026-05-26*
 
