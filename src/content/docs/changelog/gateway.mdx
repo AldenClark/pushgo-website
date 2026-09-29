@@ -16,6 +16,7 @@ description: Version history for PushGo Gateway.
 - Completed route changes can be retried after expiry or a later change, and failed retries no longer leave an incorrect active route in memory.
 - Multibyte provider tokens no longer crash diagnostic logging.
 - Private TCP connections stay readable when an outgoing delivery interrupts an incoming frame that arrives in pieces.
+- The updated TLS dependency rejects TLS 1.3 handshake messages at the wrong encryption level, and private WSS Ping/Pong writes time out when a peer stops reading.
 - MySQL private-device activity updates and subscription cleanup work when devices unsubscribe or replace their identity.
 
 ## v1.3.2
