@@ -3,6 +3,20 @@ title: Gateway Changelog
 description: Version history for PushGo Gateway.
 ---
 
+## v1.3.3
+
+### Improved
+- Route switching uses recoverable atomic transitions on SQLite, PostgreSQL, and MySQL, including Android manual transport switching on PostgreSQL and MySQL deployments.
+- Route recovery can compare the active provider token's SHA-256 fingerprint without exposing the token.
+
+### Fixed
+- Provider-token ownership and delivery routes stay consistent when a device takes over a token or subscription, retirement, and route changes overlap.
+- Pending private deliveries remain available when a route deletion cannot be saved.
+- Completed route changes can be retried after expiry or a later change, and failed retries no longer leave an incorrect active route in memory.
+- Multibyte provider tokens no longer crash diagnostic logging.
+- Private TCP connections stay readable when an outgoing delivery interrupts an incoming frame that arrives in pieces.
+- MySQL private-device activity updates and subscription cleanup work when devices unsubscribe or replace their identity.
+
 ## v1.3.2
 *2026-08-25*
 
