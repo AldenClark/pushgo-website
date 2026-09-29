@@ -72,7 +72,6 @@ docker run -d --name pushgo-gateway \
   -e PUSHGO_TOKEN='replace-with-gateway-token' \
   -e PUSHGO_PUBLIC_BASE_URL='https://gateway.example.com' \
   -e PUSHGO_TOKEN_SERVICE_URL='https://token.example.com' \
-  -e PUSHGO_TOKEN_SERVICE_AUTH_TOKEN='replace-with-a-separate-token-service-token' \
   ghcr.io/aldenclark/pushgo-gateway:latest
 ```
 
@@ -88,7 +87,7 @@ When `PUSHGO_TOKEN` is set, `/healthz` and `/readyz` also require the same Beare
 
 ## Public Region Endpoints
 
-Public Gateways are `https://gateway.pushgo.dev/` (global) and `https://gateway.pushgo.cn/` (Mainland China). A self-hosted Gateway defaults its token-service URL to `http://127.0.0.1:6766`; configure your own reachable service when it is not colocated. Any non-loopback token-service requires the environment-only `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`. It must be a dedicated Bearer token and must not reuse `PUSHGO_TOKEN`.
+Public Gateways are `https://gateway.pushgo.dev/` (global) and `https://gateway.pushgo.cn/` (Mainland China). The Gateway defaults its token-service URL to `https://token.pushgo.cn/`. Set `PUSHGO_TOKEN_SERVICE_URL` explicitly for a self-hosted token service or the global endpoint (`https://token.pushgo.dev/`). Gateway-to-token-service requests do not use Bearer authentication. Restrict access to a self-hosted token service with a loopback or private-network listener, or a restricted HTTPS reverse proxy. `PUSHGO_TOKEN` applies only to the Gateway API.
 
 ## Reverse Proxy
 
@@ -186,7 +185,7 @@ See [MCP Reference](/reference/mcp/) for tools and authorization flow.
 | `--db-url` / `PUSHGO_DB_URL` | required | Database URL; supports SQLite, PostgreSQL, and MySQL. |
 | `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | Runtime sizing profile: `small` for private/light deployments, `public` for high-load deployments. |
 | `--token` / `PUSHGO_TOKEN` | none | Gateway-level Bearer token. Empty means disabled. |
-| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `http://127.0.0.1:6766` | token-service URL. Non-loopback services also require `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`. |
+| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.cn/` | token-service URL; set explicitly for your own service or another region. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | none | External HTTPS root URL. |
 | `--sandbox-mode` / `PUSHGO_SANDBOX_MODE` | `false` | Sandbox mode, including APNs sandbox endpoint. |
 | `--observability-log-level` / `PUSHGO_OBSERVABILITY_LOG_LEVEL` | `warn` | Native tracing log level. |

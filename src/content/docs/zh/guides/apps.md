@@ -3,16 +3,16 @@ title: App 介绍与平台支持
 description: 了解 PushGo 已发布客户端、系统要求和不同平台的投递能力。
 ---
 
-PushGo 目前对外发布 Apple 平台客户端、Android 客户端和 Gateway。官网只描述已经可用的公开发布内容；未发布平台不会列为可下载或可用客户端。
+PushGo 对外发布 Apple 平台客户端、Android 客户端和 Gateway。下载链接指向其公开发布渠道；未发布平台不会列为可用客户端。
 
 ## 平台概览
 
 | 平台 | 获取方式 | 系统要求 | 主要投递路径 | 私有通道 |
 | :--- | :--- | :--- | :--- | :--- |
-| iOS | App Store | iOS 17+ | APNs | 否 |
-| macOS | App Store | macOS 14+ | APNs | 否 |
-| watchOS | App Store | watchOS 10+ | APNs | 否 |
-| Android | GitHub Releases | Android 9+ | FCM + 私有通道 | 是，支持 QUIC / Raw TCP / WSS / MQTT 5 |
+| iOS | [App Store](https://apps.apple.com/cn/app/pushgo/id6757907675) | iOS 17+ | APNs | 否 |
+| macOS | [App Store](https://apps.apple.com/cn/app/pushgo/id6757907675) | macOS 14+ | APNs | 否 |
+| watchOS | [App Store](https://apps.apple.com/cn/app/pushgo/id6757907675) | watchOS 10+ | APNs | 否 |
+| Android | [GitHub Releases](https://github.com/AldenClark/pushgo-android/releases) | Android 9+ | FCM + 私有通道 | 是，支持 QUIC / Raw TCP / WSS / MQTT 5 |
 
 ## Apple 平台客户端
 

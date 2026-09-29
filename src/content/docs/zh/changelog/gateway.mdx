@@ -3,6 +3,19 @@ title: Gateway 更新记录
 description: PushGo Gateway 版本更新历史。
 ---
 
+## v1.3.2
+*2026-08-25*
+
+### 修复
+- 默认 token service 地址改为 `https://token.pushgo.cn/`；全球和自托管部署仍可通过 `PUSHGO_TOKEN_SERVICE_URL` 覆盖。
+- 恢复发布标签对应的 Gateway 容器镜像同时发布到 GHCR 和 Docker Hub。
+
+## v1.3.1
+*2026-08-24*
+
+### 修复
+- 恢复对接受无鉴权 HTTPS 请求的 token service 的兼容性；Gateway API 的访问 token 行为未变。
+
 ## v1.3.0
 *2026-08-23*
 

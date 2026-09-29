@@ -71,7 +71,6 @@ docker run -d --name pushgo-gateway \
   -e PUSHGO_TOKEN='replace-with-gateway-token' \
   -e PUSHGO_PUBLIC_BASE_URL='https://gateway.example.com' \
   -e PUSHGO_TOKEN_SERVICE_URL='https://token.example.com' \
-  -e PUSHGO_TOKEN_SERVICE_AUTH_TOKEN='replace-with-a-separate-token-service-token' \
   ghcr.io/aldenclark/pushgo-gateway:latest
 ```
 
@@ -87,7 +86,7 @@ Channel ID 和 Channel 密碼仍然需要放在請求 body 中。兩層驗證的
 
 ## 公共區域端點
 
-公共 Gateway 為 `https://gateway.pushgo.dev/`（全球）和 `https://gateway.pushgo.cn/`（中國大陸）。自架 Gateway 的 token-service 預設位址是 `http://127.0.0.1:6766`；非同機部署請設定自己的可達服務。任何非 loopback token-service 都必須設定僅支援環境變數的 `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`，且必須使用獨立 Bearer Token，不能重用 `PUSHGO_TOKEN`。
+公共 Gateway 為 `https://gateway.pushgo.dev/`（全球）和 `https://gateway.pushgo.cn/`（中國大陸）。Gateway 的 token-service 預設位址是 `https://token.pushgo.cn/`。使用自架 token-service 或全球端點（`https://token.pushgo.dev/`）時，請明確設定 `PUSHGO_TOKEN_SERVICE_URL`。Gateway 向 token-service 發出請求時不使用 Bearer 驗證。自架 token-service 應只監聽本機或私人網路，或設於限制存取的 HTTPS 反向代理後方。`PUSHGO_TOKEN` 僅用於 Gateway API。
 
 ## 反向代理
 
@@ -185,7 +184,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | `--db-url` / `PUSHGO_DB_URL` | 無，必填 | 資料庫 URL，支援 SQLite、PostgreSQL 和 MySQL。 |
 | `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | 執行階段容量設定檔：`small` 用於私有/輕量部署，`public` 用於高負載部署。 |
 | `--token` / `PUSHGO_TOKEN` | 無 | Gateway 級 Bearer Token；為空時不啟用 Gateway 級 Token 驗證。 |
-| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `http://127.0.0.1:6766` | token-service 位址；非 loopback 服務還需 `PUSHGO_TOKEN_SERVICE_AUTH_TOKEN`。 |
+| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.cn/` | token-service 位址；自架或使用其他區域時需明確設定。 |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | 無 | 對外 HTTPS 根位址。 |
 | `--sandbox-mode` / `PUSHGO_SANDBOX_MODE` | `false` | 沙箱模式，包括 APNs sandbox endpoint。 |
 | `--observability-log-level` / `PUSHGO_OBSERVABILITY_LOG_LEVEL` | `warn` | 原生 tracing 日誌等級。 |

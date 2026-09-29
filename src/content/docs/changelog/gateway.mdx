@@ -3,6 +3,19 @@ title: Gateway Changelog
 description: Version history for PushGo Gateway.
 ---
 
+## v1.3.2
+*2026-08-25*
+
+### Fixed
+- Changed the default token-service endpoint to `https://token.pushgo.cn/`; global and self-hosted deployments can still override it with `PUSHGO_TOKEN_SERVICE_URL`.
+- Restored synchronized Gateway container image publication to GHCR and Docker Hub for release tags.
+
+## v1.3.1
+*2026-08-24*
+
+### Fixed
+- Restored compatibility with token services that accept unauthenticated HTTPS requests. Gateway API access-token behavior did not change.
+
 ## v1.3.0
 *2026-08-23*
 
