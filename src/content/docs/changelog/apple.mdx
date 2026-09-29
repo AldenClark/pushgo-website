@@ -16,6 +16,9 @@ description: Version history for PushGo iOS, macOS, and watchOS apps.
 - Changing Gateways validates the replacement before switching and keeps the save result visible.
 - Opening an unavailable object on Mac no longer shows an unrelated object's detail.
 - Rich message images no longer retain stale attachments or stop a restarted animation.
+- Message history can recover when an app upgrade is interrupted while moving its database.
+- Apple Watch cleans up the old push route after a Gateway or receiver-mode change, resumes interrupted cleanup, and registers again when returning to an earlier Gateway.
+- Apple Watch waits for a complete iPhone settings sync before using updated receiver settings.
 
 ## v1.3.0
 *2026-08-23*
