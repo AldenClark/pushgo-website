@@ -6,6 +6,7 @@ description: Version history for PushGo Gateway.
 ## v1.3.3
 
 ### Improved
+- Improved QUIC connection security against malicious peers.
 - Route switching uses recoverable atomic transitions on SQLite, PostgreSQL, and MySQL, including Android manual transport switching on PostgreSQL and MySQL deployments.
 - Route recovery can compare the active provider token's SHA-256 fingerprint without exposing the token.
 

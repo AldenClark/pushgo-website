@@ -6,6 +6,7 @@ description: PushGo Gateway 版本更新歷史。
 ## v1.3.3
 
 ### 改進
+- 增強 QUIC 連線對惡意對端的防護。
 - SQLite、PostgreSQL 和 MySQL 的路由切換均採用可恢復的原子交易，也支援 PostgreSQL 和 MySQL 部署上的 Android 手動傳輸切換。
 - 路由恢復可透過目前 provider token 的 SHA-256 指紋核對狀態，而不暴露 token 本身。
 
