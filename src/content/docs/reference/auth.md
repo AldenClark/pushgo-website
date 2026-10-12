@@ -31,7 +31,7 @@ Native Message, Event, and Thing APIs use channel credentials in the JSON body.
 | Field | Description |
 | :--- | :--- |
 | `channel_id` | Target channel. |
-| `password` | Channel password, usually 8-128 characters. |
+| `password` | Channel password; trimmed before validation, then 8-128 bytes. |
 
 The channel password controls who can write to a channel. It is not a Gateway administrator password and should not be placed in public repositories, logs, or frontend code.
 
@@ -68,6 +68,7 @@ Constraints:
 - Token type must be `Bearer`.
 - Token length is capped at 4096 characters.
 - If `PUSHGO_TOKEN` is empty, gateway-level token authentication is disabled.
+- When set, the token also protects `/healthz` and `/readyz`. MCP/OAuth discovery surfaces bypass this shared-token middleware only when MCP is enabled.
 
 ## Public Gateways
 

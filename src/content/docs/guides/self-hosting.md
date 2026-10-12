@@ -7,7 +7,7 @@ Self-hosting is for users who want to control data paths, authentication policy,
 
 ## When You Need It
 
-- You do not want notification, event, or entity state to pass through a public Gateway.
+- You do not want notification payloads or Event/Thing patches to pass through a public Gateway.
 - You need your own database, backups, logs, monitoring, and capacity policy.
 - You want lower-latency Android private transport synchronization.
 - You want MCP/OAuth on your own domain.
@@ -21,7 +21,7 @@ If you only want to try PushGo, use the public Gateway and follow [Getting Start
 | :--- | :--- | :--- |
 | Minimal | Local testing, single-user scripts | SQLite + HTTP API |
 | Production base | Long-running public domain | HTTPS reverse proxy + persistent database + Bearer token |
-| Private transports | Android low-latency sync | WSS, then optional QUIC / Raw TCP |
+| Private transports | Android low-latency sync | WSS, then optional QUIC / Raw TCP / MQTT 5 |
 | AI integration | MCP clients and AI assistants | MCP/OAuth + `PUSHGO_PUBLIC_BASE_URL` |
 
 ## Minimal Deployment
@@ -71,7 +71,7 @@ docker run -d --name pushgo-gateway \
   -e PUSHGO_DB_URL='postgres://user:pass@db:5432/pushgo' \
   -e PUSHGO_TOKEN='replace-with-gateway-token' \
   -e PUSHGO_PUBLIC_BASE_URL='https://gateway.example.com' \
-  -e PUSHGO_TOKEN_SERVICE_URL='https://token.pushgo.dev' \
+  -e PUSHGO_TOKEN_SERVICE_URL='https://token.example.com' \
   ghcr.io/aldenclark/pushgo-gateway:latest
 ```
 
@@ -87,14 +87,13 @@ When `PUSHGO_TOKEN` is set, `/healthz` and `/readyz` also require the same Beare
 
 ## Public Region Endpoints
 
-If the Gateway needs token-service, configure the region explicitly.
+Public Gateways are `https://gateway.pushgo.dev/` (global) and `https://gateway.pushgo.cn/` (Mainland China). The Gateway defaults its token-service URL to `https://token.pushgo.cn/`. Set `PUSHGO_TOKEN_SERVICE_URL` explicitly for a self-hosted token service or the global endpoint (`https://token.pushgo.dev/`). Gateway-to-token-service requests do not use Bearer authentication. Restrict access to a self-hosted token service with a loopback or private-network listener, or a restricted HTTPS reverse proxy. `PUSHGO_TOKEN` applies only to the Gateway API.
 
-| Region | Gateway | token-service |
-| :--- | :--- | :--- |
-| Global | `https://gateway.pushgo.dev/` | `https://token.pushgo.dev/` |
-| Mainland China | `https://gateway.pushgo.cn/` | `https://token.pushgo.cn/` |
+### Token Service refresh requests
 
-A private Gateway may still use the public token-service, or switch to another service as your deployment evolves.
+`GET`/`POST` requests to `/provider/token?provider=fcm` (or `provider=wns`) use the cached token by default. After FCM or WNS rejects a token, Gateway can add `force_refresh=true` to request an OAuth refresh. The updated Token Service coalesces concurrent refreshes and limits successful forced refreshes to one per 60 seconds; requests during the cooldown receive its current valid token. A forced refresh failure or shared backoff returns an error instead of falling back to the rejected cache entry. APNs does not use this parameter.
+
+Self-hosted deployments need an updated Token Service for this recovery behavior. Older versions ignore the optional parameter and keep accepting the request, but may return the rejected cached token. A successful OAuth response does not guarantee that the provider will accept the token.
 
 ## Reverse Proxy
 
@@ -121,7 +120,7 @@ server {
 }
 ```
 
-`PUSHGO_PUBLIC_BASE_URL` must be the externally reachable HTTPS root. Otherwise MCP issuer metadata, bind links, and client profile hints may contain internal addresses.
+`PUSHGO_PUBLIC_BASE_URL` should be the externally reachable HTTPS root. When MCP is enabled it is required and must use HTTPS unless the HTTP listener is loopback-only for local development; otherwise MCP issuer metadata and bind links cannot be bootstrapped safely.
 
 ## Android Private Transports
 
@@ -132,30 +131,37 @@ PUSHGO_PRIVATE_TRANSPORTS=wss
 PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ```
 
-Add QUIC / Raw TCP when you need lower latency or operate in a controlled network.
+Add QUIC, Raw TCP, or MQTT 5 when required.
 
 ```bash
-PUSHGO_PRIVATE_TRANSPORTS=quic,tcp,wss
+PUSHGO_PRIVATE_TRANSPORTS=quic,tcp,wss,mqtt
 PUSHGO_PRIVATE_QUIC_BIND=0.0.0.0:5223
 PUSHGO_PRIVATE_QUIC_PORT=5223
 PUSHGO_PRIVATE_TCP_BIND=0.0.0.0:5223
 PUSHGO_PRIVATE_TCP_PORT=5223
+PUSHGO_MQTT_BIND=0.0.0.0:1883
+PUSHGO_MQTT_PORT=1883
 PUSHGO_PRIVATE_TLS_CERT=/certs/fullchain.pem
 PUSHGO_PRIVATE_TLS_KEY=/certs/privkey.pem
 ```
 
 | Setting | Description |
 | :--- | :--- |
-| `PUSHGO_PRIVATE_TRANSPORTS` | `false`, `true`, `none`, or explicit list such as `wss` or `quic,tcp,wss`. |
+| `PUSHGO_PRIVATE_TRANSPORTS` | `false`/`off`/`disabled`/`none` disables all; `true`/`on`/`enabled`/`all` enables `quic,tcp,wss,mqtt`; otherwise use a comma-, semicolon-, pipe-, or whitespace-separated list. Default is `false`. Enabling all also enables QUIC, so a TLS certificate and key are required. |
 | `PUSHGO_PRIVATE_QUIC_BIND` | Local UDP address the Gateway listens on. |
 | `PUSHGO_PRIVATE_QUIC_PORT` | QUIC port advertised to clients. |
 | `PUSHGO_PRIVATE_TCP_BIND` | Local TCP address the Gateway listens on. |
 | `PUSHGO_PRIVATE_TCP_PORT` | Raw TCP port advertised to clients. |
-| `PUSHGO_PRIVATE_TLS_CERT` / `PUSHGO_PRIVATE_TLS_KEY` | Required for QUIC; also required for Raw TCP unless TLS is offloaded. |
-| `PUSHGO_PRIVATE_TCP_TLS_OFFLOAD` | Whether edge infrastructure handles Raw TCP TLS. |
-| `PUSHGO_PRIVATE_TCP_PROXY_PROTOCOL` | Whether the Raw TCP entrypoint expects PROXY protocol v1. |
+| `PUSHGO_PRIVATE_TLS_CERT` / `PUSHGO_PRIVATE_TLS_KEY` | Required for QUIC and when TCP or MQTT TLS termination is enabled in Gateway. |
+| `PUSHGO_PRIVATE_TCP_TLS_ENABLED` | Whether Gateway terminates Raw TCP TLS; default `false` allows edge TLS termination or controlled plain TCP. |
+| `PUSHGO_PRIVATE_TCP_PROXY_PROTOCOL` | Whether the Raw TCP entrypoint expects PROXY protocol v1; default `false`. |
+| `PUSHGO_MQTT_BIND` / `PUSHGO_MQTT_PORT` | MQTT listener and advertised port; defaults `127.0.0.1:1883` and `1883`. |
+| `PUSHGO_MQTT_TLS_ENABLED` | Whether Gateway terminates MQTT TLS; default `false`. |
+| `PUSHGO_MQTT_MAX_PACKET_BYTES` | Maximum MQTT packet size; default `32768`. |
 
 PushGo QUIC uses a custom ALPN (`pushgo-quic`) and cannot simply share the same UDP/443 entrypoint with HTTP/3. Use a separate UDP port or confirm that your edge proxy can route by protocol correctly.
+
+Container deployments must publish the selected listeners: HTTP `6666/tcp`, QUIC `5223/udp`, Raw TCP `5223/tcp`, and MQTT `1883/tcp` in the default examples. MQTT clients must use MQTT 5 and QoS 1.
 
 ## MCP / OAuth
 
@@ -165,6 +171,8 @@ Enable MCP with:
 PUSHGO_MCP_ENABLED=true
 PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 ```
+
+For non-loopback deployments, the public base URL is mandatory and must be absolute HTTPS with no credentials, query, or fragment. Omitting it is supported only for loopback-bound local development, where the Gateway derives a loopback HTTP issuer.
 
 Common settings:
 
@@ -183,25 +191,27 @@ See [MCP Reference](/reference/mcp/) for tools and authorization flow.
 | `--db-url` / `PUSHGO_DB_URL` | required | Database URL; supports SQLite, PostgreSQL, and MySQL. |
 | `--runtime-profile` / `PUSHGO_RUNTIME_PROFILE` | `small` | Runtime sizing profile: `small` for private/light deployments, `public` for high-load deployments. |
 | `--token` / `PUSHGO_TOKEN` | none | Gateway-level Bearer token. Empty means disabled. |
-| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.dev` | token-service URL. Set explicitly in production. |
+| `--token-service-url` / `PUSHGO_TOKEN_SERVICE_URL` | `https://token.pushgo.cn/` | token-service URL; set explicitly for your own service or another region. |
 | `--public-base-url` / `PUSHGO_PUBLIC_BASE_URL` | none | External HTTPS root URL. |
 | `--sandbox-mode` / `PUSHGO_SANDBOX_MODE` | `false` | Sandbox mode, including APNs sandbox endpoint. |
-| `--observability-profile` / `PUSHGO_OBSERVABILITY_PROFILE` | `prod_min` | Observability profile: `prod_min`, `ops`, `incident`, `debug`. |
 | `--observability-log-level` / `PUSHGO_OBSERVABILITY_LOG_LEVEL` | `warn` | Native tracing log level. |
+| `--db-upgrade` / `PUSHGO_DB_UPGRADE` | none | Run only database upgrade `plan` or `run`, then exit. |
 
 ## Operations
 
-- Include the database in backups; channels, devices, MCP grants, and entity state depend on persistent storage.
+- Include the database in backups; it contains channels, devices/routes, pending delivery state, sender status, MCP grants/sessions, and Widget/Live Activity subscriptions. Event/Thing projections and history live on subscribed clients rather than as canonical Gateway records.
 - SQLite is suitable for personal or light deployments; prefer PostgreSQL for multi-user or high-concurrency use.
 - For high load, check the active `PUSHGO_RUNTIME_PROFILE`, Gateway logs, and downstream provider or database health before tuning infrastructure.
-- Use `PUSHGO_OBSERVABILITY_PROFILE=ops` for production troubleshooting; temporarily raise to `incident` or `debug` for deeper investigation.
+- Temporarily raise `PUSHGO_OBSERVABILITY_LOG_LEVEL` for troubleshooting, then restore the normal level.
 - For Android private transport issues, start with `/gateway/profile` and externally reachable ports.
 
 Runtime capacity:
 
-Runtime capacity is profile-owned in Gateway v1.2.9. Use `PUSHGO_RUNTIME_PROFILE=small` for private or light deployments and `PUSHGO_RUNTIME_PROFILE=public` for high-load public deployments. Low-level queue, dispatch, provider, DB-pool, and SQLite tuning values are internal profile defaults instead of public env vars.
+Runtime capacity is profile-owned in Gateway v1.3.0. Use `PUSHGO_RUNTIME_PROFILE=small` for private or light deployments and `PUSHGO_RUNTIME_PROFILE=public` for high-load public deployments. Low-level queue, dispatch, provider, DB-pool, and SQLite tuning values are internal profile defaults instead of public env vars.
 
 ## Upgrade and Rollback
+
+Before upgrading to schema v12, run `--db-upgrade plan`, take a verified v11 snapshot, and then run `--db-upgrade run`. Once a v12 Gateway has accepted durable work, do not roll an older binary onto that database: preserve the database and recover forward with the exact v12-aware emergency artifact. To return to a pre-v12 release, restore the v11 snapshot taken before v12 writes. Never relabel the schema or delete pending delivery state.
 
 - Back up the database and runtime configuration before upgrading.
 - Keep Gateway image/binary, environment variables, and reverse-proxy config traceable.

@@ -14,7 +14,7 @@ POST /thing/archive
 POST /thing/delete
 ```
 
-请求体必须是 JSON，未声明字段会被严格拒绝。私有 Gateway 如果启用了 `PUSHGO_TOKEN`，还需要 `Authorization: Bearer <token>`。
+请求体必须是 JSON。未知扩展字段会被忽略；动作明确禁止的已知字段仍会被拒绝。私有 Gateway 如果启用了 `PUSHGO_TOKEN`，还需要 `Authorization: Bearer <token>`。
 
 ## 请求头
 
@@ -40,8 +40,8 @@ POST /thing/delete
 | 字段 | 类型 | 必填 | 说明 |
 | :--- | :--- | :--- | :--- |
 | `channel_id` | `string` | 是 | 目标频道 ID。 |
-| `password` | `string` | 是 | 频道密码，通常 8-128 个字符。 |
-| `op_id` | `string` | 否 | 幂等键；不传则网关自动生成并在响应中返回。 |
+| `password` | `string` | 是 | 频道密码；先 trim，再按 8-128 字节校验。 |
+| `op_id` | `string` | 必须省略 | 由 Gateway 生成并返回；客户端传入会返回 `400 op_id_not_allowed`。 |
 | `ciphertext` | `string` | 否 | 可选 E2EE 密文载荷。 |
 
 ## 路由级必填字段
@@ -58,18 +58,16 @@ POST /thing/delete
 | 字段 | 类型 | 规则 |
 | :--- | :--- | :--- |
 | `thing_id` | `string` | update/archive/delete 必填；create 时不得传入；1-64 个字符，可用字母、数字、`_`、`:`、`-`。 |
-| `title` | `string` | 创建时建议传；当前 Gateway 不因缺失 `title` 拒绝创建。 |
-| `description` | `string` | 可选；空字符串按缺省处理。 |
-| `tags` | `string[]` | 最多 32 项，每项最多 64 字符，trim 后去重。 |
-| `primary_image` | `string` | 可选 URL，最大 2048 字符。 |
-| `images` | `string[]` | 最多 32 项，每项最多 2048 字符，trim 后去重。 |
-| `created_at` | `number` | 仅 create 允许；不传时回退为 `observed_at`。 |
-| `deleted_at` | `number` | 仅 delete 允许；不传时回退为 `observed_at`。 |
-| `observed_at` | `number` | 必填；本次状态观测时间；接受 Unix 秒或毫秒，并归一化为毫秒。 |
-| `external_ids` | `object` | key 格式 `[A-Za-z0-9_:.-]`、<= 64 并会转小写；value 为非空 `string` <= 256，或用 `null` 删除。 |
-| `location_type` + `location_value` | `string` + `string` | 必须同时出现；type 为 `physical`、`geo`、`cloud`、`datacenter` 或 `logical`。格式：`geo` 为 `lat,lng`，`cloud` 为 `provider:region[:zone]`，`datacenter` 为 `site[:room[:rack]]`，`logical` 为斜杠分隔 token。 |
-| `attrs` | `object` | 对象补丁；value 为 `null` 表示删键；不允许数组；对象嵌套仅支持一层。 |
-| `metadata` | `object` | 否 | 自定义标量键值；key <= 64，非空标量 value <= 512；拒绝嵌套对象和数组。 |
+| `title`、`description` | `string` | 可选 patch 内容；创建时建议提供 `title`，但 Gateway 不因缺失而拒绝。 |
+| `tags`、`images` | `string[]` | 可选 patch 内容；不继承 Message 的数量和长度限制。 |
+| `primary_image`、`location_type`、`location_value` | `string` | 可选 patch 内容；1.3.0 不强制此前文档中的位置成对和格式规则。 |
+| `created_at` | `number` 或数字字符串 | 可选且仅用于 create；未传入时不写入，也不会从 `observed_at` 回填。 |
+| `deleted_at` | `number` 或数字字符串 | 可选且仅用于 delete；未传入时不写入，也不会从 `observed_at` 回填；create/update/archive 会拒绝。 |
+| `observed_at` | `number` 或数字字符串 | 必填；接受 Unix 秒或毫秒并归一化为毫秒。 |
+| `external_ids`、`attrs` | `object` | 可选 patch 内容；1.3.0 不强制此前文档中的结构限制。 |
+| `metadata` | `object` | 自定义标量键值；key <= 64 字节，非空标量文本 <= 512 字节；拒绝嵌套对象、数组和 null。 |
+
+create 禁止 `thing_id`；所有动作禁止客户端传入 `state` 和 `op_id`；`deleted_at` 仅用于 delete。未知字段会被忽略且不会生效。
 
 ## 创建实体
 
@@ -99,13 +97,9 @@ curl -X POST https://gateway.pushgo.cn/thing/create \
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
-    "op_id": "op-20260422-001",
-    "thing_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "op_id": "00191f23cc000-0123456789abcdef0123456789abcdef",
+    "thing_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1"
+  }
 }
 ```
 
@@ -184,14 +178,14 @@ Thing 表示长期对象。相关告警可以用 Message 关联到 `thing_id`，
 
 ## 响应语义
 
-Thing API 响应同样使用统一 envelope。`accepted=true` 表示 Gateway 已进入分发流程，不保证所有设备都已经展示系统通知。
+统一成功 envelope 表示 Gateway 已持久受理，不代表提供商投递或设备展示成功。可用返回的 `op_id` 查询 `GET /send_status/{op_id}`。
 
 ## 常见错误
 
 | 状态码 | 典型原因 |
 | :--- | :--- |
-| `400` | 缺少 `observed_at`、传了未知字段、`attrs` 或 `external_ids` 格式不合法。 |
+| `400` | 路由级必填字段缺失、ID/时间/metadata 无效、传入 `op_id` 或动作禁止字段。 |
 | `401` | 私有 Gateway Bearer Token 缺失或错误。 |
-| `404` | 频道或 `thing_id` 不存在。 |
-| `413` | 请求体超过 32KB。 |
-| `503` | 分发未完整成功。 |
+| `404` | 频道不存在或凭据不匹配。 |
+| `413` | 请求体超过 32 KiB（32,768 字节）。 |
+| `503` | Gateway 无法受理本次提交。 |

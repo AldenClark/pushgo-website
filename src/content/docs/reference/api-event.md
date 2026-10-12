@@ -13,7 +13,17 @@ POST /event/update
 POST /event/close
 ```
 
-The request body must be JSON, and unknown fields are rejected. If a private Gateway enables `PUSHGO_TOKEN`, include `Authorization: Bearer <token>`.
+Thing-scoped aliases are also available:
+
+```http
+POST /thing/{thing_id}/event/create
+POST /thing/{thing_id}/event/update
+POST /thing/{thing_id}/event/close
+```
+
+The path value supplies `thing_id`. If the body also contains `thing_id`, the two values must match.
+
+The request body must be JSON. Unknown extension fields are ignored, while known fields forbidden for an action are rejected. If a private Gateway enables `PUSHGO_TOKEN`, include `Authorization: Bearer <token>`.
 
 ## Headers
 
@@ -37,36 +47,33 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `channel_id` | `string` | Yes | Target channel ID. |
-| `password` | `string` | Yes | Channel password, usually 8-128 characters. |
-| `op_id` | `string` | No | Idempotency key; generated and returned if omitted. |
-| `thing_id` | `string` | No | Associate this event dispatch with an existing Thing. |
+| `password` | `string` | Yes | Channel password; trimmed before validation, then 8-128 bytes. |
+| `op_id` | `string` | Must omit | Generated and returned by the Gateway; client input returns `400 op_id_not_allowed`. |
+| `thing_id` | `string` | No | Scope the event to a Thing ID. The Gateway validates the format but does not require a server-side Thing record. |
 | `ciphertext` | `string` | No | Optional E2EE ciphertext payload. |
 
 ## Required Fields by Route
 
 | Route | Required business fields |
 | :--- | :--- |
-| `/event/create` | `title`, `status`, `message`, `severity`, `event_time` |
-| `/event/update` | `event_id`, `status`, `message`, `severity`, `event_time` |
-| `/event/close` | `event_id`, `status`, `message`, `severity`, `event_time` |
+| `/event/create` | `event_time` |
+| `/event/update` | `event_id`, `event_time` |
+| `/event/close` | `event_id`, `event_time` |
 
 ## Field Rules
 
 | Field | Type | Rules |
 | :--- | :--- | :--- |
 | `event_id` | `string` | Required for update and close; must not be sent on create; 1-64 chars, letters/digits/`_`/`:`/`-`. |
-| `title` | `string` | Required on create; optional on update and close. |
-| `description` | `string` | Optional; empty strings are treated as missing. |
-| `status` | `string` | Required; non-empty, max 24 chars. |
-| `message` | `string` | Required; non-empty, max 512 chars. |
-| `severity` | `string` | Required; only `critical`, `high`, `normal`, `low`. |
-| `event_time` | `number` | Required; when this update happened; Unix seconds or milliseconds accepted and normalized to milliseconds. |
-| `started_at` | `number` | Create only; defaults to `event_time` when omitted and is rejected on update/close. |
-| `ended_at` | `number` | Close only; defaults to `event_time` when omitted and is rejected on create/update. |
-| `tags` | `string[]` | Up to 32 items, max 64 chars each, trimmed and deduplicated. |
-| `images` | `string[]` | Up to 32 image URLs, max 2048 chars each. |
-| `attrs` | `object` | Object patch; `null` removes a key; arrays are not allowed. |
-| `metadata` | `object` | No | Custom scalar key-values; key <= 64, non-empty scalar value <= 512; nested objects and arrays are rejected. |
+| `title`, `description`, `status`, `message`, `severity` | `string` | Optional patch content. Gateway 1.3.0 does not impose the Message severity enum on Event patches. |
+| `event_time` | `number` or numeric `string` | Required; Unix seconds or milliseconds, normalized to milliseconds. |
+| `started_at` | `number` or numeric `string` | Optional create-only field; omitted when not supplied. No fallback from `event_time` is inserted. |
+| `ended_at` | `number` or numeric `string` | Optional close-only field; omitted when not supplied. No fallback from `event_time` is inserted; explicitly rejected on create/update. |
+| `tags`, `images` | `string[]` | Optional patch content; Event does not inherit Message tag/image limits. |
+| `attrs` | `object` | Optional patch content. |
+| `metadata` | `object` | Scalar values only; key <= 64 bytes, non-empty textual value <= 512 bytes; nested objects, arrays, and null are rejected. |
+
+`event_id` is forbidden on create. `op_id` is forbidden on every Event action. Unknown fields are ignored and not applied, so use canonical field names.
 
 ## Create an Event
 
@@ -95,13 +102,9 @@ Response:
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
-    "op_id": "op-20260422-001",
-    "event_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "op_id": "00191f23cc000-0123456789abcdef0123456789abcdef",
+    "event_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1"
+  }
 }
 ```
 
@@ -172,14 +175,14 @@ Thing identifies the object; Event describes the process happening to it.
 
 ## Response Semantics
 
-Event APIs use the shared response envelope. `accepted=true` means the Gateway entered dispatch, not that every device has displayed a system notification.
+The shared success envelope means the operation was durably accepted by the Gateway, not that a provider succeeded or a device displayed it. Use the returned `op_id` with `GET /send_status/{op_id}`.
 
 ## Common Errors
 
 | Status | Typical reason |
 | :--- | :--- |
-| `400` | Missing route-required field, unknown field, invalid `severity`, invalid `attrs`. |
+| `400` | Missing route-required field, invalid ID/time/metadata, supplied `op_id`, or an action-forbidden field. |
 | `401` | Private Gateway Bearer token missing or wrong. |
-| `404` | Channel or `event_id` does not exist. |
-| `413` | Request body exceeds 32KB. |
-| `503` | Dispatch did not fully succeed. |
+| `404` | Channel does not exist or credentials do not match. |
+| `413` | Request body exceeds 32 KiB (32,768 bytes). |
+| `503` | Gateway could not accept the submission. |

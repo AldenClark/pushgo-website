@@ -1,6 +1,6 @@
 ---
 title: 開源自託管通知伺服器
-description: 將 PushGo Gateway 部署為自託管通知伺服器，支援私人通道、持久狀態、E2EE 和 MCP/OAuth。
+description: 將 PushGo Gateway 部署為自託管通知伺服器，支援私人通道、持久投遞狀態、E2EE 和 MCP/OAuth。
 ---
 
 當你希望通知路徑、資料儲存、Gateway 驗證、私人通道策略和 MCP/OAuth 入口都由自己控制時，可以私人部署 PushGo。
@@ -8,7 +8,7 @@ description: 將 PushGo Gateway 部署為自託管通知伺服器，支援私人
 ## 適合場景
 
 - 為個人或團隊自動化執行私人通知 Gateway。
-- 避免通知、事件和實體狀態經過公共 Gateway。
+- 避免通知載荷和 Event/Thing patch 經過公共 Gateway。
 - 在自己的網域下暴露 HTTPS `/mcp` 端點。
 - 把備份、反向代理、日誌和可觀測性納入生產維運。
 
@@ -22,7 +22,7 @@ description: 將 PushGo Gateway 部署為自託管通知伺服器，支援私人
 
 ## 最小範例
 
-啟用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 設定為外部可存取的 HTTPS 根位址，否則 issuer 中繼資料和綁定連結可能包含內部位址。
+非 loopback 部署啟用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 設定為外部可存取的 HTTPS 根位址。只有 HTTP listener 綁定 loopback 的本機開發環境可以省略。
 
 ```bash
 curl -X POST https://gateway.pushgo.dev/message \
@@ -38,8 +38,8 @@ curl -X POST https://gateway.pushgo.dev/message \
 ## 本頁直接回答的問題
 
 - **PushGo 可以作為自託管通知伺服器執行嗎？** 可以。Gateway 面向私人部署設計，支援持久儲存和可設定通道。
-- **自託管後可以啟用 MCP 嗎？** 可以。設定外部 HTTPS 根位址後，私人 Gateway 可以開放 `/mcp` 和 OAuth 路由。
-- **還需要備份嗎？** 需要。Channel、裝置、MCP 授權、Event 和 Thing 狀態都依賴持久化儲存。
+- **自託管後可以啟用 MCP 嗎？** 可以。私人 Gateway 可以開放 `/mcp` 和 OAuth 路由；非 loopback 部署必須設定外部 HTTPS 根位址。
+- **還需要備份嗎？** 需要。應備份 Channel、裝置/路由、待投遞狀態、傳送狀態、MCP 授權/工作階段和 Widget/Live Activity 訂閱；Event/Thing 投影和歷史儲存在已訂閱用戶端。
 
 ## 安全與維運
 

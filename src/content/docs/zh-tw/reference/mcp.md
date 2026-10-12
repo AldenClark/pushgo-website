@@ -19,7 +19,7 @@ MCP 不應該取代使用者確認。涉及高影響操作時，用戶端或上�
 https://your-gateway-domain/mcp
 ```
 
-公共 Gateway 如果啟用了 MCP/OAuth，可以直接使用對應區域的 `/mcp` 端點。私人部署必須設定外部可存取的 `PUSHGO_PUBLIC_BASE_URL`。
+公共 Gateway 如果啟用了 MCP/OAuth，可以直接使用對應區域的 `/mcp` 端點。非 loopback 私人部署必須設定外部可存取的 HTTPS `PUSHGO_PUBLIC_BASE_URL`；只有 HTTP listener 綁定 loopback 的本機開發環境可以省略。
 
 ## 啟用私人 Gateway MCP
 
@@ -56,7 +56,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 6. 助手輪詢 `pushgo.channel.bind.status`。
 7. 授權完成後，助手可以在已授權 Channel 範圍內呼叫工具。
 
-綁定工作階段與 token 生命週期由目前 Gateway 執行階段設定檔管理；在 v1.2.9 中它們不是公開 CLI/env 參數。
+綁定工作階段與 token 生命週期由目前 Gateway 執行階段設定檔管理；在 v1.3.0 中它們不是公開 CLI/env 參數。
 
 ## 工具能力
 
@@ -71,17 +71,17 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | 工具 | 作用 |
 | :--- | :--- |
 | `pushgo.event.create` | 建立生命週期事件，回傳 `event_id`。 |
-| `pushgo.event.update` | 更新已有事件。 |
-| `pushgo.event.close` | 關閉已有事件。 |
+| `pushgo.event.update` | 為指定 `event_id` 傳送更新 patch。 |
+| `pushgo.event.close` | 為指定 `event_id` 傳送關閉 patch。 |
 
 ### Thing
 
 | 工具 | 作用 |
 | :--- | :--- |
 | `pushgo.thing.create` | 建立長期實體，回傳 `thing_id`。 |
-| `pushgo.thing.update` | 更新實體屬性。 |
-| `pushgo.thing.archive` | 歸檔實體。 |
-| `pushgo.thing.delete` | 刪除或退役實體。 |
+| `pushgo.thing.update` | 為指定 `thing_id` 傳送屬性 patch。 |
+| `pushgo.thing.archive` | 為指定 `thing_id` 傳送歸檔 patch。 |
+| `pushgo.thing.delete` | 為指定 `thing_id` 傳送刪除/退役 patch。 |
 
 ### Channel
 
@@ -94,18 +94,28 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 | `pushgo://channels` | 已授權 Channel 資源清單。 |
 | `pushgo://channels/{channel_id}` | 單一 Channel 的基礎資訊。 |
 
+## 動作級輸入
+
+| 工具類別 | 必填業務輸入 | 重要排除項 |
+| :--- | :--- | :--- |
+| Message | `channel_id`、`title`；使用 `thing_id` 時還需 `occurred_at` | 已發布 MCP schema 將 `op_id` 標記為 Gateway 產生，因此為保持契約相容應省略。原生 HTTP Message 明確支援用戶端提供 `op_id`。 |
+| Event | `channel_id`、`event_time`；update/close 還需 `event_id` | 省略 `op_id`；`ended_at` 僅用於 close，`started_at` 僅用於 create。 |
+| Thing | `channel_id`、`observed_at`；update/archive/delete 還需 `thing_id` | 省略 `op_id` 和 `state`；`deleted_at` 僅用於 delete。 |
+
+OAuth 模式禁止 `password`，並要求已綁定 Channel；Legacy 模式要求 `password`。傳送工具需要 `mcp:tools` scope；Channel 管理工具和資源需要 `mcp:channels:manage`。
+
 ## 用戶端設定要點
 
 - MCP endpoint 使用 `https://your-gateway-domain/mcp`。
 - 反向代理必須把 `Host` 和 `X-Forwarded-Proto` 正確傳給 Gateway。
-- 私人部署必須設定 `PUSHGO_PUBLIC_BASE_URL`，並確保它是外部可存取的 HTTPS 根位址。
+- 非 loopback 私人部署必須設定 `PUSHGO_PUBLIC_BASE_URL`，並確保它是外部可存取的 HTTPS 根位址；只有 loopback 本機開發可以省略。
 - 如果 OAuth issuer 或繫結連結出現內部網路位址，優先檢查 `PUSHGO_PUBLIC_BASE_URL`。
 - 如果用戶端不支援 DCR，使用預置用戶端配置。
 
 ## 維運注意事項
 
 - MCP 授權狀態會持久化；不要把資料庫或儲存目錄當臨時快取清空。
-- Token 與綁定工作階段生命週期在 v1.2.9 中屬於執行階段設定檔內建設定；請選擇合適的執行階段設定檔，而不是設定 TTL 環境變數。
+- Token 與綁定工作階段生命週期在 v1.3.0 中屬於執行階段設定檔內建設定；請選擇合適的執行階段設定檔，而不是設定 TTL 環境變數。
 - 定期輪換預置用戶端 secret。
 - 高風險 Channel 可以單獨建立，避免把所有自動化授權到同一 Channel。
 - 維運稽核與執行階段問題應結合 Gateway 結構化日誌與統計指標排查。
@@ -114,7 +124,7 @@ PUSHGO_PUBLIC_BASE_URL=https://gateway.example.com
 
 | 現象 | 檢查專案 |
 | :--- | :--- |
-| 用戶端無法發現 OAuth 元資料 | `PUSHGO_PUBLIC_BASE_URL` 是否設定為 HTTPS 外部位址；反向代理是否轉送 well-known 路由。 |
+| 用戶端無法發現 OAuth 元資料 | 非 loopback 部署的 `PUSHGO_PUBLIC_BASE_URL` 是否為 HTTPS 外部位址；反向代理是否轉送 well-known 路由。 |
 | 綁定連結無法開啟 | 公網 DNS、HTTPS 憑證、反向代理路徑、`PUSHGO_PUBLIC_BASE_URL`，以及綁定工作階段是否已過期。 |
 | DCR 失敗 | 用戶端是否支援 DCR；`PUSHGO_MCP_DCR_ENABLED` 是否開啟。 |
 | 工具呼叫要求 `password` | 目前可能是 Legacy 模式，或 OAuth 授權未完成。 |

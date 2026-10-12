@@ -14,7 +14,7 @@ POST /thing/archive
 POST /thing/delete
 ```
 
-The request body must be JSON, and unknown fields are rejected. If a private Gateway enables `PUSHGO_TOKEN`, include `Authorization: Bearer <token>`.
+The request body must be JSON. Unknown extension fields are ignored, while known fields forbidden for an action are rejected. If a private Gateway enables `PUSHGO_TOKEN`, include `Authorization: Bearer <token>`.
 
 ## Headers
 
@@ -40,8 +40,8 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `channel_id` | `string` | Yes | Target channel ID. |
-| `password` | `string` | Yes | Channel password, usually 8-128 characters. |
-| `op_id` | `string` | No | Idempotency key; generated and returned if omitted. |
+| `password` | `string` | Yes | Channel password; trimmed before validation, then 8-128 bytes. |
+| `op_id` | `string` | Must omit | Generated and returned by the Gateway; client input returns `400 op_id_not_allowed`. |
 | `ciphertext` | `string` | No | Optional E2EE ciphertext payload. |
 
 ## Required Fields by Route
@@ -58,18 +58,16 @@ The request body must be JSON, and unknown fields are rejected. If a private Gat
 | Field | Type | Rules |
 | :--- | :--- | :--- |
 | `thing_id` | `string` | Required for update, archive, and delete; must not be sent on create; 1-64 chars, letters/digits/`_`/`:`/`-`. |
-| `title` | `string` | Recommended on create; the Gateway currently does not reject missing `title`. |
-| `description` | `string` | Optional; empty strings are treated as missing. |
-| `tags` | `string[]` | Up to 32 items, max 64 chars each, trimmed and deduplicated. |
-| `primary_image` | `string` | Optional URL, max 2048 chars. |
-| `images` | `string[]` | Up to 32 image URLs, max 2048 chars each. |
-| `created_at` | `number` | Create only; falls back to `observed_at` when omitted. |
-| `deleted_at` | `number` | Delete only; falls back to `observed_at` when omitted. |
-| `observed_at` | `number` | Required; observation time for this state update; Unix seconds or milliseconds accepted and normalized to milliseconds. |
-| `external_ids` | `object` | Key pattern `[A-Za-z0-9_:.-]`, key <= 64 and lowercased; value is non-empty `string` <= 256 or `null` to remove. |
-| `location_type` + `location_value` | `string` + `string` | Must appear together; type is `physical`, `geo`, `cloud`, `datacenter`, or `logical`. Formats: `geo` is `lat,lng`, `cloud` is `provider:region[:zone]`, `datacenter` is `site[:room[:rack]]`, `logical` is slash-separated tokens. |
-| `attrs` | `object` | Object patch; `null` removes a key; arrays are not allowed; only one nested object level. |
-| `metadata` | `object` | No | Custom scalar key-values; key <= 64, non-empty scalar value <= 512; nested objects and arrays are rejected. |
+| `title`, `description` | `string` | Optional patch content. |
+| `tags`, `images` | `string[]` | Optional patch content; Thing does not inherit Message tag/image limits. |
+| `primary_image`, `location_type`, `location_value` | `string` | Optional patch content. Gateway 1.3.0 does not enforce the previously documented location pairing or formats. |
+| `created_at` | `number` or numeric `string` | Optional create-only field; omitted when not supplied. No fallback from `observed_at` is inserted. |
+| `deleted_at` | `number` or numeric `string` | Optional delete-only field; omitted when not supplied. No fallback from `observed_at` is inserted; rejected on create/update/archive. |
+| `observed_at` | `number` or numeric `string` | Required; Unix seconds or milliseconds, normalized to milliseconds. |
+| `external_ids`, `attrs` | `object` | Optional patch content; Gateway 1.3.0 does not enforce the previously documented shape restrictions. |
+| `metadata` | `object` | Scalar values only; key <= 64 bytes, non-empty textual value <= 512 bytes; nested objects, arrays, and null are rejected. |
+
+`thing_id` is forbidden on create. `state` is forbidden on every action. `op_id` is forbidden on every Thing action. Unknown fields are ignored and not applied.
 
 ## Create a Thing
 
@@ -99,13 +97,9 @@ Response:
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
-    "op_id": "op-20260422-001",
-    "thing_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "op_id": "00191f23cc000-0123456789abcdef0123456789abcdef",
+    "thing_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1"
+  }
 }
 ```
 
@@ -184,14 +178,14 @@ Thing represents a persistent object. Related alerts can use Message with `thing
 
 ## Response Semantics
 
-Thing APIs use the shared response envelope. `accepted=true` means the Gateway entered dispatch, not that every device has displayed a system notification.
+The shared success envelope means the operation was durably accepted by the Gateway, not that a provider succeeded or a device displayed it. Use the returned `op_id` with `GET /send_status/{op_id}`.
 
 ## Common Errors
 
 | Status | Typical reason |
 | :--- | :--- |
-| `400` | Missing `observed_at`, unknown field, invalid `attrs` or `external_ids`. |
+| `400` | Missing route-required field, invalid ID/time/metadata, supplied `op_id`, or an action-forbidden field. |
 | `401` | Private Gateway Bearer token missing or wrong. |
-| `404` | Channel or `thing_id` does not exist. |
-| `413` | Request body exceeds 32KB. |
-| `503` | Dispatch did not fully succeed. |
+| `404` | Channel does not exist or credentials do not match. |
+| `413` | Request body exceeds 32 KiB (32,768 bytes). |
+| `503` | Gateway could not accept the submission. |

@@ -3,6 +3,53 @@ title: Gateway 更新記錄
 description: PushGo Gateway 版本更新歷史。
 ---
 
+## v1.3.3
+
+### 改進
+- 增強 QUIC 連線對惡意對端的防護。
+- SQLite、PostgreSQL 和 MySQL 的路由切換均採用可恢復的原子交易，也支援 PostgreSQL 和 MySQL 部署上的 Android 手動傳輸切換。
+- 路由恢復可透過目前 provider token 的 SHA-256 指紋核對狀態，而不暴露 token 本身。
+
+### 修復
+- FCM 或 WNS 拒絕已快取的 provider token 後，Gateway 會要求 Token Service 強制重新整理，再重試投遞。此恢復能力需要更新 Token Service。
+- 裝置接管 provider token，或訂閱、退役與路由切換同時發生時，token 歸屬和投遞路由保持一致。
+- 路由刪除無法持久化時，待投遞的私人訊息仍會保留。
+- 已完成的路由切換在過期或後續切換後仍可安全重試；失敗的重試不會讓記憶體中的活動路由出錯。
+- 多位元組 provider token 不再導致診斷日誌崩潰。
+- 私人 TCP 連線收到分片影格時，即使出站投遞打斷讀取，也能繼續正確讀取該影格。
+- 更新 TLS 相依套件，拒絕在錯誤加密層級傳送的 TLS 1.3 握手訊息；私人 WSS 在對端停止讀取時，Ping/Pong 寫入會逾時，不再持續等待。
+- MySQL 上的私人裝置活動狀態更新和退訂清理恢復正常，裝置退訂或更換身分後仍能正確處理。
+
+## v1.3.2
+*2026-08-25*
+
+### 修復
+- 預設 token service 位址改為 `https://token.pushgo.cn/`；全球和自託管部署仍可透過 `PUSHGO_TOKEN_SERVICE_URL` 覆蓋。
+- 恢復發佈標籤對應的 Gateway 容器映像同時發佈到 GHCR 和 Docker Hub。
+
+## v1.3.1
+*2026-08-24*
+
+### 修復
+- 恢復對接受免驗證 HTTPS 請求的 token service 的相容性；Gateway API 的存取 token 行為未變。
+
+## v1.3.0
+*2026-08-23*
+
+### 改進
+- 新增非破壞性分頁 Pull v2 與持久原子批次 ACK；破壞性舊路由僅保留用於 beta 相容。
+- 新增 MQTT 5 私人傳輸和持久 QoS 1 重連，並使私人/provider 路由切換保持原子性。
+- 新增綁定 Message payload 的 `op_id` 冪等、傳送狀態和前向相容請求解析，同時繼續拒絕動作禁止欄位。
+- 正規化 APNs/FCM/WNS token，修正 APNs 到期時間，並把 provider 成功狀態移到真實傳送完成之後。
+- Widget 與 Live Activity 最新狀態投遞在重啟和恢復期間保持持久、有序且不會倒退到期時間。
+- 強化受管資料庫升級並確立 schema v12 回滾邊界。
+
+## v1.2.10
+*2026-06-10*
+
+### 改進
+- 拆分 Event/Thing 生命週期請求結構，使每個動作只接受有效欄位，避免跨模型攜帶無關 patch 資料。
+
 ## v1.2.9
 *2026-05-26*
 

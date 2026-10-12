@@ -3,6 +3,47 @@ title: Android Changelog
 description: Version history for PushGo Android app.
 ---
 
+## v1.3.3
+
+### Fixed
+- Improved QUIC connection security against malicious peers.
+- Saving decryption settings preserves an existing key while Gateway status is loading.
+- The Gateway editor closes on Back after the keyboard is dismissed, while saving still prevents dismissal.
+- Stale background-state events no longer end local deletion Undo early; Undo requests are checked against the five-second deadline.
+- The Gateway editor retains entered values when saving fails, and protected settings write errors are shown to the user.
+- Gateway and Channel editors and history cleanup options scroll on smaller screens or with the keyboard open, keeping save buttons and the last options reachable.
+- Data Page options scroll horizontally so every page setting remains reachable on narrow screens.
+- Bottom navigation returns when filtering or a read-state change leaves too few rows to scroll.
+- Search shows progress during slow queries.
+- Opening a message from search dismisses the keyboard so Back can close the detail view.
+- Channel resubscription and sync preserve an existing alias or name.
+- When the Gateway has committed a transport switch but local completion is interrupted, the app resumes recovery and shows a recovering status in Settings.
+- Returning from a webpage opened from a message preserves the original message detail.
+- Image URLs using IPv4-mapped local or private addresses are rejected.
+- Sharing a message image now shows its preview in the system share sheet and lets the selected app read the image.
+
+## v1.3.0
+*2026-08-24*
+
+### Improved
+- Added non-destructive paged Pull and batch ACK with beta-Gateway compatibility; legacy destructive Pull remains isolated from v2.
+- Pulled notifications and pending local deletions now survive interruption or process restart until durable handling completes.
+- Expanded entity search and filtering, added in-app links to the website guides, and improved documentation-row accessibility.
+- Persisted notification replay restores state silently without replaying system or custom alert sounds.
+
+### Fixed
+- ACKs stay bound to the Gateway that produced them, use the authoritative outer delivery ID, and are removed only after a structurally valid full acknowledgement.
+- Gateway switching, interrupted Pull draining, serialized provider ingress, and retry behavior no longer lose or misdirect pending work.
+
+## v1.2.6
+*2026-06-09*
+
+### Improved
+- Lowered the supported floor to Android 9 and improved entity projection, visible-scope mark-all-read, and pending-deletion refresh behavior.
+
+### Fixed
+- Fixed Android 9 compatibility and stale event/object detail state after patch-driven updates.
+
 ## v1.2.5
 *2026-05-26*
 

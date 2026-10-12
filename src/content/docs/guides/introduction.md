@@ -32,7 +32,7 @@ PushGo Gateway
         +-- Private transport -> Android low-latency sync
 ```
 
-The Gateway handles authentication, API acceptance, state storage, and dispatch. Clients receive, display, decrypt, and manage channel subscriptions.
+The Gateway handles authentication, durable API acceptance, operational delivery state, and dispatch. Clients receive, display, decrypt, persist history, project Event/Thing state, and manage channel subscriptions.
 
 ## Who It Is For
 

@@ -13,7 +13,17 @@ POST /event/update
 POST /event/close
 ```
 
-请求体必须是 JSON，未声明字段会被严格拒绝。私有 Gateway 如果启用了 `PUSHGO_TOKEN`，还需要 `Authorization: Bearer <token>`。
+也支持 Thing 作用域别名：
+
+```http
+POST /thing/{thing_id}/event/create
+POST /thing/{thing_id}/event/update
+POST /thing/{thing_id}/event/close
+```
+
+路径参数会提供 `thing_id`；如果请求体也包含 `thing_id`，两者必须一致。
+
+请求体必须是 JSON。未知扩展字段会被忽略；动作明确禁止的已知字段仍会被拒绝。私有 Gateway 如果启用了 `PUSHGO_TOKEN`，还需要 `Authorization: Bearer <token>`。
 
 ## 请求头
 
@@ -37,36 +47,33 @@ POST /event/close
 | 字段 | 类型 | 必填 | 说明 |
 | :--- | :--- | :--- | :--- |
 | `channel_id` | `string` | 是 | 目标频道 ID。 |
-| `password` | `string` | 是 | 频道密码，通常 8-128 个字符。 |
-| `op_id` | `string` | 否 | 幂等键；不传则网关自动生成并在响应中返回。 |
-| `thing_id` | `string` | 否 | 关联到已有 Thing，仅作用于本次事件分发和上下文。 |
+| `password` | `string` | 是 | 频道密码；先 trim，再按 8-128 字节校验。 |
+| `op_id` | `string` | 必须省略 | 由 Gateway 生成并返回；客户端传入会返回 `400 op_id_not_allowed`。 |
+| `thing_id` | `string` | 否 | 将事件归入某个 Thing ID。Gateway 只校验格式，不要求服务端已存在 Thing 记录。 |
 | `ciphertext` | `string` | 否 | 可选 E2EE 密文载荷。 |
 
 ## 路由级必填字段
 
 | 路由 | 必填业务字段 |
 | :--- | :--- |
-| `/event/create` | `title`、`status`、`message`、`severity`、`event_time` |
-| `/event/update` | `event_id`、`status`、`message`、`severity`、`event_time` |
-| `/event/close` | `event_id`、`status`、`message`、`severity`、`event_time` |
+| `/event/create` | `event_time` |
+| `/event/update` | `event_id`、`event_time` |
+| `/event/close` | `event_id`、`event_time` |
 
 ## 字段规则
 
 | 字段 | 类型 | 规则 |
 | :--- | :--- | :--- |
 | `event_id` | `string` | update/close 必填；create 时不得传入；1-64 个字符，可用字母、数字、`_`、`:`、`-`。 |
-| `title` | `string` | 创建必填；更新和关闭可选。 |
-| `description` | `string` | 可选；空字符串按缺省处理。 |
-| `status` | `string` | 必填；非空，最大 24 字符。 |
-| `message` | `string` | 必填；非空，最大 512 字符。 |
-| `severity` | `string` | 必填；仅允许 `critical`、`high`、`normal`、`low`。 |
-| `event_time` | `number` | 必填；本次更新发生时间；接受 Unix 秒或毫秒，并归一化为毫秒。 |
-| `started_at` | `number` | 仅 create；省略时默认为 `event_time`，update/close 会拒绝。 |
-| `ended_at` | `number` | 仅 close；省略时默认为 `event_time`，create/update 会拒绝。 |
-| `tags` | `string[]` | 最多 32 项，每项最多 64 字符，trim 后去重。 |
-| `images` | `string[]` | 最多 32 项，每项最多 2048 字符，trim 后去重。 |
-| `attrs` | `object` | 对象补丁；value 为 `null` 表示删键；不允许数组。 |
-| `metadata` | `object` | 否 | 自定义标量键值；key <= 64，非空标量 value <= 512；拒绝嵌套对象和数组。 |
+| `title`、`description`、`status`、`message`、`severity` | `string` | 可选 patch 内容；1.3.0 不对 Event 套用 Message 的 severity 枚举限制。 |
+| `event_time` | `number` 或数字字符串 | 必填；接受 Unix 秒或毫秒并归一化为毫秒。 |
+| `started_at` | `number` 或数字字符串 | 可选且仅用于 create；未传入时不写入，也不会从 `event_time` 回填。 |
+| `ended_at` | `number` 或数字字符串 | 可选且仅用于 close；未传入时不写入，也不会从 `event_time` 回填；create/update 会拒绝。 |
+| `tags`、`images` | `string[]` | 可选 patch 内容；不继承 Message 的数量和长度限制。 |
+| `attrs` | `object` | 可选 patch 内容。 |
+| `metadata` | `object` | 自定义标量键值；key <= 64 字节，非空标量文本 <= 512 字节；拒绝嵌套对象、数组和 null。 |
+
+create 禁止 `event_id`，所有 Event 动作均禁止客户端传入 `op_id`。未知字段会被忽略且不会生效。
 
 ## 创建事件
 
@@ -95,13 +102,9 @@ curl -X POST https://gateway.pushgo.cn/event/create \
 {
   "success": true,
   "data": {
-    "channel_id": "YOUR_CHANNEL_ID",
-    "op_id": "op-20260422-001",
-    "event_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1",
-    "accepted": true
-  },
-  "error": null,
-  "error_code": null
+    "op_id": "00191f23cc000-0123456789abcdef0123456789abcdef",
+    "event_id": "8a1fc4b3d9f04fd2857f92f66f7cc5d1"
+  }
 }
 ```
 
@@ -172,14 +175,14 @@ Thing 表示“哪个对象”，Event 表示“这个对象正在经历什么�
 
 ## 响应语义
 
-Event API 响应同样使用统一 envelope。`accepted=true` 表示 Gateway 已进入分发流程，不保证所有设备都已经展示系统通知。
+统一成功 envelope 表示 Gateway 已持久受理，不代表提供商投递或设备展示成功。可用返回的 `op_id` 查询 `GET /send_status/{op_id}`。
 
 ## 常见错误
 
 | 状态码 | 典型原因 |
 | :--- | :--- |
-| `400` | 缺少路由级必填字段、传了未知字段、`severity` 不合法、`attrs` 不是对象补丁。 |
+| `400` | 路由级必填字段缺失、ID/时间/metadata 无效、传入 `op_id` 或动作禁止字段。 |
 | `401` | 私有 Gateway Bearer Token 缺失或错误。 |
-| `404` | 频道或 `event_id` 不存在。 |
-| `413` | 请求体超过 32KB。 |
-| `503` | 分发未完整成功。 |
+| `404` | 频道不存在或凭据不匹配。 |
+| `413` | 请求体超过 32 KiB（32,768 字节）。 |
+| `503` | Gateway 无法受理本次提交。 |

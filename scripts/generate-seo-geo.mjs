@@ -118,12 +118,12 @@ const pageData = {
 		'self-hosted-notification-server': {
 			title: 'Self-hosted Open-source Notification Server',
 			description:
-				'Deploy PushGo Gateway as a self-hosted open-source notification server with private transports, persistent state, E2EE, and MCP/OAuth.',
+				'Deploy PushGo Gateway as a self-hosted open-source notification server with private transports, durable delivery state, E2EE, and MCP/OAuth.',
 			intro:
 				'Self-host PushGo when you want the notification path, data storage, Gateway authentication, private transport policy, and MCP/OAuth endpoint to stay under your control.',
 			fits: [
 				'Operate a private notification Gateway for personal or team automation.',
-				'Keep notification, event, and entity-state data out of a public Gateway.',
+				'Keep notification payloads and Event/Thing patches out of a public Gateway.',
 				'Expose your own HTTPS `/mcp` endpoint for AI assistant workflows.',
 				'Use backups, reverse proxies, logs, and observability as part of production operations.',
 			],
@@ -133,11 +133,11 @@ const pageData = {
 				['AI assistant access', 'MCP OAuth', 'Users bind channels through your public Gateway URL.'],
 			],
 			example:
-				'Set `PUSHGO_PUBLIC_BASE_URL` to the externally reachable HTTPS origin before enabling MCP/OAuth, otherwise issuer metadata and bind links may contain internal addresses.',
+				'For a non-loopback deployment, set `PUSHGO_PUBLIC_BASE_URL` to the externally reachable HTTPS origin before enabling MCP/OAuth. Omitting it is supported only when the HTTP listener is loopback-bound for local development.',
 			questions: [
 				['Can PushGo run as a self-hosted notification server?', 'Yes. The Gateway is designed for private deployment with persistent storage and configurable transport listeners.'],
-				['Does self-hosting enable MCP?', 'Yes. A private Gateway can expose `/mcp` and OAuth routes when configured with a public HTTPS base URL.'],
-				['Do I still need backups?', 'Yes. Channels, devices, MCP grants, Event state, and Thing state depend on persistent storage.'],
+				['Does self-hosting enable MCP?', 'Yes. A private Gateway can expose `/mcp` and OAuth routes. Non-loopback deployments require a public HTTPS base URL.'],
+				['Do I still need backups?', 'Yes. Back up channels, devices/routes, pending delivery state, sender status, MCP grants/sessions, and Widget/Live Activity subscriptions. Event/Thing projections and history live on subscribed clients.'],
 			],
 			links: ['guides/self-hosting', 'reference/e2ee', 'reference/mcp'],
 		},
@@ -240,10 +240,10 @@ const localizedOverrides = {
 		},
 		'self-hosted-notification-server': {
 			title: '开源自托管通知服务器',
-			description: '将 PushGo Gateway 部署为自托管通知服务器，支持私有通道、持久状态、E2EE 和 MCP/OAuth。',
+			description: '将 PushGo Gateway 部署为自托管通知服务器，支持私有通道、持久投递状态、E2EE 和 MCP/OAuth。',
 			intro: '当你希望通知路径、数据存储、Gateway 鉴权、私有通道策略和 MCP/OAuth 入口都由自己控制时，可以私有部署 PushGo。',
-			fits: ['为个人或团队自动化运行私有通知 Gateway。', '避免通知、事件和实体状态经过公共 Gateway。', '在自己的域名下暴露 HTTPS `/mcp` 端点。', '把备份、反向代理、日志和可观测性纳入生产运维。'],
-			questions: [['PushGo 可以作为自托管通知服务器运行吗？', '可以。Gateway 面向私有部署设计，支持持久存储和可配置通道。'], ['自托管后可以启用 MCP 吗？', '可以。配置外部 HTTPS 根地址后，私有 Gateway 可以开放 `/mcp` 和 OAuth 路由。'], ['还需要备份吗？', '需要。Channel、设备、MCP 授权、Event 和 Thing 状态都依赖持久化存储。']],
+			fits: ['为个人或团队自动化运行私有通知 Gateway。', '避免通知载荷和 Event/Thing patch 经过公共 Gateway。', '在自己的域名下暴露 HTTPS `/mcp` 端点。', '把备份、反向代理、日志和可观测性纳入生产运维。'],
+			questions: [['PushGo 可以作为自托管通知服务器运行吗？', '可以。Gateway 面向私有部署设计，支持持久存储和可配置通道。'], ['自托管后可以启用 MCP 吗？', '可以。私有 Gateway 可以开放 `/mcp` 和 OAuth 路由；非 loopback 部署必须配置外部 HTTPS 根地址。'], ['还需要备份吗？', '需要。应备份 Channel、设备/路由、待投递状态、发送状态、MCP 授权/会话和 Widget/Live Activity 订阅；Event/Thing 投影和历史保存在已订阅客户端。']],
 		},
 	},
 	'zh-tw': {
@@ -269,12 +269,12 @@ Object.assign(localizedOverrides.zh, {
 	},
 	'self-hosted-notification-server': {
 		title: '开源自托管通知服务器',
-		description: '将 PushGo Gateway 部署为自托管通知服务器，支持私有通道、持久状态、E2EE 和 MCP/OAuth。',
+		description: '将 PushGo Gateway 部署为自托管通知服务器，支持私有通道、持久投递状态、E2EE 和 MCP/OAuth。',
 		intro: '当你希望通知路径、数据存储、Gateway 鉴权、私有通道策略和 MCP/OAuth 入口都由自己控制时，可以私有部署 PushGo。',
-		fits: ['为个人或团队自动化运行私有通知 Gateway。', '避免通知、事件和实体状态经过公共 Gateway。', '在自己的域名下暴露 HTTPS `/mcp` 端点。', '把备份、反向代理、日志和可观测性纳入生产运维。'],
+		fits: ['为个人或团队自动化运行私有通知 Gateway。', '避免通知载荷和 Event/Thing patch 经过公共 Gateway。', '在自己的域名下暴露 HTTPS `/mcp` 端点。', '把备份、反向代理、日志和可观测性纳入生产运维。'],
 		rows: [['私有投递路径', 'Gateway', '你的基础设施控制 HTTP API 和通道监听。'], ['敏感字段', 'E2EE', '客户端在本地解密敏感字段。'], ['AI 助手访问', 'MCP OAuth', '用户通过公开 Gateway URL 绑定 Channel。']],
-		example: '启用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 设置为外部可访问的 HTTPS 根地址，否则 issuer 元数据和绑定链接可能包含内部地址。',
-		questions: [['PushGo 可以作为自托管通知服务器运行吗？', '可以。Gateway 面向私有部署设计，支持持久存储和可配置通道。'], ['自托管后可以启用 MCP 吗？', '可以。配置外部 HTTPS 根地址后，私有 Gateway 可以开放 `/mcp` 和 OAuth 路由。'], ['还需要备份吗？', '需要。Channel、设备、MCP 授权、Event 和 Thing 状态都依赖持久化存储。']],
+		example: '非 loopback 部署启用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 设置为外部可访问的 HTTPS 根地址。只有 HTTP listener 绑定 loopback 的本地开发环境可以省略。',
+		questions: [['PushGo 可以作为自托管通知服务器运行吗？', '可以。Gateway 面向私有部署设计，支持持久存储和可配置通道。'], ['自托管后可以启用 MCP 吗？', '可以。私有 Gateway 可以开放 `/mcp` 和 OAuth 路由；非 loopback 部署必须配置外部 HTTPS 根地址。'], ['还需要备份吗？', '需要。应备份 Channel、设备/路由、待投递状态、发送状态、MCP 授权/会话和 Widget/Live Activity 订阅；Event/Thing 投影和历史保存在已订阅客户端。']],
 	},
 	'devops-notifications': {
 		title: 'DevOps 与 CI/CD 通知',
@@ -317,12 +317,12 @@ Object.assign(localizedOverrides['zh-tw'], {
 	},
 	'self-hosted-notification-server': {
 		title: '開源自託管通知伺服器',
-		description: '將 PushGo Gateway 部署為自託管通知伺服器，支援私人通道、持久狀態、E2EE 和 MCP/OAuth。',
+		description: '將 PushGo Gateway 部署為自託管通知伺服器，支援私人通道、持久投遞狀態、E2EE 和 MCP/OAuth。',
 		intro: '當你希望通知路徑、資料儲存、Gateway 驗證、私人通道策略和 MCP/OAuth 入口都由自己控制時，可以私人部署 PushGo。',
-		fits: ['為個人或團隊自動化執行私人通知 Gateway。', '避免通知、事件和實體狀態經過公共 Gateway。', '在自己的網域下暴露 HTTPS `/mcp` 端點。', '把備份、反向代理、日誌和可觀測性納入生產維運。'],
+		fits: ['為個人或團隊自動化執行私人通知 Gateway。', '避免通知載荷和 Event/Thing patch 經過公共 Gateway。', '在自己的網域下暴露 HTTPS `/mcp` 端點。', '把備份、反向代理、日誌和可觀測性納入生產維運。'],
 		rows: [['私人投遞路徑', 'Gateway', '你的基礎設施控制 HTTP API 和通道監聽。'], ['敏感欄位', 'E2EE', '用戶端在本機解密敏感欄位。'], ['AI 助理存取', 'MCP OAuth', '使用者透過公開 Gateway URL 綁定 Channel。']],
-		example: '啟用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 設定為外部可存取的 HTTPS 根位址，否則 issuer 中繼資料和綁定連結可能包含內部位址。',
-		questions: [['PushGo 可以作為自託管通知伺服器執行嗎？', '可以。Gateway 面向私人部署設計，支援持久儲存和可設定通道。'], ['自託管後可以啟用 MCP 嗎？', '可以。設定外部 HTTPS 根位址後，私人 Gateway 可以開放 `/mcp` 和 OAuth 路由。'], ['還需要備份嗎？', '需要。Channel、裝置、MCP 授權、Event 和 Thing 狀態都依賴持久化儲存。']],
+		example: '非 loopback 部署啟用 MCP/OAuth 前，先把 `PUSHGO_PUBLIC_BASE_URL` 設定為外部可存取的 HTTPS 根位址。只有 HTTP listener 綁定 loopback 的本機開發環境可以省略。',
+		questions: [['PushGo 可以作為自託管通知伺服器執行嗎？', '可以。Gateway 面向私人部署設計，支援持久儲存和可設定通道。'], ['自託管後可以啟用 MCP 嗎？', '可以。私人 Gateway 可以開放 `/mcp` 和 OAuth 路由；非 loopback 部署必須設定外部 HTTPS 根位址。'], ['還需要備份嗎？', '需要。應備份 Channel、裝置/路由、待投遞狀態、傳送狀態、MCP 授權/工作階段和 Widget/Live Activity 訂閱；Event/Thing 投影和歷史儲存在已訂閱用戶端。']],
 	},
 	'devops-notifications': {
 		title: 'DevOps 與 CI/CD 通知',
